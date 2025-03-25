@@ -27,7 +27,7 @@ const useCart = () => {
     try {
       setLoading(true);
       await axios.post('/api/cart/add', { productId, quantity });
-      await fetchCartItems(); // Refresh cart after adding
+      await fetchCartItems(); // Refresh cart after addingg
     } catch (err) {
       setError(err.message);
     } finally {
