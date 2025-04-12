@@ -1,16 +1,17 @@
-const mongoose=require('mongoose')
-const subCategories = new mongoose.Schema({
-    subCategoriesName: {
+const mongoose = require('mongoose');
+
+const subCategoriesSchema = new mongoose.Schema({
+    subCategoryName: { 
         type: String,
         required: true
     },
-    SubCategoryImage: {
+    subCategoryImage: {  
         type: String,
         required: false
     },
-    SubCategoryDescription:{
-        type:String,
-        required:true
+    subCategoryDescription: {  
+        type: String,
+        required: true
     },
     createdAt: {
         type: Date,
@@ -19,7 +20,8 @@ const subCategories = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: false
-      }
-})
-const subCatgoryModel =mongoose.model('SubCategory', subCategories)
-module.exports = subCatgoryModel
+    }
+});
+
+const SubCategoryModel = mongoose.model('SubCategory', subCategoriesSchema);
+module.exports = SubCategoryModel;
