@@ -14,10 +14,7 @@ const userSchema = new Schema({
         type: String,
         required: [true, 'Last name is required']
     },
-    DOB: {  
-        type: Date,
-       default: Date.now
-    },
+  
     email: {
         type: String,
         required: [true, 'Email is required'],
@@ -29,32 +26,85 @@ const userSchema = new Schema({
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters']
     },
-    profilePicture: {
-        type: String,
-        default: ""
-    },
-    interests: {
-        type: [String],
-        default: []
-    },
+ 
     isAdmin: {
         type: Boolean,
         default: false
+    },
+    isSeller: {
+        type: Boolean,
+        default: false
+    },
+
+
+    dateOfBirth: {
+        type: Date
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other', 'prefer-not-to-say']
+    },
+    address: {
+        street: String,
+        city: String,
+        state: String,
+        country: String,
+        postalCode: String
+    },
+    profilePicture: {
+        type: String, // URL to the image
+        default: ''
+    },
+    bio: {
+        type: String,
+        maxlength: [500, 'Bio cannot be longer than 500 characters']
+    },
+    occupation: {
+        type: String
+    },
+    socialMedia: {
+        facebook: String,
+        twitter: String,
+        linkedin: String,
+        instagram: String
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    lastLogin: {
+        type: Date
+    },
+    preferences: {
+        newsletter: {
+            type: Boolean,
+            default: true
+        },
+        theme: {
+            type: String,
+            enum: ['light', 'dark', 'system'],
+            default: 'system'
+        },
+        language: {
+            type: String,
+            default: 'en'
+        }
     }
 }, { timestamps: true });
 
-// Improved token generation method
+
 userSchema.methods.genrateAuthToken = function() {
     return jwt.sign(
         {
             _id: this._id,
             email: this.email,
-            isAdmin: this.isAdmin
+            isAdmin: this.isAdmin,
+            isSeller: this.isSeller
         }, 
         process.env.JWT_KEY, 
         { expiresIn: '30d' }
     );
 };
 
-const User = model('User', userSchema);  // Better naming convention
+const User = model('User', userSchema);  
 module.exports = User;

@@ -1,13 +1,14 @@
 
 import './App.css'
-import Login from './login'
+import CategoryUpdateForm from './image'
+import Signup from './login'
 
 function App() {
   
 
   return (
     <>
-    <Login/>
+    <CategoryUpdateForm/>
     </>
   )
 }

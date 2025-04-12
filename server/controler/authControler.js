@@ -3,7 +3,8 @@ const bcrypt = require('bcryptjs');
 
 exports.userRegister = async (req, res) => {
     try {
-        const { firstName, lastName,DOB, email, password, interest } = req.body;
+  
+        const { firstName, lastName, email, password, } = req.body;
         if (!firstName || !lastName || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
@@ -12,16 +13,14 @@ exports.userRegister = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ message: "Email is already registered" });
         }
-
         const hash = await bcrypt.hash(password, 10);
 
         const userReg = new userAuthCollection({
             firstName,
             lastName,
-            DOB,
             email,
-            password: hash,  // Fixed password assignment
-            interest
+            password: hash, 
+            
         });
 
         await userReg.save();
