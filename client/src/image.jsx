@@ -27,12 +27,12 @@ const CategoryUpdateForm = () => {
     setLoading(true);
     try {
       const payload = {
-        categoryName,
-        categoryImage,
-        categoryDescription
+        SubCategoryName: categoryName,
+        SubCategoryImage: categoryImage,
+        SubCategoryDescription: categoryDescription,
       };
 
-      const response = await axios.post('http://localhost:4004/home/categoryupdate', payload);
+      const response = await axios.post('http://localhost:4004/home/subcategorycreate', payload);
 
       setMessage({ severity: 'success', text: response.data.message || 'Category updated successfully' });
 

@@ -14,12 +14,16 @@ const categorySchema=new mongoose.Schema({
     },
     subcategories: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Subcategory'
+        ref: 'SubCategory'
       }],
       isActive: {
         type: Boolean,
         default: true
       },
+    createdAt:{
+        type:Date,
+        default:Date.now
+    }
 })
 const categoryModel=mongoose.model('Category',categorySchema)
 module.exports=categoryModel
