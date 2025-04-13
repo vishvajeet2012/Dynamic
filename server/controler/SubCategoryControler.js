@@ -2,9 +2,10 @@ const SubCategoryModel = require('../models/SubCategoryModel');
 
 exports.createSubCategory = async (req, res) => {
     try {
+        console.log(req.body)
         const { subCategoryName, subCategoryImage, subCategoryDescription } = req.body;
         
-        if (!subCategoryName || !subCategoryDescription) {  // Made image optional as per model
+        if (!subCategoryName || !subCategoryDescription) {  
             return res.status(400).json({ message: "Please provide all required fields" });
         }
 
