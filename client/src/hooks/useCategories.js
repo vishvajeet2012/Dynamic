@@ -112,10 +112,11 @@ export const useUpdateCategory = ()=>{
   const [error,setError]= useState(null)
   const [success,setSuccess]=useState(false)
 
-  const updateCategory= async(id)=>{
+  const updateCategory= async(id,categoryForm)=>{
     setloading(true)
+    console.log(id,categoryForm)
     try{
-          const response = axios.put(`${homeUrl}/updatecategory/${id}`)
+          const response = axios.put(`${homeUrl}/updatecategory/${id}`,categoryForm)
           setSuccess(true)
           return response.data
     }catch{
