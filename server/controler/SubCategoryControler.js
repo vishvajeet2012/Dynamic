@@ -1,29 +1,61 @@
 const SubCategoryModel = require('../models/SubCategoryModel');
+const categoryModel = require('../models/CategoryModel');
 
 exports.createSubCategory = async (req, res) => {
     try {
-        console.log(req.body)
-        const { subCategoryName, subCategoryImage, subCategoryDescription } = req.body;
+        const { subCategoryName, subCategoryImage, subCategoryDescription, category, isActive } = req.body;
         
-        if (!subCategoryName || !subCategoryDescription) {  
-            return res.status(400).json({ message: "Please provide all required fields" });
+        // Validation
+        if (!subCategoryName || !subCategoryDescription || !category) {
+            return res.status(400).json({ 
+                message: "Missing required fields" 
+            });
         }
 
-        const newSubCategory = new SubCategoryModel({
+        // Create subcategory
+        const newSubCategory = await SubCategoryModel.create({
             subCategoryName,
             subCategoryImage,
-            subCategoryDescription
+            subCategoryDescription,
+            isActive: isActive !== undefined ? isActive : true
         });
 
-        await newSubCategory.save();
-        res.status(201).json({ 
-            message: 'Subcategory created successfully',
-            data: newSubCategory 
+        // Update category (without populate first)
+        const updatedCategory = await categoryModel.findByIdAndUpdate(
+            category,
+            { 
+                $push: { subcategories: newSubCategory._id },
+                $set: { isActive: true } 
+            },
+            { new: true }
+        );
+
+        if (!updatedCategory) {
+            await SubCategoryModel.findByIdAndDelete(newSubCategory._id);
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        // Get fully populated category in a separate query
+        const populatedCategory = await categoryModel.findById(updatedCategory._id)
+            .populate({
+                path: 'subcategories',
+                model: 'SubCategory',
+                select: 'subCategoryName subCategoryImage subCategoryDescription isActive'
+            });
+
+        res.status(201).json({
+            success: true,
+            data: {
+                subcategory: newSubCategory,
+                category: populatedCategory
+            }
         });
+
     } catch (error) {
-        console.error('Error creating subcategory:', error);
+        console.error('Error:', error);
         res.status(500).json({ 
-            message: 'Error creating subcategory', 
+            success: false,
+            message: 'Server error',
             error: error.message 
         });
     }
