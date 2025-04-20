@@ -19,7 +19,7 @@ exports.CreateAboutusControler = async (req,res)=>{
 }
 
 
-export const getAboutUs = async (req,res)=>{
+exports.getAboutUs = async (req,res)=>{
     try {
         const aboutus =await aboutusModel.find()
         res.status(200).json(aboutus)
@@ -27,3 +27,4 @@ export const getAboutUs = async (req,res)=>{
         res.status(500).json({message:"Error fetching aboutus",error})          
     }
 }
+

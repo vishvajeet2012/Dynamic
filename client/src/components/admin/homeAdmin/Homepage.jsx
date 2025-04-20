@@ -32,12 +32,11 @@ export default function HomePageControl() {
                 </button>
             </div>
 
-            {/* Announcements Section */}
             <div className="bg-gray-900 p-6 rounded-lg shadow-lg mb-6">
-                <h2 className="text-xl font-semibold mb-3">Announcements</h2>
-                <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full">
-                    Add Announcement
-                </button>
+                <h2 className="text-xl font-semibold mb-3">AboutUs</h2>
+               <Link to='/adminaboutUs' > <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full">
+                     AboutUs 
+                </button></Link>
             </div>
 
         
