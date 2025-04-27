@@ -9,7 +9,15 @@ const aboutusSchema =  new moongoose.Schema({
         required:true
 
     },
+    longDescription:{
+        type:String,
+    },
+
     isHomepage:{
+        type:Boolean,
+        default:false
+    },
+    isAboutusPage:{
         type:Boolean,
         default:false
     },

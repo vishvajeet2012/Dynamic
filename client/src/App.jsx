@@ -5,7 +5,7 @@ import CategoryUpdateForm from './image';
 import Signup from './login';
 import HomePageControl from './components/admin/homeAdmin/Homepage';
 import AdminCategory from './components/admin/homeAdmin/Category/Category';
-import AdminAboutUs from './components/admin/homeAdmin/aboutus';
+import AdminAboutUs from './components/admin/homeAdmin/aboutus/AdminAboutUs';
 
 function App() {
   return (
@@ -17,8 +17,7 @@ function App() {
         <Route path="/category-update" element={<CategoryUpdateForm />} />
         <Route path="/p" element={<HomePageControl />} />
       <Route path='/AdminCategory' element={<AdminCategory/>}/>
-      <Route path='/adminaboutus'   element={<AdminAboutUs/>}/> 
-
+      <Route path='/p/adminaboutus'   element={<AdminAboutUs/>}/> 
 
       </Routes>
     </Router>

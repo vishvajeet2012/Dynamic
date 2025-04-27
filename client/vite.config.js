@@ -12,12 +12,7 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '')
       },
-      // Add specific proxy for your logo upload endpoint
-      '/admin': {
-        target: 'http://localhost:4004',
-        changeOrigin: true,
-        secure: false
-      }
+      
     }
   }
 })

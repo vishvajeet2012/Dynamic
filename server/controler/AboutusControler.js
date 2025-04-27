@@ -2,14 +2,16 @@ const aboutusModel = require("../models/AboustUsModel");
 
 exports.CreateAboutusControler = async (req,res)=>{
     try {
-        const {Titile , Description ,isHomepage } = req.body
-        if(!Titile || !Description ){
+        const {heading , description ,isHomepage , isAboutusPage,longDescription } = req.body
+        if(!heading || !description){
             return res.status(400).json({message:"Please provide all required fields"})
         }
         const newAboutus = new aboutusModel({
-            Titile,
-            Description,
-            isHomepage
+            heading,
+            description,
+            isHomepage,
+            isAboutusPage,
+            longDescription
         });
         await newAboutus.save();
         res.status(201).json({ message: 'Aboutus created successfully' });
