@@ -2,10 +2,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Home from './components/client/home/main';
 import CategoryUpdateForm from './image';
-import Signup from './login';
 import HomePageControl from './components/admin/homeAdmin/Homepage';
 import AdminCategory from './components/admin/homeAdmin/Category/Category';
 import AdminAboutUs from './components/admin/homeAdmin/aboutus/AdminAboutUs';
+import Signup from './components/client/auth/signup';
 
 function App() {
   return (
