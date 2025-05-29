@@ -6,6 +6,7 @@ import { CiHeart } from "react-icons/ci";
 
 import { CiShoppingCart } from "react-icons/ci";
 import Menu from "./Menu";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   return (
@@ -22,7 +23,7 @@ export default function Header() {
           </div>
           <div className="flex flex-row text-xl items-center">
             <RiAccountCircleLine className="text-2xl" />
-            <p className="text-lg">login</p>
+            <Link to="/login" className="text-lg">login</Link>
           </div>
           <div className="flex text-xl flex-row items-center">
             <CiHeart />
