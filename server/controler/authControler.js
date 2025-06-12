@@ -26,7 +26,10 @@ exports.userRegister = async (req, res) => {
         await userReg.save();
         res.status(200).json({ 
             message: "User registered successfully", 
-          
+          data:{
+            firstName,
+            lastName,
+          }
         });
 
     } catch (err) {
