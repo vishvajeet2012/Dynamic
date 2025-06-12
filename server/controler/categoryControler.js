@@ -16,7 +16,7 @@ const newCategory=new categoryModel({
     isActive
     
 });
-await newCategory.save()
+      await newCategory.save()
         res.status(201).json({ message: 'Category created successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error creating category', error });

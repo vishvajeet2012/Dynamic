@@ -35,7 +35,6 @@ exports.createSubCategory = async (req, res) => {
             return res.status(404).json({ message: 'Category not found' });
         }
 
-        // Get fully populated category in a separate query
         const populatedCategory = await categoryModel.findById(updatedCategory._id)
             .populate({
                 path: 'subcategories',

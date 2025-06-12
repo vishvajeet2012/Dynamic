@@ -1,8 +1,8 @@
-const cloudnairy = require("../config/cloudnairy")
+const cloudnairyzz = require("../config/configCloudnairy")
 
 const uploadedToCloudnairy = async (file) => {
   try{
-            const result = await cloudnairy.uploader.upload(file)
+            const result = await cloudnairyzz.uploader.upload(file)
             return {
                 url: result.secure_url,
                 publicId: result.public_id
