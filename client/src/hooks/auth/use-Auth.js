@@ -6,22 +6,23 @@ export function useLogin(){
     const [loading,setloading]= useState(false)
     const [error,setError]= useState(null)
     const [success,setSuccess]= useState(null)
-
+    const [token,setToken]= useState(null)
     const login = async (email,password)=>{
         setloading(true)
         setError(null)
         setSuccess(null)
         try{
             const response = await axios.post(`${baseUrl}/userFound`,email,password)
+            setToken(response?.data?.token)
             setSuccess(true)
-            return response.data
+         return response.data.token;
         }catch(err){
             setError(err)
         }finally{
             setloading(false)
         }
     }
-    return {login,loading,error,success}
+    return {login,loading,error,success,token}
 }
 
 

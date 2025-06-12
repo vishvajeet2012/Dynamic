@@ -1,18 +1,25 @@
+
+import { useAuth } from "../../../../context/authConext";
 import { useLogin } from "../../../hooks/auth/use-Auth";
-import { Link } from "react-router-dom"; // Using React Router's Link instead
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() { 
-    const { login, loading, error, success } = useLogin();
+  const { login: loginApi, loading, error, success } = useLogin();
+  const { login: authLogin } = useAuth();
+  const navigate = useNavigate();
+
   async function handleSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const email = formData.get('email');
     const password = formData.get('password');
     
-   await  login({ email, password });
+    const token = await loginApi({ email, password });
+    if (token) {
+      authLogin(token); // Store token via context
+      navigate('/dashboard'); // Redirect to protected route
+    }
   }
-
-
   return (
     <div className="">
       <div className="w-full flex flex-row h-screen">
