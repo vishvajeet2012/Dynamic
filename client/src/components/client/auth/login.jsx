@@ -17,7 +17,7 @@ export default function Login() {
     const token = await loginApi({ email, password });
     if (token) {
       authLogin(token); // Store token via context
-      navigate('/dashboard'); // Redirect to protected route
+      navigate('/'); // Redirect to protected route
     }
   }
   return (

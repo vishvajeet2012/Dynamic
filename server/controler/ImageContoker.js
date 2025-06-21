@@ -1,7 +1,7 @@
 const Image = require("../models/imageModle");
-const { uploadToCloudinary } = require("../helper/cloudnairyHelper");
 const fs = require("fs");
 const cloudinary = require("../config/configCloudnairy");
+const uploadedToCloudnairy = require("../helper/cloudnairyHelper");
 
 const uploadImageController = async (req, res) => {
   try {
@@ -15,7 +15,7 @@ const uploadImageController = async (req, res) => {
     }
 
     //upload to cloudinary
-    const { url, publicId } = await uploadToCloudinary(req.file.path);
+    const { url, publicId } = await uploadedToCloudnairy(req.file.path);
 
     //store the image url and public id along with the uploaded user id in database
     const newlyUploadedImage = new Image({

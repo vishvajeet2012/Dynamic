@@ -67,9 +67,14 @@ export const useGetAllCategories = () => {
     setLoading(true);
     setError(null);
     setSuccess(false);
-
     try {
-      const response = await axios.get(`${homeUrl}/getallcategory`)
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${homeUrl}/getallcategory`, {
+  headers: {
+    Authorization:  `Bearer ${token}`,
+     'Content-Type': 'application/json'
+  }
+});
        setCategories(response.data);
       setSuccess(true);
       return response.data;

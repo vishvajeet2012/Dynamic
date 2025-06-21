@@ -24,7 +24,7 @@ router.get('/getaboutus', getAboutUs)
 router.get('/getallcategory',auth,GetAllCategories)
 router.post('/subcategorycreate',createSubCategory)
 
-router.post("/uploadImage" , uploadImageonCloud.uploadImageController)
+router.post('/uploadImage' ,auth,uploadImageMiddleware.single('image'), uploadImageonCloud.uploadImageController)
 router.get("/get", auth, uploadImageonCloud.fetchImagesController);
 
 //delete image route
