@@ -1,14 +1,14 @@
+require("dotenv").config();
 
-const cloudnairy = require("cloudinary").v2;
-  cloudnairy.config({
-  cloud_name: "dishdojeh",
-  api_key: "781311536959573",
-  api_secret: "jjdqa4FjQ2TaTxSaQzSEiUPzhHA",
-});  
 
 const uploadedToCloudnairy = async (file) => {
   try{
-     
+     const cloudnairy = require("cloudinary").v2;
+  cloudnairy.config({
+  cloud_name: process.env.CLOUND_NAME,
+   api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_SECRET,
+}); 
     const result = await cloudnairy?.uploader?.upload(file)
             return {
                 url: result.secure_url,

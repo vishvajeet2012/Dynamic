@@ -7,10 +7,11 @@ const logoController = require("../../controler/HomePage/HomePage"); // Note: co
 const {  createSubCategory } = require('../../controler/SubCategoryControler');
 const auth = require('../../middleware/authmiddleware');
 const uploadImageMiddleware = require('../../middleware/uploadImageMiddleware');
+const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBannersByType } = require('../../controler/BannerControler');
 
-router.post("/homelogo", logoController.uploadLogo);
-router.get("/admin/homepage/mainlogo", logoController.getLogo); 
-router.delete("/admin/homepage/mainlogo", logoController.deleteLogo); 
+router.post("/homelogo", logoController.createLogo);
+router.get("/gethomelogo", logoController.getLogo); 
+router.delete("/deltehomelogo/", logoController.deleteLogo); 
 router.post('/categorycreate',CreateCategory)
 
 router.get('/categoryupdatebyid/:id', GetCategoryById);
@@ -28,6 +29,15 @@ router.post('/uploadImage' ,auth,uploadImageMiddleware.single('image'), uploadIm
 router.get("/get", auth, uploadImageonCloud.fetchImagesController);
 
 //delete image route
-router.delete("/:id", auth, uploadImageonCloud.deleteImageController);
+router.delete("/deleteImage/:id", auth, uploadImageonCloud.deleteImageController);
+
+
+router.post('/bannercreate', auth, createBanner);
+router.put('/updatebanner/:id', auth,updateBanner);
+router.delete('/deletebaner/:id', auth,deleteBanner);
+router.post('/getBannersByType' ,auth,getBannersByType)
+router.patch('/:id/toggle-active',auth, toggleBannerActive);
+
+
 
 module.exports = router;

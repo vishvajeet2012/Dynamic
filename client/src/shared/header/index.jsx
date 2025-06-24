@@ -1,5 +1,4 @@
 import react from "react";
-import logo from "../../../public/images/s.jpg";
 import SerachBar from "./search";
 import { RiAccountCircleLine } from "react-icons/ri";
 import { CiHeart } from "react-icons/ci";
@@ -7,16 +6,20 @@ import { CiHeart } from "react-icons/ci";
 import { CiShoppingCart } from "react-icons/ci";
 import Menu from "./Menu";
 import { Link } from "react-router-dom";
+import { getLogoheader } from "../../hooks/client/homePageHooks/use-headerLogo";
 
 export default function Header() {
+const {getLogo,loading ,error,success} =   getLogoheader()
+   
+
   return (
     <>
       <div className=" w-full bg-[#e11b23] text-white font-bold h-16">
       <div>
-        <div className="flex py-5 justify-evenly items-center ">
-          <div className="w-12  flex flex-row item-center">
-            {/* <img className="h-16 w-12 aspect-square object-cover" src={logo} alt="Logo" /> */}
-            <h1 className="text-2xl font-bold">Logo</h1>
+        <div className="flex justify-evenly items-center ">
+          <div className="w-28  flex flex-row item-center">
+           <img className="h-16 w-28 aspect-square object-cover" src={success?.logo?.url} alt="Logo" /> 
+          
           </div>
           <div className="bg-black flex item-center">
             <SerachBar />

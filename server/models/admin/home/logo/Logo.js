@@ -1,13 +1,8 @@
 const mongoose = require('mongoose');
 
 const logoSchema = new mongoose.Schema({
-  settingType: {
-    type: String,
-    default: 'mainLogo',
-    enum: ['mainLogo', 'footerLogo', 'favicon'],
-    required: true
-  },
-  logoUrl: {
+
+  url: {
     type: String,
     required: true
   },
@@ -15,10 +10,11 @@ const logoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  dimensions: {
-    width: Number,
-    height: Number
+  originalId: {
+    type: String,
+    required: true
   },
+  
   format: String,
   uploadedBy: {
     type: mongoose.Schema.Types.ObjectId,

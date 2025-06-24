@@ -21,7 +21,8 @@ const uploadImageController = async (req, res) => {
     const newlyUploadedImage = new Image({
       url,
       publicId,
-      uploadedBy: req.userInfo.userId,
+      uploadedBy: req.user,///use objkect store here to know who updaloed the iamge
+    
     });
 
     await newlyUploadedImage.save();
@@ -79,7 +80,8 @@ const fetchImagesController = async (req, res) => {
 const deleteImageController = async (req, res) => {
   try {
     const getCurrentIdOfImageToBeDeleted = req.params.id;
-    const userId = req.userInfo.userId;
+    console.log(req.params.id)
+    const userId =  req.user;
 
     const image = await Image.findById(getCurrentIdOfImageToBeDeleted);
 

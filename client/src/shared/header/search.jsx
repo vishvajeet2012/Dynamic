@@ -4,8 +4,8 @@ export default function SearchBar() {
             <div className="">
                 <input 
                     type="text "
-                    placeholder="search bar "
-                    className= " w-96   pl-1 outline-none bg-white text-black border-2 border-black" 
+                    placeholder=" "
+                    className= "w-52 lg:w-96  rounded-sm py-1  outline-none bg-white text-black" 
                 />
             </div>
         </>

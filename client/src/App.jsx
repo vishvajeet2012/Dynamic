@@ -8,7 +8,8 @@ import AdminAboutUs from './components/admin/homeAdmin/aboutus/AdminAboutUs';
 import Signup from './components/client/auth/signup';
 import Login from './components/client/auth/login';
 import ProtectedRoute from './components/ProtectedRoutes';
-
+import CreateHomeLogo from './components/admin/homeAdmin/Logo/CreateHomeLogo';
+import CreateBanner from './components/admin/homeAdmin/banners/CreateBanner';
 function App() {
   return (
      <Routes>
@@ -21,6 +22,8 @@ function App() {
         <Route path="/p" element={<HomePageControl />} />
         <Route path='/AdminCategory' element={<AdminCategory />} />
         <Route path='/p/adminaboutus' element={<AdminAboutUs />} />
+        <Route path="/homelogo" element={<CreateHomeLogo />} />
+        <Route path = "/bannerMangement" element={<CreateBanner/>} />
         {/* Add other protected routes here */}
       </Route>
     </Routes>

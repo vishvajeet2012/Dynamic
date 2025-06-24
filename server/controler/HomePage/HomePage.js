@@ -1,120 +1,94 @@
-const cloudinary = require('cloudinary').v2;
-const { settingsCollection } = require('../../models/admin/home/logo/Logo');
+const logoModel = require("../../models/admin/home/logo/Logo");
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Create or Update Logo (replaces any existing logo)
+exports.createLogo = async (req, res) => {
+  try {
+    const { url, publicId , uploadedBy ,_id} = req.body;
+   
+    // Validate required fields
+    if (!url || !publicId || !uploadedBy) {
+      return res.status(400).json({ 
+        success: false,
+        message: "All fields (logoUrl, publicId, uploadedBy) are required" 
+      });
+    }
 
-module.exports = {
-  /**
-   * Upload logo to Cloudinary
-   */
-  uploadLogo: async (req, res) => {
-    try {
+    // Remove all existing logos (only one logo allowed)
+    await logoModel.deleteMany({});
     
-   console.log(req.body)
-      if (!req.body.logo || !req.body.logo.startsWith('data:image/')) {
-        return res.status(400).json({ success: false, message: "paga no iamge data" });
-      }
+    // Create new logo
+    const newLogo = new logoModel({ url, publicId, uploadedBy,originalId:_id });
+    await newLogo.save();
+    
+    res.status(201).json({ 
+      success: true,
+      message: "Logo created successfully", 
+      logo: newLogo 
+    });
+    
+  } catch (error) {
+    console.error("Error creating logo:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Error creating logo", 
+      error: error.message
+    });
+  }
+};
 
-      const uploadResult = await cloudinary.uploader.upload(req.body, {
-        folder: 'company/logos',
-        public_id: `logo_${Date.now()}`,
-        transformation: [
-          { width: 300, height: 300, crop: 'fit', quality: 'auto' },
-          { format: 'png' }
-        ]
-      });
-
-      await settingsCollection.findOneAndUpdate(
-        { settingType: 'siteConfig' },
-        { 
-          $set: { 
-            logo: uploadResult.secure_url,
-            logoPublicId: uploadResult.public_id 
-          } 
-        },
-        { upsert: true }
-      );
-
-      res.status(200).json({
-        success: true,
-        message: "Logo uploaded successfully",
-        logoUrl: uploadResult.secure_url
-      });
-    } catch (error) {
-      console.error("Logo upload error:", error);
-      res.status(500).json({
+// Get Current Logo
+exports.getLogo = async (req, res) => {
+  try {
+    // Since we only maintain one logo, we can use findOne
+    const logo = await logoModel.findOne({});
+    
+    if (!logo) {
+      return res.status(404).json({
         success: false,
-        message: "Failed to upload logo",
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        message: "No logo found"
       });
     }
-  },
+    
+    res.status(200).json({
+      success: true,
+      logo
+    });
+    
+  } catch (error) {
+    console.error("Error fetching logo:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching logo",
+      error: error.message
+    });
+  }
+};
 
-  /**
-   * Get current logo
-   */
-  getLogo: async (req, res) => {  // Changed from getCurrentLogo to getLogo
-    try {
-      const settings = await settingsCollection.findOne({ settingType: 'siteConfig' });
-      
-      if (!settings?.logo) {
-        return res.status(404).json({ 
-          success: false, 
-          message: "No logo configured" 
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        logoUrl: settings.logo,
-        lastUpdated: settings.updatedAt
-      });
-    } catch (error) {
-      console.error("Get logo error:", error);
-      res.status(500).json({
+// Delete Logo
+exports.deleteLogo = async (req, res) => {
+  try {
+    // Delete all logos (though there should only be one)
+    const result = await logoModel.deleteMany({});
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
         success: false,
-        message: "Failed to fetch logo",
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        message: "No logo found to delete"
       });
     }
-  },
-
-  /**
-   * Delete logo
-   */
-  deleteLogo: async (req, res) => {
-    try {
-      const settings = await settingsCollection.findOne({ settingType: 'siteConfig' });
-      
-      if (!settings?.logoPublicId) {
-        return res.status(404).json({ 
-          success: false, 
-          message: "No logo to delete" 
-        });
-      }
-
-      await cloudinary.uploader.destroy(settings.logoPublicId);
-      await settingsCollection.updateOne(
-        { settingType: 'siteConfig' },
-        { $unset: { logo: "", logoPublicId: "" } }
-      );
-
-      res.status(200).json({ 
-        success: true,
-        message: "Logo deleted successfully" 
-      });
-    } catch (error) {
-      console.error("Delete logo error:", error);
-      res.status(500).json({
-        success: false,
-        message: "Failed to delete logo",
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
-    }
+    
+    res.status(200).json({
+      success: true,
+      message: "Logo deleted successfully",
+      deletedCount: result.deletedCount
+    });
+    
+  } catch (error) {
+    console.error("Error deleting logo:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting logo",
+      error: error.message
+    });
   }
 };
