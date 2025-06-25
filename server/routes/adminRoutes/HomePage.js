@@ -32,10 +32,10 @@ router.get("/get", auth, uploadImageonCloud.fetchImagesController);
 router.delete("/deleteImage/:id", auth, uploadImageonCloud.deleteImageController);
 
 
-router.post('/bannercreate', auth, createBanner);
+router.post('/bannercreates', auth, createBanner);
 router.put('/updatebanner/:id', auth,updateBanner);
 router.delete('/deletebaner/:id', auth,deleteBanner);
-router.post('/getBannersByType' ,auth,getBannersByType)
+router.post('/getbannersbytype' ,auth,getBannersByType)
 router.patch('/:id/toggle-active',auth, toggleBannerActive);
 
 

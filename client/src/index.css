@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+
+.bg-primaryReds {
+    background-color: #e11b23; }

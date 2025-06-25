@@ -10,14 +10,20 @@ import Login from './components/client/auth/login';
 import ProtectedRoute from './components/ProtectedRoutes';
 import CreateHomeLogo from './components/admin/homeAdmin/Logo/CreateHomeLogo';
 import CreateBanner from './components/admin/homeAdmin/banners/CreateBanner';
+import Header from './shared/header';
+import UserProfile from './components/client/userProfile/Index';
 function App() {
   return (
+    <>
+      <Header/>
      <Routes>
+
       <Route path='/login' element={<Login />} />
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
 
       <Route element={<ProtectedRoute />}>
+      <Route path="/profile" element={<UserProfile />} />
         <Route path="/category-update" element={<CategoryUpdateForm />} />
         <Route path="/p" element={<HomePageControl />} />
         <Route path='/AdminCategory' element={<AdminCategory />} />
@@ -27,6 +33,7 @@ function App() {
         {/* Add other protected routes here */}
       </Route>
     </Routes>
+    </>
   );
 }
 export default App;

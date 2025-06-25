@@ -112,7 +112,8 @@ exports.getBannersByType = async (req, res) => {
 exports.createBanner = async (req, res) => {
     try {
         const { url, publicId, bannerType, isActive, startDate, endDate, redirectUrl, uploadedBy } = req.body;
-        
+        console.log(url,publicId,uploadedBy)
+        console.log(req.body)
         // Validate required fields
         if (!url || !publicId || !uploadedBy) {
             return res.status(400).json({

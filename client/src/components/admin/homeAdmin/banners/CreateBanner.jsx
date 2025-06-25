@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useBannerCreate, usegetBannersByType } from "../../../../hooks/client/homePageHooks/use-banner";
+import { useBannerCreate, usegetBannersByType, useUplaodImage } from "../../../../hooks/client/homePageHooks/use-banner";
 
 export default function CreateBanner() {
   // Image upload state
@@ -15,8 +15,11 @@ export default function CreateBanner() {
     endDate: ''
   });
 
+  // Banner data state that will be sent to createBanner
+  const [bannerData, setBannerData] = useState(null);
+
   // API hooks
-  const { uploadImage, loading: uploadLoading, error: uploadError } = usegetBannersByType();
+  const { uploadImage, loading: uploadLoading, error: uploadError ,banners } = useUplaodImage();
   const { createBanner, loading: createLoading, error: createError, success: createSuccess } = useBannerCreate();
 
   // Handle file selection
@@ -60,16 +63,23 @@ export default function CreateBanner() {
       const uploadResponse = await uploadImage(uploadFormData);
 
       if (uploadResponse && uploadResponse.url && uploadResponse.publicId) {
-        // Then create the banner with the uploaded image data
-        await createBanner({
+        // Prepare the banner data
+        const bannerPayload = {
           url: uploadResponse.url,
           publicId: uploadResponse.publicId,
           bannerType: formData.bannerType,
           isActive: formData.isActive,
           redirectUrl: formData.redirectUrl || undefined,
           startDate: formData.startDate || undefined,
-          endDate: formData.endDate || undefined
-        });
+          endDate: formData.endDate || undefined,
+          uploadedBy: uploadResponse.uploadedBy
+        };
+
+        // Set the banner data state
+        setBannerData(bannerPayload);
+
+        // Then create the banner with the prepared data
+        await createBanner(bannerPayload);
 
         // Reset form on success
         if (createSuccess) {
@@ -82,6 +92,7 @@ export default function CreateBanner() {
           });
           setPreviewImage(null);
           setSelectedFile(null);
+          setBannerData(null);
         }
       }
     } catch (error) {

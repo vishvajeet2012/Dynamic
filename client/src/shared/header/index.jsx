@@ -7,11 +7,17 @@ import { CiShoppingCart } from "react-icons/ci";
 import Menu from "./Menu";
 import { Link } from "react-router-dom";
 import { getLogoheader } from "../../hooks/client/homePageHooks/use-headerLogo";
+import { useGetSingleUser } from "../../hooks/auth/use-Auth";
+import { use } from "react";
+import { useEffect } from "react";
 
 export default function Header() {
 const {getLogo,loading ,error,success} =   getLogoheader()
-   
-
+     const  {getSingleUser,laoding:userLoading ,error:userError,user}  =  useGetSingleUser()
+    useEffect(() => {
+      getSingleUser()
+    },[])
+    console.log(user)
   return (
     <>
       <div className=" w-full bg-[#e11b23] text-white font-bold h-16">
@@ -26,7 +32,14 @@ const {getLogo,loading ,error,success} =   getLogoheader()
           </div>
           <div className="flex flex-row text-xl items-center">
             <RiAccountCircleLine className="text-2xl" />
-            <Link to="/login" className="text-lg">login</Link>
+          {loading ? (
+  <div>Loading...</div>
+) : user?.firstName ? (
+  <Link to="/profile" className="text-lg">{user.firstName}</Link>
+) : (
+  <Link to="/login" className="text-lg">Login</Link>
+)}
+
           </div>
           <div className="flex text-xl flex-row items-center">
             <CiHeart />

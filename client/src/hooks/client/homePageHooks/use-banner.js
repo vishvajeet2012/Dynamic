@@ -7,15 +7,26 @@ export const useBannerCreate = ()=>{
     const [success,setSuccess]= useState(null)
 
 
-    const createBanner= async (formData)=>{
+    const createBanner= async (bannerPayload)=>{
         setloading(true)
         setError(null)
         setSuccess(null)
+       const { 
+  bannerType, 
+  endDate, 
+  isActive, 
+  publicId, 
+  redirectUrl, 
+  startDate, 
+  uploadedBy, 
+  url 
+} = bannerPayload;
+        console.log(bannerPayload,"supeerkbh")
         try{
             const token   = localStorage.getItem('token')
-            const response = await axios.post(`${homeUrl}/bannercreate`,formData,{
+            const response = await axios.post(`${homeUrl}/bannercreates`,{url,uploadedBy,startDate,endDate,isActive,publicId,redirectUrl,bannerType},{
                 headers:{
-                    'Content-Type': 'multipart/form-data',
+                 
                     Authorization: `Bearer ${token}`
                 }
             })
@@ -90,7 +101,7 @@ export const useUplaodImage = ()=>{
                 })
                 setBanners(response.data?.image)
                 setSuccess(true)
-                
+                return response.data?.image
             }catch(err){
                 setError(err)
             }finally{
@@ -102,4 +113,36 @@ export const useUplaodImage = ()=>{
             }
         }
         return {uploadImage,loading ,error,success,banners}
+}
+
+
+
+export const useGetBannnerData =(bannerType)=>{
+
+
+        const [loading,setLoading ] = useState(false)
+        const [error,setError] = useState(null)
+        const [success,setSuccess] = useState(null)
+
+        const getAllBannerData = async()=>{
+            try{
+                const token = localStorage.getItem('token')
+                const response = await axios.post(`${homeUrl}/getbannersbytype`,{bannerType},{
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                setSuccess(true)
+                return response.data?.data
+            }catch(err){
+                setError(err)
+            }finally{
+            setLoading(false)
+            if(error){
+                setError(null)
+            }
+            
+            }
+        }
+return {getAllBannerData,loading ,error,success}
 }

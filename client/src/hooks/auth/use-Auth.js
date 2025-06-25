@@ -2,6 +2,34 @@ import { useState } from "react"
 import { baseUrl } from "../../lib/baseUrl"
 import axios from "axios"
 import Signup from "../../components/client/auth/signup"
+
+
+export const useGetSingleUser= ()=>{
+const [laoding,setLoading]= useState(false)
+const [error , setError]= useState(null)
+const [user,setUser]= useState({})
+
+            const getSingleUser = async()=>{
+                setLoading(true)
+                setError(null)
+                try{
+                    const token = localStorage.getItem('token');
+                    const response = await axios.get(`${baseUrl}/getsingleuser`,{
+                        headers: {
+                            Authorization:  `Bearer ${token}`,
+                             'Content-Type': 'application/json'
+                        }
+                    })
+                    setUser(response.data)
+                }catch(err){
+                    setError(err)
+                }finally{
+                    setLoading(false)
+                }
+            }
+            return {getSingleUser,laoding ,error,user}
+}
+
 export function useLogin(){
     const [loading,setloading]= useState(false)
     const [error,setError]= useState(null)
@@ -48,3 +76,7 @@ export function useSignup(){
     }
     return {Signup,loading,error,success}
 }
+
+
+
+
