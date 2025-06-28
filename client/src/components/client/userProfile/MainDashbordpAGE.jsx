@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   FiHome, // Replaced FiDashboard with FiHome
   FiUser, 
@@ -17,22 +17,29 @@ import {
   FiAlertCircle
 } from 'react-icons/fi';
 import { BsGraphUp, BsCheck2All } from 'react-icons/bs';
+import { useGetSingleUser } from "../../../hooks/auth/use-Auth.js";
+import { useUserProfileUpdate } from '../../../hooks/client/homePageHooks/use-user.js';
+import { set, useForm } from 'react-hook-form';
+import { useUplaodImage } from '../../../hooks/client/homePageHooks/use-banner.js';
 
 export default function MainDashboardPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [user, setUser] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-    role: 'Administrator'
-  });
+  const {userProfileUpdate,loading,error,success}=useUserProfileUpdate()
+   const  {getSingleUser,laoding:userLoading ,error:userError,user}  =  useGetSingleUser()
+  
+    const { uploadImage, loading: uploadLoading, error: uploadError ,banners } = useUplaodImage()
 
+
+
+    useEffect(() => {
+        getSingleUser()
+      },[])
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return <DashboardContent />;
       case 'profile':
-        return <ProfileContent user={user} />;
+        return <ProfileContent userLoading={userLoading} user={user} />;
       case 'settings':
         return <SettingsContent />;
       case 'messages':
@@ -52,15 +59,13 @@ export default function MainDashboardPage() {
           {/* User Profile Section */}
           <div className="p-6 flex flex-col items-center border-b border-gray-200">
             <img 
-              src={user.avatar} 
+              src={user.profilePicture} 
               alt="User Profile" 
               className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-primary-100"
             />
-            <h3 className="font-semibold text-lg text-gray-800">{user.name}</h3>
+            <h3 className="font-semibold text-lg text-gray-800">{user.firstName}</h3>
             <p className="text-gray-500 text-sm">{user.email}</p>
-            <span className="mt-2 px-3 py-1 bg-primary-50 text-primary-600 text-xs font-medium rounded-full">
-              {user.role}
-            </span>
+         
           </div>
 
           {/* Navigation Tabs */}
@@ -153,7 +158,7 @@ export default function MainDashboardPage() {
             </button>
             <div className="flex items-center">
               <img 
-                src={user.avatar} 
+                src={user.profilePicture} 
                 alt="User Profile" 
                 className="w-8 h-8 rounded-full object-cover mr-2"
               />
@@ -243,63 +248,346 @@ function DashboardContent() {
   );
 }
 
-function ProfileContent({ user }) {
+
+function ProfileContent({ user ,userLoading }) {
   const [showPassword, setShowPassword] = useState(false);
+  const { userProfileUpdate, loading, error, success } = useUserProfileUpdate();
+  const { uploadImage, loading: uploadLoading } = useUplaodImage();
+  const [avatarPreview, setAvatarPreview] = useState(user.avatar);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
+const [publicIds, setPublicId] = useState(null);
+const [imagesUrls, setImageUrls] = useState(null);
+  const { 
+    register, 
+    handleSubmit, 
+    formState: { errors }, 
+    setValue 
+  } = useForm({
+    defaultValues: {
+      firstName: user.firstName,
+      email: user.email,
+      mobileNumber: user.mobileNumber || '',
+      profilePicture: user.profilePicture || '',
+      city: user.city || '',
+      pincode: user.pincode || '',
+      address: user.address || '',
+      state: user.state || ''
+    }
+  });
+
+  const handleImageChange = async (e) => {
+    const file = e.target?.files?.[0];
+   const formData = new FormData();
+  formData.append("image", file); // "image" is the key expected by the server
+
+  const v = await uploadImage(formData);
+
+   
+        if (v.url) {
+        var  imageUrls   = v.url;
+
+        var publicId = v.publicId;
+        setPublicId(publicId);
+        setImageUrls(imageUrls);
+          setValue('profilePicture', imageUrls);
+          setValue('publicId', publicId);
+        } else {
+          throw new Error('Image upload failed');
+        }
+    setSelectedImage(file);
+    if (!file) return;
+
+    // Validate image
+    if (!file.type.match('image.*')) {
+      setSubmissionError('Please select an image file (JPEG, PNG, etc.)');
+      return;
+    }
+    
+    if (file.size > 2 * 1024 * 1024) { // 2MB
+      setSubmissionError('Image size should be less than 2MB');
+      return;
+    }
+
+    setPreviewLoading(true);
+    setSubmissionError(null);
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result);
+      setPreviewLoading(false);
+    };
+    reader.onerror = () => {
+      setPreviewLoading(false);
+      setSubmissionError('Error loading image');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      setSubmissionError(null);
+      let imageUrl = data.avatar; // Use existing avatar by default
+          
+      // If a new image was selected, upload it first
+      // if (selectedImage) {
+      //   const uploadResponse = await uploadImage(selectedImage);
+      //   if (uploadResponse.url) {
+      //     imageUrl = uploadResponse.url;
+      //     setValue('profilePicture', imageUrl);
+      //   } else {
+      //     throw new Error('Image upload failed');
+      //   }
+      // }
+
+      // Prepare the data to send
+      const formData = {
+        ...data,
+        profilePicture: imagesUrls,
+        orignalId:publicIds
+      };
+
+      // Call update hook
+      await userProfileUpdate(formData);
+      
+      // Reset selected image after successful upload
+      setSelectedImage(null);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setSubmissionError(error.message || 'Failed to update profile. Please try again.');
+    }
+  };
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800">Profile Information</h2>
       
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="flex flex-col items-center">
-            <img 
-              src={user.avatar} 
-              alt="Profile" 
-              className="w-32 h-32 rounded-full object-cover border-4 border-primary-100 mb-4"
-            />
-            <button className="text-sm font-medium text-primary-600 hover:text-primary-700">
-              Change Photo
-            </button>
-          </div>
-          
-          <div className="flex-1">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <InfoField label="Full Name" value={user.name} icon={<FiUser className="w-5 h-5 text-gray-400" />} />
-              <InfoField label="Email" value={user.email} icon={<FiMail className="w-5 h-5 text-gray-400" />} />
-              <InfoField label="Join Date" value="January 15, 2023" icon={<FiCalendar className="w-5 h-5 text-gray-400" />} />
-              <InfoField label="Last Login" value="2 hours ago" icon={<FiClock className="w-5 h-5 text-gray-400" />} />
-            </div>
-            
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Security</h3>
-            <div className="relative">
-              <InfoField 
-                label="Password" 
-                value={showPassword ? "mysecretpassword" : "••••••••"} 
-                icon={<FiLock className="w-5 h-5 text-gray-400" />}
-              />
-              <button 
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-0 bottom-0 text-gray-500 hover:text-gray-700"
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="bg-white p-6 rounded-xl shadow-sm">
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className="flex flex-col items-center">
+              {previewLoading ||userLoading ? (
+                <div className="w-32 h-32 rounded-full bg-gray-200 animate-pulse mb-4" />
+              ) : (
+                <img 
+                  src={avatarPreview || user.profilePicture} 
+                  alt="Profile" 
+                  className="w-32 h-32 rounded-full object-cover border-4 border-primary-100 mb-4"
+                />
+              )}
+              
+              
+              <label 
+                htmlFor="avatarUpload" 
+                className="cursor-pointer text-sm font-medium text-primary-600 hover:text-primary-700"
               >
-                {showPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
-              </button>
+                {uploadLoading ? 'Uploading...' : 'Upload New Avatar'}
+              </label>
+              
+              <input 
+                id="avatarUpload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={uploadLoading || previewLoading}
+                className="hidden"
+              />
+              <label 
+                htmlFor="avatarUpload" 
+                className="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 text-sm"
+              >
+                Choose File
+              </label>
+              {selectedImage && (
+                <p className="text-xs text-gray-500 mt-1">{selectedImage.name}</p>
+              )}
+              <input type="hidden" {...register("avatar")} />
             </div>
             
-            <div className="flex justify-end mt-6 space-x-3">
-              <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50">
-                Cancel
-              </button>
-              <button className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700">
-                Save Changes
-              </button>
+            <div className="flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-gray-500 text-sm font-medium mb-1">Full Name</label>
+                  <div className="flex items-center">
+                    <FiUser className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      {...register("firstName", { required: "Full name is required" })}
+                      className={`w-full text-gray-900 bg-gray-100 px-3 py-2 rounded ${errors.firstName ? 'border border-red-500' : ''}`}
+                      type="text"
+                    />
+                  </div>
+                  {errors.firstName && (
+                    <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-500 text-sm font-medium mb-1">Email</label>
+                  <div className="flex items-center">
+                    <FiMail className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      {...register("email", { 
+                        required: "Email is required",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: "Invalid email address"
+                        }
+                      })}
+                      className={`w-full text-gray-900 bg-gray-100 px-3 py-2 rounded ${errors.email ? 'border border-red-500' : ''}`}
+                      type="email"
+                      disabled // Typically emails shouldn't be changed
+                    />
+                  </div>
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-500 text-sm font-medium mb-1">Join Date</label>
+                  <div className="flex items-center">
+                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      value={new Date(user.createdAt).toLocaleDateString('en-US',{day:'2-digit',month:'long',year:'numeric'})}
+                      className="w-full text-gray-900 outline-none bg-gray-100 px-3 py-2 rounded"
+                      type="text"
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-gray-500 text-sm font-medium mb-1">Mobile Number</label>
+                  <div className="flex items-center">
+                    <FiClock className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      {...register("mobileNumber", {
+                        pattern: {
+                          value: /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,3}[-\s.]?[0-9]{3,6}$/im,
+                          message: "Invalid phone number"
+                        }
+                      })}
+                      className={`w-full text-gray-900 bg-gray-100 px-3 py-2 rounded ${errors.mobileNumber ? 'border border-red-500' : ''}`}
+                      type="tel"
+                    />
+                  </div>
+                  {errors.mobileNumber && (
+                    <p className="text-red-500 text-xs mt-1">{errors.mobileNumber.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-gray-500 text-sm font-medium mb-1">Address</label>
+                  <div className="flex items-center">
+                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      {...register("address")}
+                      className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
+                      type="text"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-gray-500 text-sm font-medium mb-1">City</label>
+                  <div className="flex items-center">
+                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      {...register("city")}
+                      className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
+                      type="text"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-gray-500 text-sm font-medium mb-1">State</label>
+                  <div className="flex items-center">
+                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      {...register("state")}
+                      className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
+                      type="text"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-gray-500 text-sm font-medium mb-1">Pincode</label>
+                  <div className="flex items-center">
+                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
+                    <input
+                      {...register("pincode")}
+                      className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
+                      type="text"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Security</h3>
+              <div className="relative">
+                <label className="block text-gray-500 text-sm font-medium mb-1">Password</label>
+                <div className="flex items-center">
+                  <FiLock className="w-5 h-5 text-gray-400 mr-2" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password (click Change Password to update)"
+                    className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
+                    readOnly
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
+                  </button>
+                </div>
+                <button 
+                  type="button"
+                  className="text-sm text-primary-600 hover:text-primary-700 mt-2"
+                  onClick={() => setActiveTab('settings')}
+                >
+                  Change Password
+                </button>
+              </div>
+              
+              <div className="flex justify-end mt-6 space-x-3">
+                <button 
+                  type="button"
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="px-4 py-2 bg-primaryReds text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50"
+                  disabled={loading || uploadLoading || previewLoading}
+                >
+                  {(loading || uploadLoading) ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+              
+              {error && (
+                <div className="mt-4 text-red-500 text-sm">{error}</div>
+              )}
+              {submissionError && (
+                <div className="mt-4 text-red-500 text-sm">{submissionError}</div>
+              )}
+              {success && (
+                <div className="mt-4 text-green-500 text-sm">Profile updated successfully!</div>
+              )}
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
+
 
 function SettingsContent() {
   const settings = [
@@ -462,7 +750,12 @@ function InfoField({ label, value, icon }) {
       <label className="block text-gray-500 text-sm font-medium mb-1">{label}</label>
       <div className="flex items-center">
         {icon && <span className="mr-2">{icon}</span>}
-        <p className="text-gray-900">{value}</p>
+        <input
+          className="text-gray-900 bg-gray-100 px-2 py-1 rounded"
+          type="text"
+          value={value}
+          readOnly
+        />
       </div>
     </div>
   );

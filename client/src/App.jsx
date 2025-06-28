@@ -12,6 +12,7 @@ import CreateHomeLogo from './components/admin/homeAdmin/Logo/CreateHomeLogo';
 import CreateBanner from './components/admin/homeAdmin/banners/CreateBanner';
 import Header from './shared/header';
 import UserProfile from './components/client/userProfile/Index';
+import AdminProduct from './components/admin/Admin-Product';
 function App() {
   return (
     <>
@@ -30,6 +31,7 @@ function App() {
         <Route path='/p/adminaboutus' element={<AdminAboutUs />} />
         <Route path="/homelogo" element={<CreateHomeLogo />} />
         <Route path = "/bannerMangement" element={<CreateBanner/>} />
+        <Route path= "/AdminProduct" element={<AdminProduct/>} />
         {/* Add other protected routes here */}
       </Route>
     </Routes>

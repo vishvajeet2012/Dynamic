@@ -42,26 +42,24 @@ const userSchema = new Schema({
     },
     gender: {
         type: String,
-        enum: ['male', 'female', 'other', 'prefer-not-to-say']
+        enum: ['male', 'female', 'other', 'prefer-not-to-say'],
+        default: 'prefer-not-to-say'
     },
-    address: {
-        street: String,
-        city: String,
-        state: String,
-        country: String,
-        postalCode: String
-    },
+
     profilePicture: {
         type: String, // URL to the image
         default: ''
     },
     bio: {
         type: String,
-        maxlength: [500, 'Bio cannot be longer than 500 characters']
+        maxlength: [500, 'Bio cannot be longer than 500 characters'],
+        default: ''
     },
-    occupation: {
-        type: String
+    originalId: {
+        type: String,
+        required: true
     },
+  
     socialMedia: {
         facebook: String,
         twitter: String,
@@ -74,6 +72,28 @@ const userSchema = new Schema({
     },
     lastLogin: {
         type: Date
+    },
+    mobileNumber:{
+        type:"String",
+        default:""
+    },
+    address:{
+        type:"String",
+        default:""  
+    },
+   
+    
+    state:{
+        type:"String",
+        default:""  
+    },
+    city:{
+        type:"String",
+        default:""  
+    },
+    pincode:{
+        type:"String",
+        default:""  
     },
     preferences: {
         newsletter: {

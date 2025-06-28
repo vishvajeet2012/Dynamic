@@ -1,5 +1,5 @@
 const categoryModel = require("../models/CategoryModel");
-
+const SubCategoryModel = require('../models/SubCategoryModel');
 exports.CreateCategory =async(req,res)=>{
     try{
         console.log(req.body ,"dsf   ")
@@ -26,13 +26,29 @@ const newCategory=new categoryModel({
 
 exports.GetAllCategories = async (req, res) => {
     try {
-        const categories = await categoryModel.find();
+        const categories = await categoryModel.find()
+            .populate({
+                path: 'subcategories',
+                select: 'subCategoryName subCategoryImage subCategoryDescription isActive'
+            });
+
         if (!categories || categories.length === 0) {
-            return res.status(404).json({ message: 'No categories found' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'No categories found' 
+            });
         }
-        res.status(200).json(categories);
+
+        res.status(200).json(
+         categories
+        );
+
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching categories', error });
+        res.status(500).json({ 
+            success: false,
+            message: 'Error fetching categories',
+            error: error.message 
+        });
     }
 };
 
