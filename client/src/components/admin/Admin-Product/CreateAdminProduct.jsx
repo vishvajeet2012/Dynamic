@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import useCreateProduct from "../../../hooks/Product/Product";
+import {useCreateProduct} from "../../../hooks/Product/Product";
 import { useUplaodImage } from '../../../hooks/client/homePageHooks/use-banner';
 import { useGetAllCategories } from '../../../hooks/useCategories';
 
@@ -305,6 +305,20 @@ export default function CreateAdminProduct() {
               />
             </div>
             
+  <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Slug*</label>
+              <input
+                type="text"
+                name="slug"
+                value={productData.slug}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded"
+                required
+              />
+            </div>
+            
+
+
             <div className="flex items-center mb-4">
               <input
                 type="checkbox"

@@ -62,7 +62,7 @@ exports.createProduct = async (req, res) => {
 
     // Validate subcategory IDs (array)
     let subcategoryIds = Array.isArray(subcategories) ? subcategories : [subcategories];
-  console.log(subcategoryIds);
+
     const existingSubCategories = await SubCategory.find({ _id: { $in: subcategoryIds } });
 
     if (existingSubCategories.length !== subcategoryIds.length) {
@@ -73,17 +73,17 @@ exports.createProduct = async (req, res) => {
       });
     }
 
-    // Also verify that subcategories belong to the selected category
-    // const invalidSubcategories = existingSubCategories.filter(
-    //   sub => sub.category.toString() !== category.toString()
-    // );
+   /// Also verify that subcategories belong to the selected category
+    const invalidSubcategories = existingSubCategories.filter(
+      sub => sub.category.toString() !== category.toString()
+    );
     
-    // if (invalidSubcategories.length > 0) {
-    //   const invalidIds = invalidSubcategories.map(sub => sub._id.toString());
-    //   return res.status(400).json({
-    //     message: `The following subcategories don't belong to the selected category: ${invalidIds.join(', ')}`
-    //   });
-    // }
+    if (invalidSubcategories.length > 0) {
+      const invalidIds = invalidSubcategories.map(sub => sub._id.toString());
+      return res.status(400).json({
+        message: `The following subcategories don't belong to the selected category: ${invalidIds.join(', ')}`
+      });
+    }
 
     // Calculate selling price
     const sellingPrice = basePrice - (basePrice * (discount || 0) / 100);
@@ -155,6 +155,44 @@ exports.createProduct = async (req, res) => {
     });
   }
 };
+
+  exports.updateAdminProduct =async (req,res)=>{
+  try{
+        const {
+      name,
+      description,
+      basePrice,
+      discount,
+      ratings,
+      images,
+      stock,
+      imagesUrls,
+      publicId,
+      numOfReviews,
+      isNewArrival,
+      category,         // Single ID (not array)
+      subcategories,      // Array of IDs
+      color,
+      gender,
+      size,
+      weight,
+      slug
+    } = req.body;
+
+    // Required fields check
+    const requiredFields = ['name', 'description', 'basePrice', 'category', 'subcategories'];
+    const missingFields = requiredFields.filter(field => !req.body[field] && req.body[field] !== 0);
+
+      
+    
+  }catch(error){
+    res.status(500).json({message:"Error updating product",error,status:false})
+  }
+  }
+
+
+
+
 // Get single product by ID
 exports.getProduct = async (req, res) => {
   try {
@@ -182,7 +220,10 @@ exports.getProducts = async (req, res) => {
     if (req.query.size) filter.size = { $in: [req.query.size] };
     if (req.query.isNewArrival) filter.isNewArrival = req.query.isNewArrival === 'true';
 
-    const products = await Product.find(filter);
+  const products = await Product.find(filter).populate({
+                    path: 'category',
+                    select: 'categoryName categoryImage categoryDescription isActive'
+                });;
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });

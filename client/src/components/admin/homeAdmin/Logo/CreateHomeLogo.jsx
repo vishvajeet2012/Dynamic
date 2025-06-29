@@ -70,8 +70,8 @@ export default function CreateHomeLogo() {
 
       // Create logo record in database
       const createResponse = await axios.post(
-        `${homeUrl}/createlogo`,
-        { url: uploadResponse.data.image },
+        `${homeUrl}/homelogo`,
+         uploadResponse?.data?.image ,
         {
           headers: {
             Authorization: `Bearer ${token}`,

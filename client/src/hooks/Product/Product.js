@@ -2,7 +2,7 @@ import axios from "axios";
 import { homeUrl } from "../../lib/baseUrl";
 import { useState } from "react";
 
-export default function useCreateProduct(){
+export const  useCreateProduct =()=>{
    const [Product, setCreateProduct] = useState({});
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState(null);
@@ -33,3 +33,78 @@ export default function useCreateProduct(){
    }
    return {createProduct,loading ,Product, error,success}
 }
+
+
+export const   useGetProduct=()=>{
+    const [Product, setProduct] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+
+    const getProduct = async (id) => {
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+        try{
+            const token  = localStorage.getItem('token')
+            const response = await axios.get(`${homeUrl}/getallproduct`,
+                {
+                   headers:{
+                
+                authorization:`Bearer ${token}`
+                
+            }
+                }
+            )
+            setProduct(response);
+            setSuccess(response?.data);
+            return response?.data
+        }catch(error){
+            setError(error)
+        }finally{
+            setLoading(false)       
+        }   
+       }
+       return {getProduct,loading ,Product, error,success}
+}
+
+
+
+
+
+
+export const   useAdminGetProduct=()=>{
+    const [Product, setProduct] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+
+    const AdmingetProduct = async (id) => {
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+        try{
+            const token  = localStorage.getItem('token')
+            const response = await axios.get(`${homeUrl}/getallproduct`,
+                {
+                   headers:{
+                
+                authorization:`Bearer ${token}`
+                
+            }
+                }
+            )
+            setProduct(response);
+            setSuccess(response?.data);
+            return response?.data
+        }catch(error){
+            setError(error)
+        }finally{
+            setLoading(false)       
+        }   
+       }
+       return {AdmingetProduct,loading ,Product, error,success}
+}
+
+
+

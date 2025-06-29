@@ -17,16 +17,16 @@ const {getLogo,loading ,error,success} =   getLogoheader()
     useEffect(() => {
       getSingleUser()
     },[])
-    console.log(user)
+   
   return (
     <>
       <div className=" w-full bg-[#e11b23] text-white font-bold h-16">
       <div>
         <div className="flex justify-evenly items-center ">
-          <div className="w-28  flex flex-row item-center">
-           <img className="h-16 w-28 aspect-square object-cover" src={success?.logo?.url} alt="Logo" /> 
+          <Link to="/" className="w-32  flex flex-row justify-start item-center">
+           <img className="h-16 w-32  aspect-square object-cover" src={success?.logo?.url} alt="Logo" /> 
           
-          </div>
+          </Link>
           <div className="bg-black flex item-center">
             <SerachBar />
           </div>

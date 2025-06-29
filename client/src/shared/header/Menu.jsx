@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useGetAllCategories } from '../../hooks/useCategories';
+import { Link } from 'react-router-dom';
 
 export default function Menu() {
   const { loading, error, categories, fetechCategories } = useGetAllCategories();
@@ -28,14 +29,14 @@ export default function Menu() {
           <nav className="flex items-center space-x-8">
             <ul className="flex space-x-6">
               <li>
-                <a
-                  href="#" 
+                <Link
+                  to="/" 
                   className="flex items-center text-gray-700 hover:text-blue-600 transition-colors
                              text-sm font-medium uppercase tracking-wide relative group"
                 >
                   Home
                   <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
-                </a>
+                </Link>
               </li>
               {categories?.filter((category) => category.isActive===true)?.map((category) => (
                 <li key={category._id}>
