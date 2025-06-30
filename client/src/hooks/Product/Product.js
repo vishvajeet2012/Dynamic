@@ -108,3 +108,59 @@ export const   useAdminGetProduct=()=>{
 
 
 
+
+export const useAdmindelteProduct =()=>{
+
+    const [loading,setloading]=useState(false)
+    const [error,setError]=useState(null)
+    const [success,setProduct]=useState(null)
+            const deleteProduct = async (formData) => {
+                try{
+                            const token  = localStorage.getItem('token')
+                            const response = await axios.post(`${homeUrl}/productdetele`,formData,{
+                                headers:{
+                                    authorization:`Bearer ${token}`
+                                }
+                            })
+                            setProduct(response)
+                            return response
+    }catch(error){
+       setError(error)
+
+
+    
+    }finally{
+        setloading(false)
+    }
+
+            }
+            return {deleteProduct,loading,error,success}
+    
+}
+
+
+
+export const useUpdateAdminPorduct = ()=>{
+    const [loading,setloading]=useState(false)
+    const [error,setError]=useState(null)
+    const [success,setProduct]=useState(null)
+            const updateProduct = async (formData) => {
+                try{
+                            const token  = localStorage.getItem('token')
+                            const response = await axios.post(`${homeUrl}/updateproduct`,formData,{
+                                headers:{
+                                    authorization:`Bearer ${token}`
+                                }
+                            })
+                            setProduct(response)
+                            return response
+    }catch(error){
+       setError(error)
+
+
+    
+    }finally{
+        setloading(false)
+    }            }
+            return {updateProduct,loading,error,success}    
+}

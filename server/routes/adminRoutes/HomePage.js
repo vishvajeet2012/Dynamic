@@ -8,7 +8,7 @@ const {  createSubCategory } = require('../../controler/SubCategoryControler');
 const auth = require('../../middleware/authmiddleware');
 const uploadImageMiddleware = require('../../middleware/uploadImageMiddleware');
 const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBannersByType } = require('../../controler/BannerControler');
-const { createProduct, getProducts } = require('../../controler/Productcontroler');
+const { createProduct, getProducts, productDelete, updateProduct } = require('../../controler/Productcontroler');
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
@@ -43,7 +43,8 @@ router.patch('/:id/toggle-active',auth, toggleBannerActive);
     /////////////////////////Product ////////////////
     router.post('/productcreate', auth, createProduct);
     router.get('/getallproduct',auth,getProducts)
-    
+    router.post("/productdetele",auth,productDelete)
+router.post('/updateproduct',auth,updateProduct)
 
 
 module.exports = router;
