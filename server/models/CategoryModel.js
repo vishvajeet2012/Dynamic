@@ -8,6 +8,10 @@ const categorySchema=new mongoose.Schema({
         type:String,
       
     },
+    imagePublicId:{
+        type:String,
+
+    },
     categoryDescription:{
         type:String,
         required:true

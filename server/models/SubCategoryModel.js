@@ -9,6 +9,10 @@ const subCategoriesSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    imagePublicId:{
+        type:String,
+
+    },
     subCategoryDescription: {  
         type: String,
         required: true

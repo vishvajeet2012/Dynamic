@@ -8,7 +8,8 @@ import {
      
     useCreateSubCateogry,
     useDeleteCategory,
-    useUpdateCategory
+    useUpdateCategory,
+    useupdateSubCategory
 } from '../../../../hooks/useCategories';
 import { useUplaodImage } from "../../../../hooks/client/homePageHooks/use-banner";
 
@@ -33,7 +34,7 @@ export default function AdminCategory() {
   const { deleteCategory } = useDeleteCategory();
   const { createSubCategory } = useCreateSubCateogry();
   //  [FIX] Instantiate the new hook for updating subcategories
- /// const { updateSubCategory } = useUpdateSubCateogry();
+  const { subCategoryupdate } = useupdateSubCategory();
 
   const [view, setView] = useState('welcome');
   
@@ -87,11 +88,12 @@ export default function AdminCategory() {
 
       const data = {
         categoryName, categoryDescription, isActive: categoryIsActive,
-        categoryImage: imageUrl, imagePublicId: publicId,
+        categoryImage: imageUrl, 
+        imagePublicId: publicId,
       };
 
       if (selectedCategory) {
-       // await updateCategory(selectedCategory._id, data);
+       await updateCategory(selectedCategory._id, data);
       } else {
         await createCategory(data);
       }
@@ -124,17 +126,18 @@ export default function AdminCategory() {
       const subCategoryData = {
         subCategoryName, subCategoryDescription, isActive: subCategoryIsActive,
         subCategoryImage: imageUrl, imagePublicId: publicId,
-        category: selectedCategory._id
+        category: selectedCategory._id,
+        id:selectedSubcategory._id
       };
-
-      if (selectedSubcategory) {
+ await subCategoryupdate(subCategoryData);
+    //   if (selectedSubcategory   ) {
         // --- UPDATE LOGIC ---
-       // await updateSubCategory(selectedSubcategory._id, subCategoryData);
-      } else {
-        // --- CREATE LOGIC ---
-        const sub = await createSubCategory(subCategoryData);
-        await updateCategory(selectedCategory._id, { $push: { subcategories: sub._id } });
-      }
+    
+        // } else {
+        //     // --- CREATE LOGIC ---
+        //     const sub = await createSubCategory(subCategoryData);
+        //     await updateCategory(selectedCategory._id, { $push: { subcategories: sub._id } });
+        // }
       
       resetSubCategoryForm();
       fetechCategories();

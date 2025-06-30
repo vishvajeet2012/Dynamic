@@ -133,3 +133,32 @@ export const useUpdateCategory = ()=>{
   }
   return {updateCategory,loading,error,success}
 }
+
+
+export const useupdateSubCategory = ()=>{
+
+  const [loading,setloading]= useState(false)
+  const [error,setError]= useState(null)
+  const [success,setSuccess]=useState(false)
+  const subCategoryupdate = async(subCategoryData)=>{
+    setloading(true)
+    console.log(subCategoryData)
+    try{
+          const response = axios.post(`${homeUrl}/updateSubCategory`,subCategoryData,{
+            headers:{
+              'Content-Type': 'application/json',
+              authorization:`Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          setSuccess(true)
+          return response.data
+    }catch{
+      setError
+
+    }finally{
+      setloading(false)
+    }                     
+
+  }
+  return {subCategoryupdate,loading,error,success}
+}

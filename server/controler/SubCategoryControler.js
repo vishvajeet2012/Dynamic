@@ -5,7 +5,7 @@ const categoryModel = require('../models/CategoryModel');
 
 exports.createSubCategory = async (req, res) => {
     try {
-        const { subCategoryName, subCategoryImage, subCategoryDescription, category, isActive } = req.body;
+        const { subCategoryName, subCategoryImage, subCategoryDescription, category, isActive ,imagePublicId} = req.body;
         
         // Validation
         if (!subCategoryName || !subCategoryDescription || !category) {
@@ -19,7 +19,8 @@ exports.createSubCategory = async (req, res) => {
             subCategoryName,
             subCategoryImage,
             subCategoryDescription,
-            isActive: isActive !== undefined ? isActive : true
+            isActive: isActive !== undefined ? isActive : true,
+            imagePublicId
         });
 
         // Update category (without populate first)
@@ -62,3 +63,27 @@ exports.createSubCategory = async (req, res) => {
         });
     }
 };
+
+
+
+exports.updateSubCategory = async (req, res) => {
+    try {
+     
+        const {id, subCategoryName, subCategoryImage, subCategoryDescription, isActive ,imagePublicId} = req.body
+                const result = await SubCategoryModel.findByIdAndUpdate(id, {
+                    subCategoryName,
+                    subCategoryImage,
+                    subCategoryDescription,
+                    isActive,
+                    imagePublicId
+                }, { new: true });
+                res.status(200).json({
+                    message: 'Subcategory updated successfully',
+                    subcategory: result     
+                })
+    }catch(error)
+    {
+        res.status(500).json({ message: 'Error updating subcategory', error });
+    }
+
+}

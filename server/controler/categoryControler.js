@@ -56,7 +56,7 @@ exports.GetAllCategories = async (req, res) => {
 exports.UpdateCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const { categoryName, categoryImage, categoryDescription, isActive } = req.body;
+        const { categoryName, categoryImage, categoryDescription, isActive ,imagePublicId } = req.body;
 
         if (!categoryName || !categoryDescription) {
             return res.status(400).json({ message: "Please provide all required fields" });
@@ -68,7 +68,8 @@ exports.UpdateCategory = async (req, res) => {
                 categoryName,
                 categoryImage,
                 categoryDescription,
-                isActive
+                isActive,
+                imagePublicId
             },
             { new: true }
         );
