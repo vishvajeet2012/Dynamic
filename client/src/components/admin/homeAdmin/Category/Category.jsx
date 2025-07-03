@@ -127,7 +127,7 @@ export default function AdminCategory() {
         subCategoryName, subCategoryDescription, isActive: subCategoryIsActive,
         subCategoryImage: imageUrl, imagePublicId: publicId,
         category: selectedCategory._id,
-        id:selectedSubcategory._id
+        id:selectedSubcategory
       };
  await subCategoryupdate(subCategoryData);
     //   if (selectedSubcategory   ) {
