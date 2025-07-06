@@ -16,12 +16,12 @@ export default function ProductCard({ item }) {
   } = item;
 
   return (
-    <Card className="rounded-xl overflow-hidden border border-gray-100 cursor-pointer h-full flex flex-col">
-      <div className="relative w-full aspect-square bg-gray-50 group overflow-hidden">
+    <Card className="  border  cursor-pointer h-full flex flex-col">
+      <div className="relative w-full rounded-tr-xl rounded-tl-xl group overflow-hidden">
         <img
           src={images?.[0]?.imagesUrls}
           alt={name}
-          className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+          className="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
         />
 
         {discount > 0 && (

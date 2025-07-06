@@ -5,8 +5,15 @@ import AboutUs from "../../../shared/HomePage/Aboutus";
 import NewArrivals from "../../../shared/NewArrivals";
 import UploadImageComponent from "./imageUpload";
 import { useGetProduct } from "../../../hooks/Product/Product";
+import CategorySection from "../../../shared/HomePage/CategorySection";
+import { useGetAllCategories } from "../../../hooks/useCategories";
 
 export default function Home() {
+const { loading, error, categories, fetechCategories } = useGetAllCategories();
+
+  useEffect(() => {
+    fetechCategories();
+  }, []);
 
 
   return (
@@ -14,7 +21,9 @@ export default function Home() {
 
   
    <Banner bannerType="homepage"/>
+  
    <NewArrivals />
+   <CategorySection categories={categories}/>
    <AboutUs/>
 
     </>

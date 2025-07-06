@@ -46,7 +46,7 @@ export default function AdminCategory() {
   const [categoryIsActive, setCategoryIsActive] = useState(true);
   const [categoryImageFile, setCategoryImageFile] = useState(null);
   const [categoryImagePreview, setCategoryImagePreview] = useState("");
-
+const [subCategoryId,setSubCategoryid]=useState("")
   const [subCategoryName, setSubCategoryName] = useState("");
   const [subCategoryDescription, setSubCategoryDescription] = useState("");
   const [subCategoryIsActive, setSubCategoryIsActive] = useState(true);
@@ -88,12 +88,11 @@ export default function AdminCategory() {
 
       const data = {
         categoryName, categoryDescription, isActive: categoryIsActive,
-        categoryImage: imageUrl, 
-        imagePublicId: publicId,
+        categoryImage: imageUrl, imagePublicId: publicId,
       };
 
       if (selectedCategory) {
-       await updateCategory(selectedCategory._id, data);
+       // await updateCategory(selectedCategory._id, data);
       } else {
         await createCategory(data);
       }
@@ -126,18 +125,19 @@ export default function AdminCategory() {
       const subCategoryData = {
         subCategoryName, subCategoryDescription, isActive: subCategoryIsActive,
         subCategoryImage: imageUrl, imagePublicId: publicId,
-        category: selectedCategory._id,
-        id:selectedSubcategory
+        category: selectedCategory._id ,
+        subCategoryId
+        
       };
- await subCategoryupdate(subCategoryData);
-    //   if (selectedSubcategory   ) {
+
+      if (selectedSubcategory) {
         // --- UPDATE LOGIC ---
-    
-        // } else {
-        //     // --- CREATE LOGIC ---
-        //     const sub = await createSubCategory(subCategoryData);
-        //     await updateCategory(selectedCategory._id, { $push: { subcategories: sub._id } });
-        // }
+       await subCategoryupdate(subCategoryData);
+      } else {
+        // --- CREATE LOGIC ---
+        const sub = await createSubCategory(subCategoryData);
+       // await updateCategory(selectedCategory._id, { $push: { subcategories: sub._id } });
+      }
       
       resetSubCategoryForm();
       fetechCategories();
@@ -164,6 +164,8 @@ export default function AdminCategory() {
 
   const handleEditSubCategory = (sub, parent) => {
     resetCategoryForm();
+    
+    setSubCategoryid(sub._id)
     setSelectedCategory(parent);
     setSelectedSubcategory(sub);
     setSubCategoryName(sub.subCategoryName); setSubCategoryDescription(sub.subCategoryDescription);
