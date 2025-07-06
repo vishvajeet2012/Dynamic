@@ -69,14 +69,26 @@ exports.createSubCategory = async (req, res) => {
 exports.updateSubCategory = async (req, res) => {
     try {
      
-        const {id, subCategoryName, subCategoryImage, subCategoryDescription, isActive ,imagePublicId} = req.body
-                const result = await SubCategoryModel.findByIdAndUpdate(id, {
+        const {category,subCategoryId, subCategoryName, subCategoryImage, subCategoryDescription, isActive ,imagePublicId} = req.body
+                const result = await SubCategoryModel.findByIdAndUpdate(subCategoryId, {
                     subCategoryName,
                     subCategoryImage,
                     subCategoryDescription,
                     isActive,
                     imagePublicId
                 }, { new: true });
+
+                  // Update category (without populate first)
+        const updatedCategory = await categoryModel.findByIdAndUpdate(
+            category,
+            { 
+                $push: { subcategories: result._id },
+                $set: { isActive: true } 
+            },
+            { new: true }
+        );
+
+
                 res.status(200).json({
                     message: 'Subcategory updated successfully',
                     subcategory: result     
