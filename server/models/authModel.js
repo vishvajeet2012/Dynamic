@@ -9,12 +9,10 @@ const userSchema = new Schema({
         type: String,
         required: [true, 'First name is required']
     },
-
     lastName: {
         type: String,
         required: [true, 'Last name is required']
     },
-  
     email: {
         type: String,
         required: [true, 'Email is required'],
@@ -26,7 +24,6 @@ const userSchema = new Schema({
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters']
     },
- 
     isAdmin: {
         type: Boolean,
         default: false
@@ -35,8 +32,6 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
-
-
     dateOfBirth: {
         type: Date
     },
@@ -45,9 +40,8 @@ const userSchema = new Schema({
         enum: ['male', 'female', 'other', 'prefer-not-to-say'],
         default: 'prefer-not-to-say'
     },
-
     profilePicture: {
-        type: String, // URL to the image
+        type: String,
         default: ''
     },
     bio: {
@@ -57,9 +51,7 @@ const userSchema = new Schema({
     },
     originalId: {
         type: String,
-        required: true
     },
-  
     socialMedia: {
         facebook: String,
         twitter: String,
@@ -70,30 +62,36 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
+    otp: {
+        type: String,
+        select: false
+    },
+    otpExpiry: {
+        type: Date,
+        select: false
+    },
     lastLogin: {
         type: Date
     },
-    mobileNumber:{
-        type:"String",
-        default:""
+    mobileNumber: {
+        type: String,
+        default: ""
     },
-    address:{
-        type:"String",
-        default:""  
+    address: {
+        type: String,
+        default: ""  
     },
-   
-    
-    state:{
-        type:"String",
-        default:""  
+    state: {
+        type: String,
+        default: ""  
     },
-    city:{
-        type:"String",
-        default:""  
+    city: {
+        type: String,
+        default: ""  
     },
-    pincode:{
-        type:"String",
-        default:""  
+    pincode: {
+        type: String,
+        default: ""  
     },
     preferences: {
         newsletter: {
@@ -112,8 +110,8 @@ const userSchema = new Schema({
     }
 }, { timestamps: true });
 
-
-userSchema.methods.genrateAuthToken = function() {
+// Generate JWT Token
+userSchema.methods.generateAuthToken = function() {
     return jwt.sign(
         {
             _id: this._id,
@@ -124,6 +122,16 @@ userSchema.methods.genrateAuthToken = function() {
         process.env.JWT_KEY, 
         { expiresIn: '30d' }
     );
+};
+
+// Generate OTP
+userSchema.methods.generateOTP = function() {
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    this.otp = otp;
+    // Set OTP expiry to 10 minutes from now
+    this.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    return otp;
 };
 
 const User = model('User', userSchema);  
