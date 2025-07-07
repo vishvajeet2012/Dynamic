@@ -125,18 +125,14 @@ exports.userRegister = async (req, res) => {
         }
 
         res.status(200).json({ 
+            status: 200,
             message: "User registered successfully. Please check your email for OTP.", 
-            data: {
-                firstName,
-                lastName,
-                email,
-                userId: user._id
-            }
+            data:user
         });
 
     } catch (err) {
         console.error("Registration error:", err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ status: 500, message: "Internal server error" });
     }
 };
 
@@ -159,7 +155,7 @@ exports.verifyOTP = async (req, res) => {
         }
 
         // Check if OTP matches and is not expired
-        if (user.otp !== otp || user.otpExpiry < new Date()) {
+        if (user?.otp !== otp || user.otpExpiry < new Date()) {
             return res.status(400).json({ message: "Invalid or expired OTP" });
         }
 

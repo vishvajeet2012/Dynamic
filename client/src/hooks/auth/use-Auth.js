@@ -66,7 +66,7 @@ export function useSignup(){
         setSuccess(null)
         try{
             const response = await axios.post(`${baseUrl}/userSignup`, firstName, lastName, email, password)
-            setSuccess(true)
+            setSuccess(response.data)
             return response.data
         }catch(err){
             setError(err)
@@ -75,6 +75,34 @@ export function useSignup(){
         }
     }
     return {Signup,loading,error,success}
+}
+
+
+export function useVerfiyOtp(){
+    const [loading,setloading]= useState(false)
+    const [error,setError]= useState(null)
+    const [success,setSuccess]= useState(null)
+
+    const verifyOtp = async(email,otp)=>{
+        setloading(true)
+        setError(null)
+        setSuccess(null)
+        try{
+            const response = axios.post(`${baseUrl}/verifyotp`,{email,otp},{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            setSuccess(response.data)
+            return response.data
+        }catch(err){
+            setError(err)
+        }finally{
+            setloading(false)
+        }
+    }
+return {verifyOtp,loading,error,success}
+
 }
 
 

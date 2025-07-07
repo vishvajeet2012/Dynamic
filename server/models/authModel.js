@@ -64,11 +64,11 @@ const userSchema = new Schema({
     },
     otp: {
         type: String,
-        select: false
+
     },
     otpExpiry: {
         type: Date,
-        select: false
+
     },
     lastLogin: {
         type: Date

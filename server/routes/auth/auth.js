@@ -8,7 +8,7 @@ const { productDelete } = require('../../controler/Productcontroler');
 Router.post('/userSignup', userRegister);
 Router.post('/userFound', userLogin);
 Router.get('/getsingleuser',auth,getUser)
-Router.post('/verify-otp', verifyOTP);
+Router.post('/verifyotp', verifyOTP);
 Router.post('/resend-otp',resendOTP);
 
 Router.post('/updateprofile',auth,updateUserProfilePicture)
