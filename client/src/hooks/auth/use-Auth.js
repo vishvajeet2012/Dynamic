@@ -139,3 +139,72 @@ export function useResendOtp(){
 return {resendOtp,loading,error,success}
 
 }
+
+
+/////////////////forget password//////////////
+export const useforgetPassword = ()=>{
+    const [loading,setLoading]= useState(false)
+    const [error , setError]= useState(null)
+    const [success , setSuccess]= useState(null)
+    const forgetPassword = async (email)=>{
+        setLoading(true)
+        setError(null)
+        setSuccess(null)
+        try{
+            const token = localStorage.getItem('token');
+            const response = await axios.post(`${baseUrl}/forgetPassword`,{
+
+            },{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization:  `Bearer ${token}`
+                }
+            })
+            setSuccess(response)
+            return response.data
+        }catch(err){
+            setError(err)
+        }finally{
+            setLoading(false)
+        }
+    }
+    return {forgetPassword,loading,error,success}
+
+
+}
+
+
+
+export const useverifyForgotPasswordOTP = ()=>{
+    const [loading,setLoading]= useState(false)
+    const [error , setError]= useState(null)
+    const [success , setSuccess]= useState(null)
+    const verifyForgotPasswordOTP = async ( otp, newPassword, confirmPassword )=>{
+        setLoading(true)
+        setError(null)
+        setSuccess(null)
+        try{
+            const token = localStorage.getItem('token');
+            const response = await axios.post(`${baseUrl}/forgetPassword`,{
+ otp, newPassword, confirmPassword 
+            },{
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization:  `Bearer ${token}`
+                }
+            })
+            setSuccess(response)
+            return response.data
+        }catch(err){
+            setError(err)
+        }finally{
+            setLoading(false)
+        }
+    }
+    return {verifyForgotPasswordOTP,loading,error,success}
+
+
+}
+
+
+

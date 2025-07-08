@@ -257,3 +257,109 @@ exports.userLogin = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        
+        const email = req.user?.email
+
+        if (!email) {
+            return res.status(400).json({ 
+                status: 400,
+                message: "Email is required" 
+            });
+        }
+
+        const user = await userAuthCollection.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ 
+                status: 404,
+                message: "User not found with this email" 
+            });
+        }
+
+        // Generate OTP
+        const otp = user.generateOTP();
+        await user.save();
+
+        // Send OTP email
+        const emailSent = await sendOTPEmail(email, otp);
+        if (!emailSent) {
+            return res.status(500).json({ 
+                status: 500,
+                message: "Failed to send OTP email" 
+            });
+        }
+
+        res.status(200).json({ 
+            status: 200,
+            message: "OTP sent successfully. Please check your email.",
+            email
+        });
+
+    } catch (err) {
+        console.error("Forgot password error:", err);
+        return res.status(500).json({ 
+            status: 500,
+            message: "Internal server error" 
+        });
+    }
+};
+
+exports.verifyForgotPasswordOTP = async (req, res) => {
+    try {
+        const { otp, newPassword, confirmPassword } = req.body;
+        const email = req.user?.email
+        
+        if (!email || !otp || !newPassword || !confirmPassword) {
+            return res.status(400).json({ 
+                status: 400,
+                message: "All fields are required" 
+            });
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ 
+                status: 400,
+                message: "Password and confirm password do not match" 
+            });
+        }
+
+        const user = await userAuthCollection.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ 
+                status: 404,
+                message: "User not found" 
+            });
+        }
+
+        // Check if OTP matches and is not expired
+        if (user?.otp !== otp || user.otpExpiry < new Date()) {
+            return res.status(400).json({ 
+                status: 400,
+                message: "Invalid or expired OTP" 
+            });
+        }
+
+        // Update password
+        const hash = await bcrypt.hash(newPassword, 10);
+        user.password = hash;
+        user.otp = undefined;
+        user.otpExpiry = undefined;
+        await user.save();
+
+        res.status(200).json({ 
+            status: 200,
+            message: "Password reset successfully",
+            email
+        });
+
+    } catch (err) {
+        console.error("Forgot password OTP verification error:", err);
+        return res.status(500).json({ 
+            status: 500,
+            message: "Internal server error" 
+        });
+    }
+};

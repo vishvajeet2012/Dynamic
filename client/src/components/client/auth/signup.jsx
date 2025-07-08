@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/input-otp"
 import { useAuth } from "../../../../context/authConext";
 export default function Signup() {
+   const {forgetPassword,loading:forgetLoading,error: forgetError,success: forgetSuccess}=   useforgetPassword()
+
+
     const { Signup, loading, error, success } = useSignup();
   const [showOtp,setShowOtp]= useState(false)
     async function handleSubmit(e) {
@@ -105,6 +108,7 @@ export default function Signup() {
 
  function OtpVerification({email}) {
   const [otp,setOtp]= useState("")
+  
   const  {verifyOtp,loading:otpLoading,error:otpError,success:otpSuccess}=  useVerfiyOtp()
 const  {resendOtp,loading,error,success}=  useResendOtp()
 const { login: authLogin } = useAuth();
@@ -140,9 +144,7 @@ useEffect(() => {
  console.log(otpSuccess?.data?.token)
 }, [otpSuccess]);
 
-useEffect(() => {
- console.log(success?.data.message)
-}, [success]);
+
 
 
 

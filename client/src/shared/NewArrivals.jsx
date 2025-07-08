@@ -25,7 +25,7 @@ export default function NewArrivals() {
         {Product?.data?.map((product, idx) => (
           <div
             key={idx}
-            className="min-w-[85%] sm:min-w-[50%] lg:min-w-[25%] px-2"
+            className="min-w-[17%] sm:min-w-[19%] lg:min-w-[20%] px-2"
           >
             <ProductCard item={product} />
           </div>

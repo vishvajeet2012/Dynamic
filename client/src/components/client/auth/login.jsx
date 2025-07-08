@@ -1,12 +1,13 @@
 
 import { useAuth } from "../../../../context/authConext";
-import { useLogin } from "../../../hooks/auth/use-Auth";
+import { useforgetPassword, useLogin } from "../../../hooks/auth/use-Auth";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() { 
   const { login: loginApi, loading, error, success } = useLogin();
   const { login: authLogin } = useAuth();
   const navigate = useNavigate();
+ const {forgetPassword,loading:forgetLoading,error: forgetError,success: forgetSuccess}=   useforgetPassword()
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -14,6 +15,11 @@ export default function Login() {
     const email = formData.get('email');
     const password = formData.get('password');
     
+
+        const handleClickForget = async() => {
+          await forgetPassword();  
+        }
+
     const token = await loginApi({ email, password });
     if (token) {
       authLogin(token); // Store token via context
@@ -57,10 +63,13 @@ export default function Login() {
               
               {error && <p className="text-red-500 mt-2">{error}</p>}
               {success && <p className="text-green-500 mt-2">{success}</p>}
-              
-              <p className="mt-4">
+              <div className="mt-4 flex  flex-row justify-between">
+              <p className="">
                 Don't have an account? <Link to="/signup" className="text-blue-500 hover:underline">Sign up</Link>
               </p>
+              <Link onClick={handleClickForget} to="/forget-password" className="text-blue-500 hover:underline">Forget Password</Link>
+              </div>
+
             </form> 
           </div>
         </div>
