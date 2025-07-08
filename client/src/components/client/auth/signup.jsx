@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useSignup, useVerfiyOtp } from "../../../hooks/auth/use-Auth"
+import { useResendOtp, useSignup, useVerfiyOtp } from "../../../hooks/auth/use-Auth"
 import { useState,useEffect } from "react";
 import {
   InputOTP,
@@ -106,6 +106,7 @@ export default function Signup() {
  function OtpVerification({email}) {
   const [otp,setOtp]= useState("")
   const  {verifyOtp,loading:otpLoading,error:otpError,success:otpSuccess}=  useVerfiyOtp()
+const  {resendOtp,loading,error,success}=  useResendOtp()
 const { login: authLogin } = useAuth();
   const navigate = useNavigate();
 
@@ -117,7 +118,8 @@ const handleFrom = async(e)=>{
 if (otp.length === 6) {
         console.log("OTP verified:", otp);
    await verifyOtp(email,otp)
-authLogin(otpSuccess?.token)
+   
+
       } else {
         setError("Please enter a 6-digit code");
       }
@@ -125,8 +127,22 @@ authLogin(otpSuccess?.token)
 
   },1000)
 
-}
+}                   
 
+        const  HandleResendOtp= async()=>{
+              await resendOtp(email)
+        }
+
+useEffect(() => {
+  authLogin(otpSuccess?.data?.token)
+  if(otpSuccess?.data?.token){
+  navigate('/')}
+ console.log(otpSuccess?.data?.token)
+}, [otpSuccess]);
+
+useEffect(() => {
+ console.log(success?.data.message)
+}, [success]);
 
 
 
@@ -136,7 +152,7 @@ authLogin(otpSuccess?.token)
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Account</h1>
           <p className="text-gray-600">We've sent a 4-digit code to your email</p>
-          <p className="text-gray-800 font-medium mt-1">user@example.com</p>
+          <p className="text-gray-800 font-medium mt-1">{email}</p>
         </div>
 
         <form onSubmit={handleFrom}>
@@ -161,11 +177,12 @@ authLogin(otpSuccess?.token)
           >
             Verify Account
           </button>
-
-          <div className="mt-6 text-center">
+               { otpSuccess?.data?.message|| success?.data?.message && <p className="mt-2 text-green-500">{success?.data?.message||otpSuccess?.data?.message}</p>}
+          <div className="mt-4 text-center">
             <p className="text-gray-600">
               Didn't receive code? 
               <button
+              onClick={HandleResendOtp}
                 type="button"
                 className="text-blue-600 hover:underline ml-1"
               >

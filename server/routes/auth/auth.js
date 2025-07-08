@@ -9,7 +9,7 @@ Router.post('/userSignup', userRegister);
 Router.post('/userFound', userLogin);
 Router.get('/getsingleuser',auth,getUser)
 Router.post('/verifyotp', verifyOTP);
-Router.post('/resend-otp',resendOTP);
+Router.post('/resendotp',resendOTP);
 
 Router.post('/updateprofile',auth,updateUserProfilePicture)
 Router.post('/userdataupdate',auth,updateUserData)

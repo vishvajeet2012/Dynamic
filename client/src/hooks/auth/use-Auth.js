@@ -88,12 +88,12 @@ export function useVerfiyOtp(){
         setError(null)
         setSuccess(null)
         try{
-            const response = axios.post(`${baseUrl}/verifyotp`,{email,otp},{
+            const response = await axios.post(`${baseUrl}/verifyotp`,{email,otp},{
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
-            setSuccess(response.data)
+            setSuccess(response)
             return response.data
         }catch(err){
             setError(err)
@@ -108,3 +108,34 @@ return {verifyOtp,loading,error,success}
 
 
 
+
+
+
+
+
+export function useResendOtp(){
+    const [loading,setloading]= useState(false)
+    const [error,setError]= useState(null)
+    const [success,setSuccess]= useState(null)
+
+    const resendOtp = async(email)=>{
+        setloading(true)
+        setError(null)
+        setSuccess(null)
+        try{
+            const response = await axios.post(`${baseUrl}/resendotp`,{email},{
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            setSuccess(response)
+            return response.data
+        }catch(err){
+            setError(err)
+        }finally{
+            setloading(false)
+        }
+    }
+return {resendOtp,loading,error,success}
+
+}

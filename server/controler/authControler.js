@@ -127,7 +127,12 @@ exports.userRegister = async (req, res) => {
         res.status(200).json({ 
             status: 200,
             message: "User registered successfully. Please check your email for OTP.", 
-            data:user
+            data:{
+                firstName,
+                lastName,
+                email,
+                password:"password "
+            }
         });
 
     } catch (err) {
@@ -168,7 +173,7 @@ exports.verifyOTP = async (req, res) => {
         // Generate JWT token
         const token = user.generateAuthToken();
 
-        res.status(200).json({ 
+        res.status(200).json({ status:200,
             message: "Account verified successfully",
             token,
             user: {
@@ -194,7 +199,7 @@ exports.resendOTP = async (req, res) => {
             return res.status(400).json({ message: "Email is required" });
         }
 
-        const user = await User.findOne({ email });
+        const user = await userAuthCollection.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
