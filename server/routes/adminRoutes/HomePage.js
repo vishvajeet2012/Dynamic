@@ -12,19 +12,19 @@ const { createProduct, getProducts, productDelete, updateProduct } = require('..
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
-router.delete("/deltehomelogo/", logoController.deleteLogo); 
-router.post('/categorycreate',CreateCategory)
+router.delete("/deltehomelogo/",auth, logoController.deleteLogo); 
+router.post('/categorycreate',auth,CreateCategory)
 
 router.get('/categoryupdatebyid/:id', GetCategoryById);
 router.put('/updatecategory/:id', UpdateCategory);
 router.delete('/deletecategory/:id', DeleteCategory);
 
 router.post('/createaboutus',auth, CreateAboutusControler )
-router.get('/getaboutus',auth, getAboutUs)
+router.get('/getaboutus', getAboutUs)
 
 
-router.get('/getallcategory',auth,GetAllCategories)
-router.post('/subcategorycreate',createSubCategory)
+router.get('/getallcategory',GetAllCategories)
+router.post('/subcategorycreate',auth,createSubCategory)
 router.post('/updateSubCategory',auth,updateSubCategory)
 
 router.post('/uploadImage' ,auth,uploadImageMiddleware.single('image'), uploadImageonCloud.uploadImageController)
@@ -37,13 +37,13 @@ router.delete("/deleteImage/:id", auth, uploadImageonCloud.deleteImageController
 router.post('/bannercreates', auth, createBanner);
 router.put('/updatebanner/:id', auth,updateBanner);
 router.delete('/deletebaner/:id', auth,deleteBanner);
-router.post('/getbannersbytype' ,auth,getBannersByType)
+router.post('/getbannersbytype' ,getBannersByType)
 router.patch('/:id/toggle-active',auth, toggleBannerActive);
 
 
     /////////////////////////Product ////////////////
     router.post('/productcreate', auth, createProduct);
-    router.get('/getallproduct',auth,getProducts)
+    router.get('/getallproduct',getProducts)
     router.post("/productdetele",auth,productDelete)
 router.post('/updateproduct',auth,updateProduct)
 

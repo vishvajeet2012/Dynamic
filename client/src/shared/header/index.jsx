@@ -21,16 +21,16 @@ const {getLogo,loading ,error,success} =   getLogoheader()
     useEffect(() => {
     const token =localStorage.getItem('token')
       
-      if  (!token){   
-    guestUserCreate()
-         }
+    //   if  (!token){   
+    // guestUserCreate()
+    //      }
            
       getSingleUser()
     },[])
-    useEffect(()=>{ 
-console.log(guestToken,"guest toekn")
-authLogin(guestToken)
-    },[guestToken])
+//     useEffect(()=>{ 
+// console.log(guestToken,"guest toekn")
+// authLogin(guestToken)
+//     },[guestToken])
    
   return (
     <>
