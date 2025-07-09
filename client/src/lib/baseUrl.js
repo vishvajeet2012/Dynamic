@@ -1,2 +1,2 @@
-export const homeUrl = 'http://localhost:4004/home';
-export const baseUrl='http://localhost:4004/api'
+export const homeUrl = 'https://server-yxvm.onrender.com/home';
+export const baseUrl='https://server-yxvm.onrender.com/api'

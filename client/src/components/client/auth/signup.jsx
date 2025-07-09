@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/input-otp"
 import { useAuth } from "../../../../context/authConext";
 export default function Signup() {
-   const {forgetPassword,loading:forgetLoading,error: forgetError,success: forgetSuccess}=   useforgetPassword()
+   
 
 
     const { Signup, loading, error, success } = useSignup();
