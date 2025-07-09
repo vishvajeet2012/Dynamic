@@ -19,12 +19,13 @@ const {getLogo,loading ,error,success} =   getLogoheader()
 
      const  {getSingleUser,laoding:userLoading ,error:userError,user}  =  useGetSingleUser()
     useEffect(() => {
+    const token =localStorage.getItem('token')
         if(!token){
             guestUserCreate()
         }     
       getSingleUser()
     },[])
-    useEffect(()=>{
+    useEffect(()=>{ 
 console.log(guestToken)
     },[guestToken])
    

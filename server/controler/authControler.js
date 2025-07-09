@@ -423,6 +423,39 @@ exports.verifyForgotPasswordOTP = async (req, res) => {
 };
 
 
+// exports.createGuestUser = async (req, res) => {
+
+//     try {
+//         // Generate a unique guest identifier
+//         const guestToken = require('crypto').randomBytes(32).toString('hex');
+        
+//         // Create guest user in database
+//         const guestUser = new userAuthCollection({
+//             isGuest: true,
+//             guestToken: guestToken,
+//             guestExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days expiry
+//             // You can add other default fields if needed
+//         });
+//    const token = user.generateAuthToken();
+//         await guestUser.save();
+
+//         // Return guest token to client
+//         res.status(200).json({
+//             status: 200,
+//             message: "Guest session created",
+//             guestToken: token,
+//             guestUserId: guestUser._id
+//         });
+
+//     } catch (err) {
+//         console.error("Guest user creation error:", err);
+//         return res.status(500).json({ 
+//             status: 500, 
+//             message: "Internal server error" 
+//         });
+//     }
+// };
+
 exports.createGuestUser = async (req, res) => {
     try {
         // Generate a unique guest identifier
@@ -438,12 +471,16 @@ exports.createGuestUser = async (req, res) => {
 
         await guestUser.save();
 
+        // Generate authentication token
+        const token = guestUser.generateAuthToken();
+
         // Return guest token to client
         res.status(200).json({
             status: 200,
             message: "Guest session created",
-            guestToken: guestToken,
-            guestUserId: guestUser._id
+            token: token,  // Changed from guestToken to token for clarity
+            guestUserId: guestUser._id,
+            isGuest: true  // Explicitly indicate this is a guest user
         });
 
     } catch (err) {
