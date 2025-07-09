@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const subCategoriesSchema = new mongoose.Schema({
-    subCategoryName: { 
+const ChildCategorySchema = new mongoose.Schema({
+    ChildCategoryName: { 
         type: String,
         required: true
     },
-    subCategoryImage: {  
+    ChildCategoryImage: {  
         type: String,
         required: false
     },
@@ -13,11 +13,7 @@ const subCategoriesSchema = new mongoose.Schema({
         type:String,
 
     },
-      subcategories: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'childCategory'
-          }],
-    subCategoryDescription: {  
+    ChildCategoryDescription: {  
         type: String,
         required: true
     },
@@ -30,7 +26,13 @@ const subCategoriesSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
+    ,
+    ChildBanner:{
+        type:String,
+        default:""
+    }
+
 });
 
-const SubCategoryModel = mongoose.model('SubCategory', subCategoriesSchema);
-module.exports = SubCategoryModel;
+const ChildCategoryModel = mongoose.model('childCategory', ChildCategorySchema);
+module.exports = ChildCategoryModel;
