@@ -7,15 +7,15 @@ const jwt = require('jsonwebtoken');
 const userSchema = new Schema({
     firstName: {
         type: String,
-        
+        default:"guest"
     },
     lastName: {
         type: String,
-   
+   default:"user"
     },
     email: {
         type: String,
-       
+       default:"",
       
         lowercase: true
     },
