@@ -219,7 +219,12 @@ export const useGuestUserCreate = ()=>{
         setError(null)
         setSuccess(null)
         try{
-            const response = await axios.post(`${baseUrl}/createGuestUser`)
+            const response = await axios.post(`${baseUrl}/createGuestUser`,{
+              headers: {
+                    'Content-Type': 'application/json',
+                    
+                }
+            })
             setSuccess(response?.data?.token)
             return response.data
         }catch(err){
