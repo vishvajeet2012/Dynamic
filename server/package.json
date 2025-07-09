@@ -4,6 +4,7 @@
   "description": "fully dynamic server",
   "main": "server.js",
   "scripts": {
+    "build":"npm install",
     "start": "nodemon server.js",
     "dev": "nodemon server.js"
   },

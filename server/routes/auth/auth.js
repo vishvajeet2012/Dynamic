@@ -10,8 +10,8 @@ Router.post('/userFound', userLogin);
 Router.get('/getsingleuser',auth,getUser)
 Router.post('/verifyotp', verifyOTP);
 Router.post('/resendotp',resendOTP);
-Router.post("/forgetPassword",auth,forgotPassword)
-Router.post("/verifyotppass",auth,verifyForgotPasswordOTP)
+Router.post("/forgetPassword",forgotPassword)
+Router.post("/verifyotppass",verifyForgotPasswordOTP)
 
 Router.post('/updateprofile',auth,updateUserProfilePicture)
 Router.post('/userdataupdate',auth,updateUserData)

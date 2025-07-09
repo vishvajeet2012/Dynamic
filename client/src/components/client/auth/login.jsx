@@ -16,9 +16,7 @@ export default function Login() {
     const password = formData.get('password');
     
 
-        const handleClickForget = async() => {
-          await forgetPassword();  
-        }
+    
 
     const token = await loginApi({ email, password });
     if (token) {
@@ -26,6 +24,9 @@ export default function Login() {
       navigate('/'); // Redirect to protected route
     }
   }
+    async function handleClickForget () {
+          await forgetPassword();  
+        }
   return (
     <div className="">
       <div className="w-full flex flex-row h-screen">
@@ -67,7 +68,7 @@ export default function Login() {
               <p className="">
                 Don't have an account? <Link to="/signup" className="text-blue-500 hover:underline">Sign up</Link>
               </p>
-              <Link onClick={handleClickForget} to="/forget-password" className="text-blue-500 hover:underline">Forget Password</Link>
+            { error && <Link onClick={handleClickForget} to="/forget-password" className="text-blue-500 hover:underline">Forget Password</Link>}
               </div>
 
             </form> 

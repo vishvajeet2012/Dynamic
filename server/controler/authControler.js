@@ -262,7 +262,7 @@ exports.userLogin = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
     try {
         
-        const email = req.user?.email
+        const { email } = req.body;
 
         if (!email) {
             return res.status(400).json({ 
@@ -309,8 +309,8 @@ exports.forgotPassword = async (req, res) => {
 
 exports.verifyForgotPasswordOTP = async (req, res) => {
     try {
-        const { otp, newPassword, confirmPassword } = req.body;
-        const email = req.user?.email
+        const { email,otp, newPassword, confirmPassword } = req.body;
+       
         
         if (!email || !otp || !newPassword || !confirmPassword) {
             return res.status(400).json({ 

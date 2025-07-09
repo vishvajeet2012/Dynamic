@@ -153,7 +153,7 @@ export const useforgetPassword = ()=>{
         try{
             const token = localStorage.getItem('token');
             const response = await axios.post(`${baseUrl}/forgetPassword`,{
-
+                            email
             },{
                 headers: {
                     'Content-Type': 'application/json',
@@ -179,14 +179,14 @@ export const useverifyForgotPasswordOTP = ()=>{
     const [loading,setLoading]= useState(false)
     const [error , setError]= useState(null)
     const [success , setSuccess]= useState(null)
-    const verifyForgotPasswordOTP = async ( otp, newPassword, confirmPassword )=>{
+    const verifyForgotPasswordOTP = async (email, otp, newPassword, confirmPassword )=>{
         setLoading(true)
         setError(null)
         setSuccess(null)
         try{
             const token = localStorage.getItem('token');
             const response = await axios.post(`${baseUrl}/forgetPassword`,{
- otp, newPassword, confirmPassword 
+ email,otp, newPassword, confirmPassword 
             },{
                 headers: {
                     'Content-Type': 'application/json',
