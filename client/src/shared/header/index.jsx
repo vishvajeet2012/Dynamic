@@ -58,7 +58,7 @@ const {getLogo,loading ,error,success} =   getLogoheader()
           <div className="flex text-xl flex-row items-center">
             <CiHeart />
 
-            <p className="text-lg">Wishlist</p>
+            <Link to="/p" className="text-lg">Wishlist</Link>
           </div>
 
           <div className="text-xl flex items-center flex-row">
