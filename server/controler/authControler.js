@@ -87,59 +87,117 @@ const sendOTPEmail = async (email, otp) => {
     }
 };
 
+// exports.userRegister = async (req, res) => {
+//     try {
+//         const { firstName, lastName, email, password } = req.body;
+        
+//         if (!firstName || !lastName || !email || !password) {
+//             return res.status(400).json({ message: "All fields are required" });
+//         }
+        
+//         const existingUser = await userAuthCollection.findOne({ email });
+//          if (existingUser) {
+//             if (!existingUser.isVerified) {
+//                 // Delete unverified user
+//                 await userAuthCollection.deleteOne({ email });
+//             } else {
+//                 return res.status(400).json({ message: "Email is already registered." });
+//             }
+//         }
+
+
+//         const hash = await bcrypt.hash(password, 10);
+//         const user = new userAuthCollection({
+//             firstName,
+//             lastName,
+//             email,
+//             password: hash,
+//         });
+
+//         // Generate OTP
+//         const otp = user.generateOTP();
+//         await user.save();
+
+//         // Send OTP email
+//         const emailSent = await sendOTPEmail(email, otp);
+//         if (!emailSent) {
+//             return res.status(500).json({ message: "Failed to send OTP email" });
+//         }
+
+//         res.status(200).json({ 
+//             status: 200,
+//             message: "User registered successfully. Please check your email for OTP.", 
+//             data:{
+//                 firstName,
+//                 lastName,
+//                 email,
+//                 password:"password "
+//             }
+//         });
+
+//     } catch (err) {
+//         console.error("Registration error:", err);
+//         return res.status(500).json({ status: 500, message: "Internal server error" });
+//     }
+// };
+
+
+
+
 exports.userRegister = async (req, res) => {
     try {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, guestToken } = req.body;
         
+        // Check required fields
         if (!firstName || !lastName || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
         
+        // Check for existing user
         const existingUser = await userAuthCollection.findOne({ email });
-         if (existingUser) {
-            if (!existingUser.isVerified) {
-                // Delete unverified user
-                await userAuthCollection.deleteOne({ email });
-            } else {
-                return res.status(400).json({ message: "Email is already registered." });
+        
+        // Handle guest conversion if guestToken provided
+        if (guestToken) {
+            const guestUser = await userAuthCollection.findOne({ 
+                guestToken,
+                isGuest: true 
+            });
+            
+            if (!guestUser) {
+                return res.status(400).json({ message: "Invalid guest session" });
             }
+            
+            // Convert guest to regular user
+            guestUser.firstName = firstName;
+            guestUser.lastName = lastName;
+            guestUser.email = email;
+            guestUser.password = await bcrypt.hash(password, 10);
+            guestUser.isGuest = false;
+            guestUser.guestToken = undefined;
+            
+            // Generate OTP
+            const otp = guestUser.generateOTP();
+            await guestUser.save();
+            
+            // Send OTP email
+            await sendOTPEmail(email, otp);
+            
+            return res.status(200).json({ 
+                message: "Account created successfully. Please verify your email.",
+                isGuestConversion: true
+            });
         }
-
-
-        const hash = await bcrypt.hash(password, 10);
-        const user = new userAuthCollection({
-            firstName,
-            lastName,
-            email,
-            password: hash,
-        });
-
-        // Generate OTP
-        const otp = user.generateOTP();
-        await user.save();
-
-        // Send OTP email
-        const emailSent = await sendOTPEmail(email, otp);
-        if (!emailSent) {
-            return res.status(500).json({ message: "Failed to send OTP email" });
-        }
-
-        res.status(200).json({ 
-            status: 200,
-            message: "User registered successfully. Please check your email for OTP.", 
-            data:{
-                firstName,
-                lastName,
-                email,
-                password:"password "
-            }
-        });
-
+        
+        // Rest of your existing registration logic...
     } catch (err) {
-        console.error("Registration error:", err);
-        return res.status(500).json({ status: 500, message: "Internal server error" });
+        // Error handling
     }
 };
+
+
+
+
+
 
 exports.verifyOTP = async (req, res) => {
     try {
@@ -359,6 +417,39 @@ exports.verifyForgotPasswordOTP = async (req, res) => {
         console.error("Forgot password OTP verification error:", err);
         return res.status(500).json({ 
             status: 500,
+            message: "Internal server error" 
+        });
+    }
+};
+
+
+exports.createGuestUser = async (req, res) => {
+    try {
+        // Generate a unique guest identifier
+        const guestToken = require('crypto').randomBytes(32).toString('hex');
+        
+        // Create guest user in database
+        const guestUser = new userAuthCollection({
+            isGuest: true,
+            guestToken: guestToken,
+            guestExpiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days expiry
+            // You can add other default fields if needed
+        });
+
+        await guestUser.save();
+
+        // Return guest token to client
+        res.status(200).json({
+            status: 200,
+            message: "Guest session created",
+            guestToken: guestToken,
+            guestUserId: guestUser._id
+        });
+
+    } catch (err) {
+        console.error("Guest user creation error:", err);
+        return res.status(500).json({ 
+            status: 500, 
             message: "Internal server error" 
         });
     }

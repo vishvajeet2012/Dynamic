@@ -208,3 +208,25 @@ export const useverifyForgotPasswordOTP = ()=>{
 
 
 
+/////guest export 
+
+export const useGuestUserCreate = ()=>{
+    const [loading,setLoading]= useState(false)
+    const [error , setError]= useState(null)
+    const [success , setSuccess]= useState(null)
+    const guestUserCreate = async ()=>{
+        setLoading(true)
+        setError(null)
+        setSuccess(null)
+        try{
+            const response = await axios.post(`${baseUrl}/createGuestUser`,{})
+            setSuccess(response?.data?.token)
+            return response.data
+        }catch(err){
+            setError(err)
+        }finally{
+            setLoading(false)
+        }
+    }
+    return {guestUserCreate,loading,error,success}
+}

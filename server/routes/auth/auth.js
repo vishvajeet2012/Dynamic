@@ -1,5 +1,5 @@
 const Router = require('express').Router();
-const { userRegister, userLogin, verifyOTP, resendOTP, forgotPassword, verifyForgotPasswordOTP } = require('../../controler/authControler');
+const { userRegister, userLogin, verifyOTP, resendOTP, forgotPassword, verifyForgotPasswordOTP, createGuestUser } = require('../../controler/authControler');
 const { CreateCategory } = require('../../controler/categoryControler');
 const auth = require('../../middleware/authmiddleware');
 
@@ -12,6 +12,10 @@ Router.post('/verifyotp', verifyOTP);
 Router.post('/resendotp',resendOTP);
 Router.post("/forgetPassword",forgotPassword)
 Router.post("/verifyotppass",verifyForgotPasswordOTP)
+
+//s//guest
+Router.post("/createGuestUser",createGuestUser)
+
 
 Router.post('/updateprofile',auth,updateUserProfilePicture)
 Router.post('/userdataupdate',auth,updateUserData)

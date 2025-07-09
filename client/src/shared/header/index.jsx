@@ -7,16 +7,26 @@ import { CiShoppingCart } from "react-icons/ci";
 import Menu from "./Menu";
 import { Link } from "react-router-dom";
 import { getLogoheader } from "../../hooks/client/homePageHooks/use-headerLogo";
-import { useGetSingleUser } from "../../hooks/auth/use-Auth";
+import { useGetSingleUser, useGuestUserCreate } from "../../hooks/auth/use-Auth";
 import { use } from "react";
 import { useEffect } from "react";
+import { useAuth } from "../../../context/authConext";
 
 export default function Header() {
 const {getLogo,loading ,error,success} =   getLogoheader()
+ const { login: authLogin } = useAuth();
+ const{guestUserCreate,loading:guestLloading,error:guestError,success:guestToken}= useGuestUserCreate()
+
      const  {getSingleUser,laoding:userLoading ,error:userError,user}  =  useGetSingleUser()
     useEffect(() => {
+        if(!token){
+            guestUserCreate()
+        }     
       getSingleUser()
     },[])
+    useEffect(()=>{
+console.log(guestToken)
+    },[guestToken])
    
   return (
     <>

@@ -66,6 +66,16 @@ const userSchema = new Schema({
         type: String,
 
     },
+    isGuest: {
+  type: Boolean,
+  default: false
+},
+guestToken: {
+  type: String
+},
+guestExpiry: {
+  type: Date
+},
     otpExpiry: {
         type: Date,
 
