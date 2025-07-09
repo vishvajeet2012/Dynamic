@@ -19,11 +19,11 @@ router.get('/categoryupdatebyid/:id', GetCategoryById);
 router.put('/updatecategory/:id', UpdateCategory);
 router.delete('/deletecategory/:id', DeleteCategory);
 
-router.post('/createaboutus', CreateAboutusControler )
-router.get('/getaboutus', getAboutUs)
+router.post('/createaboutus',auth, CreateAboutusControler )
+router.get('/getaboutus',auth, getAboutUs)
 
 
-router.get('/getallcategory',GetAllCategories)
+router.get('/getallcategory',auth,GetAllCategories)
 router.post('/subcategorycreate',createSubCategory)
 router.post('/updateSubCategory',auth,updateSubCategory)
 
@@ -37,13 +37,13 @@ router.delete("/deleteImage/:id", auth, uploadImageonCloud.deleteImageController
 router.post('/bannercreates', auth, createBanner);
 router.put('/updatebanner/:id', auth,updateBanner);
 router.delete('/deletebaner/:id', auth,deleteBanner);
-router.post('/getbannersbytype' ,getBannersByType)
+router.post('/getbannersbytype' ,auth,getBannersByType)
 router.patch('/:id/toggle-active',auth, toggleBannerActive);
 
 
     /////////////////////////Product ////////////////
     router.post('/productcreate', auth, createProduct);
-    router.get('/getallproduct',getProducts)
+    router.get('/getallproduct',auth,getProducts)
     router.post("/productdetele",auth,productDelete)
 router.post('/updateproduct',auth,updateProduct)
 
