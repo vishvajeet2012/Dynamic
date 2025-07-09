@@ -20,7 +20,7 @@ export default function HomePageControl() {
 
             <div className="bg-gray-900 p-6 rounded-lg shadow-lg mb-6">
                 <h2 className="text-xl font-semibold mb-3">Category Section</h2>
-              <Link to="/AdminCategory"><button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full">Add Category</button></Link> 
+              <Link to="/admincategory"><button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-full">Add Category</button></Link> 
           
             </div>
 

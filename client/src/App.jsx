@@ -30,7 +30,7 @@ function App() {
       <Route path="/profile" element={<UserProfile />} />
         <Route path="/category-update" element={<CategoryUpdateForm />} />
         <Route path="/p" element={<HomePageControl />} />
-        <Route path='/AdminCategory' element={<AdminCategory />} />
+        <Route path='/admincategory' element={<AdminCategory />} />
         <Route path='/p/adminaboutus' element={<AdminAboutUs />} />
         <Route path="/homelogo" element={<CreateHomeLogo />} />
         <Route path = "/bannerMangement" element={<CreateBanner/>} />
