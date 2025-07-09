@@ -219,7 +219,7 @@ export const useGuestUserCreate = ()=>{
         setError(null)
         setSuccess(null)
         try{
-            const response = await axios.post(`${baseUrl}/createGuestUser`,{})
+            const response = await axios.post(`${baseUrl}/createGuestUser`)
             setSuccess(response?.data?.token)
             return response.data
         }catch(err){
