@@ -21,8 +21,9 @@ const {getLogo,loading ,error,success} =   getLogoheader()
     useEffect(() => {
     const token =localStorage.getItem('token')
       
-            guestUserCreate()
-     
+      if  (!token){   
+    guestUserCreate()
+         }
            
       getSingleUser()
     },[])
