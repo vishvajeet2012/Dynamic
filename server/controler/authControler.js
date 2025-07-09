@@ -238,7 +238,7 @@ exports.userLogin = async (req, res) => {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ message: "All fields are required", status: 400 });
-        }
+        }   
         const user = await userAuthCollection.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: "User not found, please register first", status: 404 });
