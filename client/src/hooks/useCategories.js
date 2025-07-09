@@ -162,3 +162,34 @@ export const useupdateSubCategory = ()=>{
   }
   return {subCategoryupdate,loading,error,success}
 }
+
+
+
+
+export const useChildCateogry = ()=>{
+  const [loading,setLoading]= useState(false)
+  const [error , setError]= useState(null)
+  const [success , setSuccess]= useState(false)
+  const childCategory = async (formData)=>{    
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+    try {
+      const response =await axios.post(`${homeUrl}/childcategorycreate`,formData, {
+              headers:{
+                'Content-Type': 'application/json',
+                authorization:`Bearer ${localStorage.getItem('token')}`
+              }
+      })
+      setSuccess(true);
+      return response.data;  
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create category');
+      throw err;
+    } finally {
+      setLoading(false);  
+    }
+  }
+  return {childCategory,loading , error,success}
+
+}

@@ -9,6 +9,7 @@ const auth = require('../../middleware/authmiddleware');
 const uploadImageMiddleware = require('../../middleware/uploadImageMiddleware');
 const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBannersByType } = require('../../controler/BannerControler');
 const { createProduct, getProducts, productDelete, updateProduct } = require('../../controler/Productcontroler');
+const { createChildCategory } = require('../../controler/childCategoryControler');
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
@@ -26,6 +27,9 @@ router.get('/getaboutus', getAboutUs)
 router.get('/getallcategory',GetAllCategories)
 router.post('/subcategorycreate',auth,createSubCategory)
 router.post('/updateSubCategory',auth,updateSubCategory)
+
+router.post("/childcategory",auth,createChildCategory)
+
 
 router.post('/uploadImage' ,auth,uploadImageMiddleware.single('image'), uploadImageonCloud.uploadImageController)
 router.get("/get", auth, uploadImageonCloud.fetchImagesController);
