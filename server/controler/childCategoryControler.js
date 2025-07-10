@@ -2,59 +2,75 @@ const childModel = require("../models/childCategoryModel");
 const SubCategoryModel = require("../models/SubCategoryModel");
 
 exports.createChildCategory = async(req,res)=>{
-
 try {
-        const {subCategory,
-            ChildCategoryName, 
-            ChildCategoryImage, 
-            imagePublicId, 
-            childCategoryDescription,
-            bannerImage ,
-            isActive
-        } = req.body;
+    const {
+      subCategory,
+      childCategoryName,
+      childCategoryImage,
+      imagePublicId,
+      childCategoryDescription,
+      bannerImage,
+      isActive
+    } = req.body;
 
-        if( !childCategoryName|| 
-            !childCategoryImage||
-           ! imagePublicId|| 
-            !childCategoryDescription){
-                return res.status(404).json({message:"field missing", status:404 })
-            }
-            const child = await childModel.create({
-                 ChildCategoryName, 
-            ChildCategoryImage, 
-            imagePublicId, 
-            ChildCategoryDescription,
-            bannerImage ,
-            isActive
-            })
-            if(!child){
-                res.status(404).json({message:"error while creating child cateogry"})
-
-            } 
-                
-             const updatedChildCategory = await SubCategoryModel.findByIdAndUpdate(
-                        subCategory,
-                        { 
-                            $push: { childCategory: child._id },
-                            $set: { isActive: true } 
-                        },
-                        { new: true }
-                    );
-                    if(updatedChildCategory){
-                         await childModel.findByIdAndDelete(child._id);
-                                    return res.status(404).json({ message: 'Category not found' });
-                    }
-        res.status(201).json({
-            success: true,
-            message:"childCtegoryCreated",
-            data: {
-                childCategory: child,
-               
-            }
-        });
-
-    }catch(e){
-        res.status(500).json({status:500,message:"server error",error:error})
+    // Validation
+    if (
+      !childCategoryName ||
+      !childCategoryImage ||
+    
+      !childCategoryDescription
+    ) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        status: 400
+      });
     }
 
-}
+    // Create child category
+    const child = await childModel.create({
+      childCategoryName,
+      childCategoryImage,
+      imagePublicId,
+      childCategoryDescription,
+      bannerImage,
+      isActive
+    });
+
+    if (!child) {
+      return res.status(500).json({ message: "Error while creating child category" });
+    }
+
+    // Handle subCategory update only if it's present
+    if (subCategory && subCategory !== "") {
+      const updatedChildCategory = await SubCategoryModel.findByIdAndUpdate(
+        subCategory,
+        {
+          $push: { childCategory: child._id },
+          $set: { isActive: true }
+        },
+        { new: true }
+      );
+
+      if (!updatedChildCategory) {
+        // Rollback: delete created child category
+        await childModel.findByIdAndDelete(child._id);
+        return res.status(404).json({ message: "Subcategory not found" });
+      }
+    }
+
+    // Success response
+    return res.status(201).json({
+      success: true,
+      message: "Child category created successfully",
+      data: {
+        childCategory: child
+      }
+    });
+  } catch (e) {
+    return res.status(500).json({
+      status: 500,
+      message: "Server error",
+      error: e.message
+    });
+  }
+};
