@@ -3,7 +3,7 @@ const SubCategoryModel = require('../models/SubCategoryModel');
 exports.CreateCategory =async(req,res)=>{
     try{
         console.log(req.body ,"dsf   ")
-        const {categoryName,categoryImage,categoryDescription,isActive}=req.body
+        const {categoryName,categoryImage,categoryDescription,isActive ,bannerImage}=req.body
     if(!categoryName  || !categoryDescription ){
         return res.status(400).json({message:"Please provide all required fields"})
     }
@@ -13,7 +13,8 @@ const newCategory=new categoryModel({
     categoryName,
     categoryImage,
     categoryDescription,
-    isActive
+    isActive,
+    bannerImage
     
 });
       await newCategory.save()
@@ -29,7 +30,7 @@ exports.GetAllCategories = async (req, res) => {
         const categories = await categoryModel.find()
             .populate({
                 path: 'subcategories',
-                select: 'subCategoryName subCategoryImage subCategoryDescription isActive'
+                select: 'subCategoryName subCategoryImage subCategoryDescription isActive bannerImage'
             });
 
         if (!categories || categories.length === 0) {

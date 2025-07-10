@@ -16,6 +16,10 @@ const categorySchema=new mongoose.Schema({
         type:String,
         required:true
     },
+    bannerImage:{
+        type:String,
+        default:null
+    },
     subcategories: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'SubCategory'

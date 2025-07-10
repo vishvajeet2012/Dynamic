@@ -5,7 +5,7 @@ const categoryModel = require('../models/CategoryModel');
 
 exports.createSubCategory = async (req, res) => {
     try {
-        const { subCategoryName, subCategoryImage, subCategoryDescription, category, isActive ,imagePublicId} = req.body;
+        const { subCategoryName, subCategoryImage, subCategoryDescription, category, isActive ,imagePublicId,bannerImage} = req.body;
         
         // Validation
         if (!subCategoryName || !subCategoryDescription || !category) {
@@ -20,7 +20,8 @@ exports.createSubCategory = async (req, res) => {
             subCategoryImage,
             subCategoryDescription,
             isActive: isActive !== undefined ? isActive : true,
-            imagePublicId
+            imagePublicId,
+            bannerImage
         });
 
         // Update category (without populate first)
