@@ -70,13 +70,14 @@ exports.createSubCategory = async (req, res) => {
 exports.updateSubCategory = async (req, res) => {
     try {
      
-        const {category,subCategoryId, subCategoryName, subCategoryImage, subCategoryDescription, isActive ,imagePublicId} = req.body
+        const {category,subCategoryId, subCategoryName, subCategoryImage, subCategoryDescription, isActive ,imagePublicId,bannerImage} = req.body
                 const result = await SubCategoryModel.findByIdAndUpdate(subCategoryId, {
                     subCategoryName,
                     subCategoryImage,
                     subCategoryDescription,
                     isActive,
-                    imagePublicId
+                    imagePublicId,
+                    bannerImage
                 }, { new: true });
 
                   // Update category (without populate first)
