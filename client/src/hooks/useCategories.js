@@ -175,7 +175,7 @@ export const useChildCateogryCreate = ()=>{
     setError(null);
     setSuccess(false);
     try {
-      const response =await axios.post(`${homeUrl}/childcategorycreate`,formData, {
+      const response =await axios.post(`${homeUrl}/childcategory`,formData, {
               headers:{
                 'Content-Type': 'application/json',
                 authorization:`Bearer ${localStorage.getItem('token')}`

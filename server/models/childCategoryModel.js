@@ -13,7 +13,7 @@ const ChildCategorySchema = new mongoose.Schema({
         type:String,
 
     },
-    ChildCategoryDescription: {  
+    childCategoryDescription: {  
         type: String,
         required: true
     },
@@ -27,7 +27,7 @@ const ChildCategorySchema = new mongoose.Schema({
         default: false
     }
     ,
-    ChildBanner:{
+    bannerImage:{
         type:String,
         default:""
     }

@@ -4,19 +4,19 @@ const SubCategoryModel = require("../models/SubCategoryModel");
 exports.createChildCategory = async(req,res)=>{
 
 try {
-        const {subCategoryId,
+        const {subCategory,
             ChildCategoryName, 
             ChildCategoryImage, 
             imagePublicId, 
-            ChildCategoryDescription,
-            ChildBanner 
+            childCategoryDescription,
+            bannerImage ,
+            isActive
         } = req.body;
 
-        if( !ChildCategoryName|| 
-            !ChildCategoryImage||
+        if( !childCategoryName|| 
+            !childCategoryImage||
            ! imagePublicId|| 
-            !ChildCategoryDescription||
-            !ChildBanner){
+            !childCategoryDescription){
                 return res.status(404).json({message:"field missing", status:404 })
             }
             const child = await childModel.create({
@@ -24,7 +24,8 @@ try {
             ChildCategoryImage, 
             imagePublicId, 
             ChildCategoryDescription,
-            ChildBanner
+            bannerImage ,
+            isActive
             })
             if(!child){
                 res.status(404).json({message:"error while creating child cateogry"})
@@ -32,7 +33,7 @@ try {
             } 
                 
              const updatedChildCategory = await SubCategoryModel.findByIdAndUpdate(
-                        subCategoryId,
+                        subCategory,
                         { 
                             $push: { childCategory: child._id },
                             $set: { isActive: true } 

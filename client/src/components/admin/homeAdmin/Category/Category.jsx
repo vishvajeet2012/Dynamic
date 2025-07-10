@@ -395,7 +395,7 @@ export default function AdminCategory() {
   const { updateCategory } = useUpdateCategory();
   const { deleteCategory } = useDeleteCategory();
   const { createSubCategory } = useCreateSubCateogry();
-  const { createChildCategory, loading: childCategoryLoading, error: childCategoryError } = useChildCateogryCreate();
+  const { childCategory, loading: childCategoryLoading, error: childCategoryError } = useChildCateogryCreate();
   const { subCategoryupdate } = useupdateSubCategory();
   // const { deleteSubCategory } = useDeleteSubCategory();
   // const { deleteChildCategory } = useDeleteChildCategory();
@@ -567,7 +567,6 @@ export default function AdminCategory() {
       if (subCategoryBannerFile) {
         const formData = new FormData();
         formData.append("image", subCategoryBannerFile);
-        console.log("subCategoryBannerFile", subCategoryBannerFile);
         const res = await uploadImage(formData);
         bannerUrl = res.url;
         bannerPublicId = res.public_id;
@@ -584,7 +583,7 @@ export default function AdminCategory() {
         category: selectedCategory._id,
         subCategoryId: selectedSubcategory?._id || ""
       };
-console.log("subCategoryData", subCategoryData)
+
       if (selectedSubcategory) {
         await subCategoryupdate(subCategoryData);
       } else {
@@ -640,7 +639,7 @@ console.log("subCategoryData", subCategoryData)
       if (selectedChildCategory) {
        // await updateChildCategory(childCategoryData);
       } else {
-        await createChildCategory(childCategoryData);
+        await childCategory(childCategoryData);
       }
       
       resetChildCategoryForm();
