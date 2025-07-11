@@ -19,7 +19,7 @@ const subCategoriesSchema = new mongoose.Schema({
     },
       childCategory: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'childCategory'
+            ref: 'ChildCategory'
           }],
     subCategoryDescription: {  
         type: String,

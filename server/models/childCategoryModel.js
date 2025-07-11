@@ -30,5 +30,5 @@ const ChildCategorySchema = new mongoose.Schema({
   }
 });
 
-const ChildCategoryModel = mongoose.model('childCategory', ChildCategorySchema);
+const ChildCategoryModel = mongoose.model('ChildCategory', ChildCategorySchema);
 module.exports = ChildCategoryModel;
