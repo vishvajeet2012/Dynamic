@@ -31,10 +31,11 @@ exports.GetAllCategories = async (req, res) => {
             .populate({
                 path: 'subcategories',
                 select: 'subCategoryName subCategoryImage subCategoryDescription isActive bannerImage'
+              ,match: { isActive: true } // Only populate active subcategories
             }).populate({
-                path:"childCategories",
+                path:"childCategory",
                 select:"categoryName categoryImage categoryDescription isActive bannerImage"
-            })
+            }) 
 
         if (!categories || categories.length === 0) {
             return res.status(404).json({ 
