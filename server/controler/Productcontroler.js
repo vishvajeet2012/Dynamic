@@ -230,7 +230,7 @@ exports.createProduct = async (req, res) => {
       const givenChildIds = Array.isArray(childCategories)
       ? childCategories.map(id => id.toString())
       : [childCategories.toString()];
-    }
+    
     const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
     if (invalidChildIds.length > 0) {
       return res.status(400).json({
@@ -238,7 +238,7 @@ exports.createProduct = async (req, res) => {
         message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
       });
     }
-
+  }
     // Calculate selling price if basePrice or discount changes
     let sellingPrice = product.sellingPrice;
     if (basePrice !== undefined || discount !== undefined) {
