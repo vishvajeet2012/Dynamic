@@ -130,6 +130,9 @@ const SubCategory = require('../models/SubCategoryModel');
 
 
 
+
+
+
 exports.createProduct = async (req, res) => {
   try {
     const {
@@ -140,12 +143,11 @@ exports.createProduct = async (req, res) => {
       category,
       subcategories,
       childCategory,
-      images = [],
+      imagesUrls,
+      publicId,
       stock = 0,
       isNewArrival = false,
       color,
-      imagesUrls,
-      publicId,
       gender,
       size,
       weight,
@@ -162,64 +164,70 @@ exports.createProduct = async (req, res) => {
 
     // Validate numeric values
     if (isNaN(basePrice) || basePrice <= 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "basePrice must be a number greater than 0" 
+        message: "basePrice must be a number greater than 0"
       });
     }
 
     if (discount < 0 || discount > 100) {
-      return res.status(400).json({ 
-        success: false,
-        message: "Discount must be between 0 and 100" 
-      });
-    }
-
-    // Fetch category and its subcategories
-    const categoryDoc = await Category.findById(category).lean();
-    if (!categoryDoc) {
-      return res.status(404).json({ 
-        success: false,
-        message: "Category not found" 
-      });
-    }
-
-    // Validate subcategories
-    const validSubIds = categoryDoc.subcategories.map(sub => sub._id.toString());
-    const givenSubIds = Array.isArray(subcategories)
-      ? subcategories.map(id => id.toString())
-      : [subcategories.toString()];
-
-    const invalidSubIds = givenSubIds.filter(id => !validSubIds.includes(id));
-    if (invalidSubIds.length > 0) {
       return res.status(400).json({
         success: false,
-        message: `These subcategories do not belong to the selected category: ${invalidSubIds.join(", ")}`
+        message: "Discount must be between 0 and 100"
       });
     }
 
-    // Find the selected subcategory documents
-    const selectedSubcategories = categoryDoc.subcategories.filter(
-      sub => givenSubIds.includes(sub._id.toString())
-    );
+    // Validate category exists
+    const categoryExists = await Category.exists({ _id: category });
+    if (!categoryExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found"
+      });
+    }
+
+    // Convert subcategories to array if single value
+    const subcategoriesArray = Array.isArray(subcategories) 
+      ? subcategories 
+      : [subcategories];
+
+    // Validate subcategories belong to category
+    const invalidSubcategories = await SubCategory.find({
+      _id: { $in: subcategoriesArray },
+      category: { $ne: category }
+    });
+
+    if (invalidSubcategories.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `These subcategories don't belong to the selected category: ${invalidSubcategories.map(s => s._id).join(', ')}`
+      });
+    }
 
     // Validate child categories if provided
-    let givenChildIds = [];
     if (childCategory) {
-      givenChildIds = Array.isArray(childCategory)
-        ? childCategory.map(id => id.toString())
-        : [childCategory.toString()];
-      
-      // Get all valid child category IDs from the selected subcategories
-      const validChildIds = selectedSubcategories.flatMap(
-        sub => sub.childCategory ? sub.childCategory.map(child => child._id.toString()) : []
+      const childCategoriesArray = Array.isArray(childCategory)
+        ? childCategory
+        : [childCategory];
+
+      // Get all valid child categories for the selected subcategories
+      const validChildCategories = await Subcategory.find({
+        _id: { $in: subcategoriesArray }
+      }).select('childCategory');
+
+      const validChildIds = validChildCategories
+        .flatMap(sub => sub.childCategory)
+        .map(id => id.toString());
+
+      const invalidChildIds = childCategoriesArray.filter(
+        id => !validChildIds.includes(id.toString())
       );
-      
-      const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
+
       if (invalidChildIds.length > 0) {
         return res.status(400).json({
           success: false,
-          message: `Invalid child categories for the selected subcategories: ${invalidChildIds.join(", ")}`
+          message: `These child categories don't belong to the selected subcategories: ${invalidChildIds.join(', ')}`,
+          validChildCategories: validChildIds
         });
       }
     }
@@ -235,11 +243,13 @@ exports.createProduct = async (req, res) => {
       discount,
       sellingPrice,
       category,
-      subcategories: givenSubIds,
-      childCategory: givenChildIds.length > 0 ? givenChildIds : undefined,
+      subcategories: subcategoriesArray,
+      childCategory: childCategory 
+        ? (Array.isArray(childCategory) ? childCategory : [childCategory])
+        : undefined,
       images: {
-        publicId,
-        imagesUrls
+        publicId: publicId || '',
+        imagesUrls: imagesUrls || []
       },
       stock,
       isNewArrival,
@@ -257,21 +267,21 @@ exports.createProduct = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("🔥 Product creation error:", err);
+    console.error("Product creation error:", err);
 
     if (err.code === 11000) {
       return res.status(409).json({
         success: false,
-        message: `Duplicate value for field: ${Object.keys(err.keyValue)[0]}`
+        message: `Product with this ${Object.keys(err.keyPattern)[0]} already exists`
       });
     }
 
     if (err.name === "ValidationError") {
       const errors = Object.values(err.errors).map(e => e.message);
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Validation error", 
-        errors 
+        message: "Validation error",
+        errors
       });
     }
 
@@ -282,7 +292,6 @@ exports.createProduct = async (req, res) => {
     });
   }
 };
-
 
  exports.updateProduct = async (req, res) => {
   try {
