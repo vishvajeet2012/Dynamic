@@ -127,6 +127,9 @@ const SubCategory = require('../models/SubCategoryModel');
 //     });
 //   }
 // };
+
+
+
 exports.createProduct = async (req, res) => {
   try {
     const {
