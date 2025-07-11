@@ -397,12 +397,12 @@ exports.getProducts = async (req, res) => {
                     select: 'subCategoryName subCategoryImage subCategoryDescription isActive',
                     match: { isActive: true }, // Only populate active subcategories
                
-               populate: {
+              
+                  }).populate ({
                     path: 'childCategory',
                     select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
                     match: { isActive: true } // Only populate active child categories
-                }
-                  })
+                })
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });
