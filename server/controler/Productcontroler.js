@@ -62,19 +62,19 @@ exports.createProduct = async (req, res) => {
         message: `These subcategories do not belong to the selected category: ${invalidSubIds.join(", ")}`
       });
     }
-      if(childCategories){
-      const validChildIds = categoryDoc.childCategories.map(id => id.toString());
+      if(childCategory){
+      const validChildIds = categoryDoc?.subcategories.childCategories.map(id => id.toString());
       const givenChildIds = Array.isArray(childCategories)
       ? childCategories.map(id => id.toString())
       : [childCategories.toString()];
-    }
+    
     const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
     if (invalidChildIds.length > 0) {
       return res.status(400).json({
         success: false,
         message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
       });
-    }
+    }}
 
     // Calculate selling price
     const sellingPrice = basePrice - (basePrice * discount) / 100;
@@ -87,6 +87,7 @@ exports.createProduct = async (req, res) => {
       discount,
       sellingPrice,
       category,
+      childCategory:givenChildIds,
       subcategories: givenSubIds,
       images:{
         publicId,
@@ -226,7 +227,7 @@ exports.createProduct = async (req, res) => {
       }
     }
     if(childCategories){
-      const validChildIds = categoryDoc.childCategories.map(id => id.toString());
+      const validChildIds = categoryDoc?.subcategories?.childCategories.map(id => id.toString());
       const givenChildIds = Array.isArray(childCategories)
       ? childCategories.map(id => id.toString())
       : [childCategories.toString()];
