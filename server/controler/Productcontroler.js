@@ -16,7 +16,7 @@ exports.createProduct = async (req, res) => {
       discount = 0,
       category,
       subcategories,
-      childCategories,
+      childCategory,
       images = [],
       stock = 0,
       isNewArrival = false,
@@ -63,10 +63,10 @@ exports.createProduct = async (req, res) => {
       });
     }
      
-      const validChildIds = categoryDoc?.subcategories?.childCategories.map(id => id.toString());
-      const givenChildIds = Array.isArray(childCategories)
-      ? childCategories.map(id => id.toString())
-      : [childCategories.toString()];
+      const validChildIds = categoryDoc?.subcategories?.childCategory.map(id => id.toString());
+      const givenChildIds = Array.isArray(childCategory)
+      ? childCategory.map(id => id.toString())
+      : [childCategory.toString()];
     
     const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
     if (invalidChildIds.length > 0) {

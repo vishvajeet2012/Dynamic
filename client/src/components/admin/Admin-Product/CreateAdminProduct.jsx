@@ -144,7 +144,7 @@ export default function CreateAdminProduct() {
       imagesUrls: imagesUrls,
       size: productData.size,
       subcategories: productData.subcategories,
-      childCategories: productData.childCategories // <-- Added for submission
+      childCategory: productData.childCategories // <-- Added for submission
     };
 
     await createProduct(productToCreate);
