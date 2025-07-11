@@ -47,6 +47,10 @@ const productSchema = new mongoose.Schema({
           type: mongoose.Schema.Types.ObjectId,
           ref: 'SubCategory'
         }],
+        childCategory: [{
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'ChildCategory'
+                  }],
   ratings: {
     type: Number,
     default: 0
