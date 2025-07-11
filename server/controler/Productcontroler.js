@@ -63,7 +63,7 @@ exports.createProduct = async (req, res) => {
       });
     }
      
-      const validChildIds = validSubIds?.childCategory.map(id => id.toString());
+      const validChildIds = validSubIds?.childCategory?.map(id => id.toString());
       const givenChildIds = Array.isArray(childCategory)
       ? childCategory.map(id => id.toString())
       : [childCategory.toString()];
