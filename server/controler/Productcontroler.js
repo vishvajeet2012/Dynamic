@@ -7,6 +7,126 @@ const SubCategory = require('../models/SubCategoryModel');
 
 
 
+// exports.createProduct = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       description,
+//       basePrice,
+//       discount = 0,
+//       category,
+//       subcategories,
+//       childCategory,
+//       images = [],
+//       stock = 0,
+//       isNewArrival = false,
+//       color,
+//        imagesUrls,
+//       publicId,
+//       gender,
+//       size,
+//       weight,
+//       slug
+//     } = req.body;
+
+//     // Validate required fields
+//     if (!name || !description || !basePrice || !category || !subcategories) {
+//       return res.status(400).json({
+//         message: "Missing required fields: name, description, basePrice, category, subcategories"
+//       });
+//     }
+
+//     // Validate numeric values
+//     if (isNaN(basePrice) || basePrice <= 0) {
+//       return res.status(400).json({ message: "basePrice must be a number greater than 0" });
+//     }
+
+//     if (discount < 0 || discount > 100) {
+//       return res.status(400).json({ message: "Discount must be between 0 and 100" });
+//     }
+
+//     // Fetch category and its subcategories
+//     const categoryDoc = await Category.findById(category).lean();
+//     if (!categoryDoc) {
+//       return res.status(404).json({ message: "Category not found" });
+//     }
+
+//     const validSubIds = categoryDoc.subcategories.map(id => id.toString());
+//     const givenSubIds = Array.isArray(subcategories)
+//       ? subcategories.map(id => id.toString())
+//       : [subcategories.toString()];
+
+//     const invalidSubIds = givenSubIds.filter(id => !validSubIds.includes(id));
+//     if (invalidSubIds.length > 0) {
+//       return res.status(400).json({
+//         message: `These subcategories do not belong to the selected category: ${invalidSubIds.join(", ")}`
+//       });
+//     }
+     
+//       const validChildIds = categoryDoc?.subcategories?.childCategory.map(id => id.toString());
+//       const givenChildIds = Array.isArray(childCategory)
+//       ? childCategory.map(id => id.toString())
+//       : [childCategory.toString()];
+    
+//     const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
+//     if (invalidChildIds.length > 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
+//       });
+//     }
+
+//     // Calculate selling price
+//     const sellingPrice = basePrice - (basePrice * discount) / 100;
+
+//     // Create product
+//     const newProduct = await Product.create({
+//       name,
+//       description,
+//       basePrice,
+//       discount,
+//       sellingPrice,
+//       category,
+//       childCategory:givenChildIds,
+//       subcategories: givenSubIds,
+//       images:{
+//         publicId,
+//         imagesUrls},
+//       stock,
+//       isNewArrival,
+//       color,
+//       gender,
+//       size,
+//       weight,
+//       slug
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Product created successfully",
+//       product: newProduct
+//     });
+
+//   } catch (err) {
+//     console.error("🔥 Product creation error:", err);
+
+//     if (err.code === 11000) {
+//       return res.status(409).json({
+//         message: `Duplicate value for field: ${Object.keys(err.keyValue)[0]}`
+//       });
+//     }
+
+//     if (err.name === "ValidationError") {
+//       const errors = Object.values(err.errors).map(e => e.message);
+//       return res.status(400).json({ message: "Validation error", errors });
+//     }
+
+//     return res.status(500).json({
+//       message: "Internal Server Error",
+//       error: err.message
+//     });
+//   }
+// };
 exports.createProduct = async (req, res) => {
   try {
     const {
@@ -21,7 +141,7 @@ exports.createProduct = async (req, res) => {
       stock = 0,
       isNewArrival = false,
       color,
-       imagesUrls,
+      imagesUrls,
       publicId,
       gender,
       size,
@@ -32,26 +152,37 @@ exports.createProduct = async (req, res) => {
     // Validate required fields
     if (!name || !description || !basePrice || !category || !subcategories) {
       return res.status(400).json({
+        success: false,
         message: "Missing required fields: name, description, basePrice, category, subcategories"
       });
     }
 
     // Validate numeric values
     if (isNaN(basePrice) || basePrice <= 0) {
-      return res.status(400).json({ message: "basePrice must be a number greater than 0" });
+      return res.status(400).json({ 
+        success: false,
+        message: "basePrice must be a number greater than 0" 
+      });
     }
 
     if (discount < 0 || discount > 100) {
-      return res.status(400).json({ message: "Discount must be between 0 and 100" });
+      return res.status(400).json({ 
+        success: false,
+        message: "Discount must be between 0 and 100" 
+      });
     }
 
     // Fetch category and its subcategories
     const categoryDoc = await Category.findById(category).lean();
     if (!categoryDoc) {
-      return res.status(404).json({ message: "Category not found" });
+      return res.status(404).json({ 
+        success: false,
+        message: "Category not found" 
+      });
     }
 
-    const validSubIds = categoryDoc.subcategories.map(id => id.toString());
+    // Validate subcategories
+    const validSubIds = categoryDoc.subcategories.map(sub => sub._id.toString());
     const givenSubIds = Array.isArray(subcategories)
       ? subcategories.map(id => id.toString())
       : [subcategories.toString()];
@@ -59,21 +190,35 @@ exports.createProduct = async (req, res) => {
     const invalidSubIds = givenSubIds.filter(id => !validSubIds.includes(id));
     if (invalidSubIds.length > 0) {
       return res.status(400).json({
+        success: false,
         message: `These subcategories do not belong to the selected category: ${invalidSubIds.join(", ")}`
       });
     }
-     
-      const validChildIds = categoryDoc?.subcategories?.childCategory.map(id => id.toString());
-      const givenChildIds = Array.isArray(childCategory)
-      ? childCategory.map(id => id.toString())
-      : [childCategory.toString()];
-    
-    const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
-    if (invalidChildIds.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
-      });
+
+    // Find the selected subcategory documents
+    const selectedSubcategories = categoryDoc.subcategories.filter(
+      sub => givenSubIds.includes(sub._id.toString())
+    );
+
+    // Validate child categories if provided
+    let givenChildIds = [];
+    if (childCategory) {
+      givenChildIds = Array.isArray(childCategory)
+        ? childCategory.map(id => id.toString())
+        : [childCategory.toString()];
+      
+      // Get all valid child category IDs from the selected subcategories
+      const validChildIds = selectedSubcategories.flatMap(
+        sub => sub.childCategory ? sub.childCategory.map(child => child._id.toString()) : []
+      );
+      
+      const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
+      if (invalidChildIds.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid child categories for the selected subcategories: ${invalidChildIds.join(", ")}`
+        });
+      }
     }
 
     // Calculate selling price
@@ -87,11 +232,12 @@ exports.createProduct = async (req, res) => {
       discount,
       sellingPrice,
       category,
-      childCategory:givenChildIds,
       subcategories: givenSubIds,
-      images:{
+      childCategory: givenChildIds.length > 0 ? givenChildIds : undefined,
+      images: {
         publicId,
-        imagesUrls},
+        imagesUrls
+      },
       stock,
       isNewArrival,
       color,
@@ -112,16 +258,22 @@ exports.createProduct = async (req, res) => {
 
     if (err.code === 11000) {
       return res.status(409).json({
+        success: false,
         message: `Duplicate value for field: ${Object.keys(err.keyValue)[0]}`
       });
     }
 
     if (err.name === "ValidationError") {
       const errors = Object.values(err.errors).map(e => e.message);
-      return res.status(400).json({ message: "Validation error", errors });
+      return res.status(400).json({ 
+        success: false,
+        message: "Validation error", 
+        errors 
+      });
     }
 
     return res.status(500).json({
+      success: false,
       message: "Internal Server Error",
       error: err.message
     });
