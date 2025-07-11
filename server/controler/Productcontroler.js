@@ -16,6 +16,7 @@ exports.createProduct = async (req, res) => {
       discount = 0,
       category,
       subcategories,
+      childCategory,
       images = [],
       stock = 0,
       isNewArrival = false,
@@ -59,6 +60,19 @@ exports.createProduct = async (req, res) => {
     if (invalidSubIds.length > 0) {
       return res.status(400).json({
         message: `These subcategories do not belong to the selected category: ${invalidSubIds.join(", ")}`
+      });
+    }
+      if(childCategories){
+      const validChildIds = categoryDoc.childCategories.map(id => id.toString());
+      const givenChildIds = Array.isArray(childCategories)
+      ? childCategories.map(id => id.toString())
+      : [childCategories.toString()];
+    }
+    const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
+    if (invalidChildIds.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
       });
     }
 
@@ -125,6 +139,7 @@ exports.createProduct = async (req, res) => {
       discount,
       category,
       subcategories,
+      childCategories,
       stock,
       isNewArrival,
       color,
@@ -210,6 +225,19 @@ exports.createProduct = async (req, res) => {
         }
       }
     }
+    if(childCategories){
+      const validChildIds = categoryDoc.childCategories.map(id => id.toString());
+      const givenChildIds = Array.isArray(childCategories)
+      ? childCategories.map(id => id.toString())
+      : [childCategories.toString()];
+    }
+    const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
+    if (invalidChildIds.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
+      });
+    }
 
     // Calculate selling price if basePrice or discount changes
     let sellingPrice = product.sellingPrice;
@@ -230,6 +258,7 @@ exports.createProduct = async (req, res) => {
       subcategories: subcategories !== undefined 
         ? (Array.isArray(subcategories) ? subcategories : [subcategories])
         : product.subcategories,
+        childCategory: childCategories !== undefined ? childCategories : product.childCategories,
       images: {
         publicId: publicId !== undefined ? publicId : product.images.publicId,
         imagesUrls: imagesUrls !== undefined ? imagesUrls : product.images.imagesUrls
