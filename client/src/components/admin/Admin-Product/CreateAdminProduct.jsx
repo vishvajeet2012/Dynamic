@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {useCreateProduct} from "../../../hooks/Product/Product";
+import { useCreateProduct } from "../../../hooks/Product/Product";
 import { useUplaodImage } from '../../../hooks/client/homePageHooks/use-banner';
 import { useGetAllCategories } from '../../../hooks/useCategories';
 
@@ -9,7 +9,7 @@ export default function CreateAdminProduct() {
   const [imagesUrls, setImageUrls] = useState(null);
   const [publicIds, setPublicId] = useState(null);
   const { categories, loading: categoriesLoading, error: categoriesError, fetechCategories } = useGetAllCategories();
-  
+
   const [productData, setProductData] = useState({
     name: '',
     description: '',
@@ -21,11 +21,13 @@ export default function CreateAdminProduct() {
     gender: 'unisex',
     category: '',
     subcategories: [],
+    childCategories: [], // <-- Added state for child categories
     stock: 0,
     isNewArrival: false,
-    images: []
+    images: [],
+    slug: ''
   });
-  
+
   const [imageFiles, setImageFiles] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
 
@@ -38,8 +40,8 @@ export default function CreateAdminProduct() {
     setProductData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
-      // Reset subcategories when category changes
-      ...(name === 'category' && { subcategories: [] })
+      // Reset subcategories and child categories when category changes
+      ...(name === 'category' && { subcategories: [], childCategories: [] })
     }));
   };
 
@@ -54,30 +56,68 @@ export default function CreateAdminProduct() {
     });
   };
 
+  // Get selected category details
+  const selectedCategory = categories?.find(cat => cat._id === productData.category);
+  // Get active subcategories only
+  const activeSubcategories = selectedCategory?.subcategories?.filter(sub => sub.isActive) || [];
+
   const handleSubcategoryChange = (e) => {
-    const { value, checked } = e.target;
+    const { value, checked } = e.target; // value is the subcategory._id
+
+    // Find the full subcategory object to access its children
+    const subcategory = activeSubcategories.find(sub => sub._id === value);
+    const childIdsOfThisSub = subcategory?.childCategory?.map(child => child._id) || [];
+
     setProductData(prev => {
-      if (checked) {
-        return { ...prev, subcategories: [...prev.subcategories, value] };
-      } else {
-        return { ...prev, subcategories: prev.subcategories.filter(id => id !== value) };
-      }
+      const newSubcategories = checked
+        ? [...prev.subcategories, value]
+        : prev.subcategories.filter(id => id !== value);
+
+      // If a subcategory is unchecked, remove its children from the state
+      const newChildCategories = checked
+        ? prev.childCategories
+        : prev.childCategories.filter(childId => !childIdsOfThisSub.includes(childId));
+
+      return {
+        ...prev,
+        subcategories: newSubcategories,
+        childCategories: newChildCategories,
+      };
     });
   };
 
+  const handleChildCategoryChange = (e) => {
+    const { value, checked } = e.target;
+    setProductData(prev => {
+      const newChildCategories = checked
+        ? [...prev.childCategories, value]
+        : prev.childCategories.filter(id => id !== value);
+      return { ...prev, childCategories: newChildCategories };
+    });
+  };
+
+
   const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
-    const formData = new FormData();
-    formData.append("image", e.target.files[0]);
+    if (files.length === 0) return;
 
-    const v = await uploadImage(formData);
-    
-    if (v.url) {
-      setPublicId(v.publicId);
-      setImageUrls(v.url);
-    } else {
-      throw new Error('Image upload failed');
+    const formData = new FormData();
+    formData.append("image", files[0]);
+
+    try {
+        const v = await uploadImage(formData);
+        if (v.url) {
+            setPublicId(v.publicId);
+            setImageUrls(v.url);
+        } else {
+            throw new Error('Image upload failed to return a URL.');
+        }
+    } catch (uploadError) {
+        console.error("Upload error:", uploadError);
+        // Optionally, display this error to the user
+        return;
     }
+
 
     setImageFiles(files);
     const previews = files.map(file => URL.createObjectURL(file));
@@ -86,10 +126,11 @@ export default function CreateAdminProduct() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Prepare the product object to send
     const productToCreate = {
       name: productData.name,
+      slug: productData.slug,
       description: productData.description,
       basePrice: parseFloat(productData.basePrice),
       sellingPrice: parseFloat(productData.sellingPrice),
@@ -102,34 +143,30 @@ export default function CreateAdminProduct() {
       publicId: publicIds,
       imagesUrls: imagesUrls,
       size: productData.size,
-      subcategories: productData.subcategories
+      subcategories: productData.subcategories,
+      childCategories: productData.childCategories // <-- Added for submission
     };
-    
+
     await createProduct(productToCreate);
   };
 
   const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'OS'];
   const genderOptions = ['men', 'women', 'unisex'];
 
-  // Get selected category details
-  const selectedCategory = categories?.find(cat => cat._id === productData.category);
-  // Get active subcategories only
-  const activeSubcategories = selectedCategory?.subcategories?.filter(sub => sub.isActive) || [];
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Create New Product</h1>
-      
+
       {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
       {success && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">Product created successfully!</div>}
       {categoriesError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">Failed to load categories: {categoriesError}</div>}
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Basic Information */}
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
-            
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Product Name*</label>
               <input
@@ -141,7 +178,7 @@ export default function CreateAdminProduct() {
                 required
               />
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Description*</label>
               <textarea
@@ -153,7 +190,7 @@ export default function CreateAdminProduct() {
                 required
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-gray-700 mb-2">Base Price*</label>
@@ -177,7 +214,7 @@ export default function CreateAdminProduct() {
                 />
               </div>
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Discount (%)</label>
               <input
@@ -190,7 +227,7 @@ export default function CreateAdminProduct() {
                 className="w-full px-3 py-2 border rounded"
               />
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Color*</label>
               <input
@@ -202,12 +239,23 @@ export default function CreateAdminProduct() {
                 required
               />
             </div>
+             <div className="mb-4">
+               <label className="block text-gray-700 mb-2">Slug*</label>
+               <input
+                 type="text"
+                 name="slug"
+                 value={productData.slug}
+                 onChange={handleChange}
+                 className="w-full px-3 py-2 border rounded"
+                 required
+               />
+             </div>
           </div>
-          
+
           {/* Category & Attributes */}
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Category & Attributes</h2>
-            
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Gender*</label>
               <select
@@ -224,7 +272,7 @@ export default function CreateAdminProduct() {
                 ))}
               </select>
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Category*</label>
               <select
@@ -243,37 +291,57 @@ export default function CreateAdminProduct() {
                 ))}
               </select>
               {categoriesLoading && <p className="text-sm text-gray-500">Loading categories...</p>}
-              {selectedCategory && (
-                <p className="text-sm text-gray-500 mt-1">{selectedCategory.categoryDescription}</p>
-              )}
             </div>
             
+            {/* --- CHILD CATEGORY LOGIC START --- */}
             {productData.category && activeSubcategories.length > 0 && (
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Subcategories</label>
-                <div className="space-y-2">
-                  {activeSubcategories?.map(subcategory => (
-                    <div key={subcategory._id} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`sub-${subcategory._id}`}
-                        value={subcategory._id}
-                        checked={productData.subcategories.includes(subcategory._id)}
-                        onChange={handleSubcategoryChange}
-                        className="mr-2"
-                      />
-                      <label htmlFor={`sub-${subcategory._id}`}>
-                        {subcategory.subCategoryName}
-                        {subcategory.subCategoryDescription && (
-                          <span className="text-xs text-gray-500 ml-2">({subcategory.subCategoryDescription})</span>
-                        )}
-                      </label>
+              <div className="mb-4 p-3 border rounded">
+                <label className="block text-gray-700 mb-2 font-semibold">Subcategories</label>
+                <div className="space-y-3">
+                  {activeSubcategories.map(subcategory => (
+                    <div key={subcategory._id}>
+                      {/* Subcategory Checkbox */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`sub-${subcategory._id}`}
+                          value={subcategory._id}
+                          checked={productData.subcategories.includes(subcategory._id)}
+                          onChange={handleSubcategoryChange}
+                          className="mr-2 h-4 w-4"
+                        />
+                        <label htmlFor={`sub-${subcategory._id}`} className="font-medium text-gray-800">
+                          {subcategory.subCategoryName}
+                        </label>
+                      </div>
+
+                      {/* Child Category Checkboxes (shown if parent subcategory is checked) */}
+                      {productData.subcategories.includes(subcategory._id) && subcategory.childCategory?.length > 0 && (
+                        <div className="ml-8 mt-2 space-y-2 border-l-2 pl-4">
+                          {subcategory.childCategory.map(child => (
+                            <div key={child._id} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                id={`child-${child._id}`}
+                                value={child._id}
+                                checked={productData.childCategories.includes(child._id)}
+                                onChange={handleChildCategoryChange}
+                                className="mr-2"
+                              />
+                              <label htmlFor={`child-${child._id}`} className="text-sm">
+                                {child.childCategoryName}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
             )}
-            
+            {/* --- CHILD CATEGORY LOGIC END --- */}
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Sizes</label>
               <div className="grid grid-cols-3 gap-2">
@@ -292,7 +360,7 @@ export default function CreateAdminProduct() {
                 ))}
               </div>
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Stock*</label>
               <input
@@ -304,20 +372,6 @@ export default function CreateAdminProduct() {
                 required
               />
             </div>
-            
-  <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Slug*</label>
-              <input
-                type="text"
-                name="slug"
-                value={productData.slug}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded"
-                required
-              />
-            </div>
-            
-
 
             <div className="flex items-center mb-4">
               <input
@@ -332,11 +386,10 @@ export default function CreateAdminProduct() {
             </div>
           </div>
         </div>
-        
+
         {/* Image Upload */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Product Images</h2>
-          
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Upload Images*</label>
             <input
@@ -350,7 +403,7 @@ export default function CreateAdminProduct() {
             {uploadLoading && <p className="text-sm text-gray-500">Uploading image...</p>}
             {uploadError && <p className="text-sm text-red-500">{uploadError}</p>}
           </div>
-          
+
           {previewImages.length > 0 && (
             <div className="mt-4">
               <h3 className="text-md font-medium mb-2">Preview</h3>
@@ -364,7 +417,7 @@ export default function CreateAdminProduct() {
             </div>
           )}
         </div>
-        
+
         <div className="flex justify-end">
           <button
             type="submit"
