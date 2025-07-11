@@ -7,6 +7,7 @@ const SubCategory = require('../models/SubCategoryModel');
 
 
 
+
 exports.createProduct = async (req, res) => {
   try {
     const {
@@ -21,7 +22,7 @@ exports.createProduct = async (req, res) => {
       stock = 0,
       isNewArrival = false,
       color,
-       imagesUrls,
+      imagesUrls,
       publicId,
       gender,
       size,
@@ -29,14 +30,14 @@ exports.createProduct = async (req, res) => {
       slug
     } = req.body;
 
-    // Validate required fields
+    // ✅ Required Fields Validation
     if (!name || !description || !basePrice || !category || !subcategories) {
       return res.status(400).json({
         message: "Missing required fields: name, description, basePrice, category, subcategories"
       });
     }
 
-    // Validate numeric values
+    // ✅ Number Validation
     if (isNaN(basePrice) || basePrice <= 0) {
       return res.status(400).json({ message: "basePrice must be a number greater than 0" });
     }
@@ -45,12 +46,13 @@ exports.createProduct = async (req, res) => {
       return res.status(400).json({ message: "Discount must be between 0 and 100" });
     }
 
-    // Fetch category and its subcategories
+    // ✅ Check if Category exists
     const categoryDoc = await Category.findById(category).lean();
     if (!categoryDoc) {
       return res.status(404).json({ message: "Category not found" });
     }
 
+    // ✅ Validate Subcategories belong to Category
     const validSubIds = categoryDoc.subcategories.map(id => id.toString());
     const givenSubIds = Array.isArray(subcategories)
       ? subcategories.map(id => id.toString())
@@ -62,24 +64,32 @@ exports.createProduct = async (req, res) => {
         message: `These subcategories do not belong to the selected category: ${invalidSubIds.join(", ")}`
       });
     }
-     
-      const validChildIds = validSubIds?.childCategory?.map(id => id.toString());
-      const givenChildIds = Array.isArray(childCategory)
+
+    // ✅ Get childCategory list from SubCategory documents
+    const subDocs = await SubCategory.find({ _id: { $in: givenSubIds } }).lean();
+
+    // ✅ Flatten all valid childCategory IDs
+    const validChildIds = subDocs.flatMap(sub =>
+      Array.isArray(sub.childCategory) ? sub.childCategory.map(id => id.toString()) : []
+    );
+
+    // ✅ Validate Child Category
+    const givenChildIds = Array.isArray(childCategory)
       ? childCategory.map(id => id.toString())
       : [childCategory.toString()];
-    
+
     const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
     if (invalidChildIds.length > 0) {
       return res.status(400).json({
         success: false,
-        message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
+        message: `Invalid child categories for selected subcategories: ${invalidChildIds.join(", ")}`
       });
     }
 
-    // Calculate selling price
+    // ✅ Calculate Selling Price
     const sellingPrice = basePrice - (basePrice * discount) / 100;
 
-    // Create product
+    // ✅ Create Product
     const newProduct = await Product.create({
       name,
       description,
@@ -87,11 +97,12 @@ exports.createProduct = async (req, res) => {
       discount,
       sellingPrice,
       category,
-      childCategory:givenChildIds,
       subcategories: givenSubIds,
-      images:{
+      childCategory: givenChildIds,
+      images: {
         publicId,
-        imagesUrls},
+        imagesUrls
+      },
       stock,
       isNewArrival,
       color,
@@ -126,8 +137,7 @@ exports.createProduct = async (req, res) => {
       error: err.message
     });
   }
-};
-
+}
 
 
 
