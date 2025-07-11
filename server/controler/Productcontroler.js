@@ -16,7 +16,7 @@ exports.createProduct = async (req, res) => {
       discount = 0,
       category,
       subcategories,
-      childCategory,
+      childCategories,
       images = [],
       stock = 0,
       isNewArrival = false,
@@ -63,7 +63,7 @@ exports.createProduct = async (req, res) => {
       });
     }
      
-      const validChildIds = categoryDoc?.subcategories.childCategories.map(id => id.toString());
+      const validChildIds = categoryDoc?.subcategories?.childCategories.map(id => id.toString());
       const givenChildIds = Array.isArray(childCategories)
       ? childCategories.map(id => id.toString())
       : [childCategories.toString()];
