@@ -25,37 +25,47 @@ const newCategory=new categoryModel({
 
 }
 
-exports.GetAllCategories = async (req, res) => {
-    try {
-        const categories = await categoryModel.find()
-            .populate({
+    exports.GetAllCategories = async (req, res) => {
+        try {
+            const categories = await categoryModel.find()
+             .populate({
                 path: 'subcategories',
-                select: 'subCategoryName subCategoryImage subCategoryDescription isActive bannerImage'
-              ,match: { isActive: true } // Only populate active subcategories
-            }).populate({
-                path:"childCategory",
-                select:"categoryName categoryImage categoryDescription isActive bannerImage"
-            }) 
+                select: 'subCategoryName subCategoryImage subCategoryDescription isActive bannerImage',
+                match: { isActive: true }, // Only populate active subcategories
+                populate: {
+                    path: 'childCategory',
+                    select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
+                    match: { isActive: true } // Only populate active child categories
+                }
+            });
+                // .populate({
+                //     path: 'subcategories',
+                //     select: 'subCategoryName subCategoryImage subCategoryDescription isActive bannerImage'
+                // ,match: { isActive: true } // Only populate active subcategories
+                // }).populate({
+                //     path:"childCategory",
+                //     select:"categoryName categoryImage categoryDescription isActive bannerImage"
+                // }) 
 
-        if (!categories || categories.length === 0) {
-            return res.status(404).json({ 
+            if (!categories || categories.length === 0) {
+                return res.status(404).json({ 
+                    success: false,
+                    message: 'No categories found' 
+                });
+            }
+
+            res.status(200).json(
+            categories
+            );
+
+        } catch (error) {
+            res.status(500).json({ 
                 success: false,
-                message: 'No categories found' 
+                message: 'Error fetching categories',
+                error: error.message 
             });
         }
-
-        res.status(200).json(
-         categories
-        );
-
-    } catch (error) {
-        res.status(500).json({ 
-            success: false,
-            message: 'Error fetching categories',
-            error: error.message 
-        });
-    }
-};
+    };
 
 
 exports.UpdateCategory = async (req, res) => {
