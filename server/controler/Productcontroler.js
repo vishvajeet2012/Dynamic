@@ -62,7 +62,7 @@ exports.createProduct = async (req, res) => {
         message: `These subcategories do not belong to the selected category: ${invalidSubIds.join(", ")}`
       });
     }
-      if(childCategory){
+     
       const validChildIds = categoryDoc?.subcategories.childCategories.map(id => id.toString());
       const givenChildIds = Array.isArray(childCategories)
       ? childCategories.map(id => id.toString())
@@ -74,7 +74,7 @@ exports.createProduct = async (req, res) => {
         success: false,
         message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
       });
-    }}
+    }
 
     // Calculate selling price
     const sellingPrice = basePrice - (basePrice * discount) / 100;
