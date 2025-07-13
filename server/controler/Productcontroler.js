@@ -438,85 +438,45 @@ const { Types } = require('mongoose'); // Import Types for ObjectId validation
 
 
 exports.getProductbykeys = async (req, res) => {
-  try {
-    const { categoryIds, subcategoryIds, childCategoryIds } = req.body;
-
-    // --- 1. PAGINATION ---
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 12;
-    const skip = (page - 1) * limit;
-
-    // --- 2. VALIDATE INPUT ---
-    if (!categoryIds && !subcategoryIds && !childCategoryIds) {
-      return res.status(400).json({
-        success: false,
-        message: "Either categoryIds, subcategoryIds, or childCategoryIds is required.",
-      });
-    }
-
-    // --- 3. PROCESS IDS (string or array) ---
-    const processIds = (ids) => {
-      if (!ids) return [];
-      if (typeof ids === 'string') return [ids];
-      if (Array.isArray(ids)) return ids;
-      return [];
-    };
-
-    const categoryArray = processIds(categoryIds);
-    const subcategoryArray = processIds(subcategoryIds);
-    const childCategoryArray = processIds(childCategoryIds);
-
-    // --- 4. BUILD QUERY ---
+ try {
+    const { categoryId, subcategoryIds, childCategoryIds } = req.query;
+    
+    // Build the query object
     const query = {};
-
-    // Category filter - single ObjectId field
-    if (categoryArray.length > 0) {
-      query.category = { $in: categoryArray };
+    
+    if (categoryId) {
+      query.category = categoryId;
     }
-
-    // Subcategories filter - array field
-    if (subcategoryArray.length > 0) {
+    
+    if (subcategoryIds) {
+      // Convert comma-separated string to array of IDs
+      const subcategoryArray = subcategoryIds.split(',');
       query.subcategories = { $in: subcategoryArray };
     }
-
-    // ChildCategory filter - array field  
-    if (childCategoryArray.length > 0) {
+    
+    if (childCategoryIds) {
+      // Convert comma-separated string to array of IDs
+      const childCategoryArray = childCategoryIds.split(',');
       query.childCategory = { $in: childCategoryArray };
     }
-
-    // --- 5. EXECUTE QUERY ---
-    const [products, totalProducts] = await Promise.all([
-      Product.find(query)
-        .populate('category')
-        .populate('subcategories')
-        .populate('childCategory')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Product.countDocuments(query)
-    ]);
-
-    // --- 6. RESPONSE ---
-    return res.status(200).json({
+    
+    const products = await Product.find(query)
+      .populate('category')
+      .populate('subcategories')
+      .populate('childCategory');
+    
+    res.status(200).json({
       success: true,
-      data: {
-        products,
-        pagination: {
-          totalProducts,
-          totalPages: Math.ceil(totalProducts / limit),
-          currentPage: page,
-          hasNextPage: page * limit < totalProducts,
-          hasPrevPage: page > 1,
-        }
-      }
+      count: products.length,
+      data: products
     });
-
+    
   } catch (error) {
-    console.error('Error in getProductbykeys:', error);
-    return res.status(500).json({
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: 'An error occurred while fetching products.',
+      message: 'Server Error',
+      error: error.message
     });
   }
 };
