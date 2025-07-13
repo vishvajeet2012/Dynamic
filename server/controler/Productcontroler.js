@@ -443,7 +443,7 @@ exports.getProductbykeys= async (req, res) => {
     // --- 1. VALIDATION & PAGINATION SETUP ---
 
     const { keyword, categoryIds } = req.body;
-    
+  
     // Set up pagination from query parameters, with safe defaults.
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 12;
@@ -451,23 +451,12 @@ exports.getProductbykeys= async (req, res) => {
 
     // --- Input Validation ---
     // Ensure categoryIds, if provided, is a valid array of ObjectIDs.
-    if (categoryIds) {
-      if (!Array.isArray(categoryIds)) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'categoryIds must be an array.' 
-        });
-      }
-      for (const id of categoryIds) {
-        if (!Types.ObjectId.isValid(id)) {
-          return res.status(400).json({
-            success: false,
-            message: `Invalid category ID provided: ${id}`
-          });
-        }
-      }
-    }
-
+          if(!categoryIds){
+            return res.status(400).json({
+              success: false,
+              message: "categoryIds is required",
+            });
+          }
     // --- 2. BUILD THE DATABASE QUERY ---
 
     const query = {};
