@@ -11,9 +11,9 @@ console.log(id);
   const {ProductByKey   ,loading ,Product, error,success}= useProductByKeys()
   useEffect(() => {
       setCategory(id)
-      if(categoryIds){
-        ProductByKey(keyword,categoryIds)
-      }
+      
+        ProductByKey(categoryIds)
+      
   },[id])
   console.log(Product)
     return (
