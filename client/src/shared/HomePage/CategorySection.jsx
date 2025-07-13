@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 
 export default function CategorySection({categories}){
 const [subCategoryData,setSubCategoryData]= useState()
@@ -21,7 +22,7 @@ setSubCategoryData(categories?.flatMap(e=>e.subcategories))
                            {subCategoryData?.slice(0,8).map((value ,index)=>(
 
                          
-                             <div key={value?._id} className="   aspect-square " > 
+                             <Link to={`/category/${value?._id}`} key={value?._id} className="   aspect-square " > 
                            <img
           src={value?.subCategoryImage}
           alt={value?.subCategoryName}
@@ -29,7 +30,7 @@ setSubCategoryData(categories?.flatMap(e=>e.subcategories))
         />
 
 
-                            </div>  ))}
+                            </Link>  ))}
 </div>
  
                 </div>
