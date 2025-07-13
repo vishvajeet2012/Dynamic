@@ -8,14 +8,14 @@ const [keyword, setKeyword] = useState(null);
 const {id} = useParams()
 console.log(id); 
 
-  const {ProductByKey   ,loading ,Product, error,success}= useProductByKeys()
+  const {ProductByKeys   ,loading ,Product, error,success}= useProductByKeys()
   useEffect(() => {
       setCategory(id)
       
-        ProductByKey(categoryIds)
+        ProductByKeys(categoryIds)
       
   },[id])
-  console.log(Product)
+ 
     return (
         <div>
            
