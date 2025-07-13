@@ -439,65 +439,65 @@ const { Types } = require('mongoose'); // Import Types for ObjectId validation
 
 exports.getProductbykeys = async (req, res) => {
   try {
-    const { keyword, categoryIds } = req.body;
+    const { categoryIds, subcategoryIds, childCategoryIds } = req.body;
 
     // --- 1. PAGINATION ---
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 12;
     const skip = (page - 1) * limit;
 
-    // --- 2. VALIDATE categoryIds ---
-    if (!categoryIds && !keyword) {
+    // --- 2. VALIDATE INPUT ---
+    if (!categoryIds && !subcategoryIds && !childCategoryIds) {
       return res.status(400).json({
         success: false,
-        message: "Either keyword or categoryIds is required.",
+        message: "Either categoryIds, subcategoryIds, or childCategoryIds is required.",
       });
     }
 
-    let categoryArray = [];
+    // --- 3. PROCESS IDS (string or array) ---
+    const processIds = (ids) => {
+      if (!ids) return [];
+      if (typeof ids === 'string') return [ids];
+      if (Array.isArray(ids)) return ids;
+      return [];
+    };
 
-    if (categoryIds) {
-      if (typeof categoryIds === 'string') {
-        categoryArray = [categoryIds]; // convert string to array
-      } else if (Array.isArray(categoryIds)) {
-        categoryArray = categoryIds;
-      } else {
-        return res.status(400).json({
-          success: false,
-          message: "categoryIds must be a string or an array.",
-        });
-      }
-    }
+    const categoryArray = processIds(categoryIds);
+    const subcategoryArray = processIds(subcategoryIds);
+    const childCategoryArray = processIds(childCategoryIds);
 
-    // --- 3. BUILD QUERY ---
+    // --- 4. BUILD QUERY ---
     const query = {};
 
-    if (keyword && typeof keyword === 'string' && keyword.trim() !== '') {
-      query.$text = { $search: keyword.trim() };
-    }
-
+    // Category filter - single ObjectId field
     if (categoryArray.length > 0) {
       query.category = { $in: categoryArray };
     }
 
-    // --- 4. QUERY EXECUTION ---
+    // Subcategories filter - array field
+    if (subcategoryArray.length > 0) {
+      query.subcategories = { $in: subcategoryArray };
+    }
+
+    // ChildCategory filter - array field  
+    if (childCategoryArray.length > 0) {
+      query.childCategory = { $in: childCategoryArray };
+    }
+
+    // --- 5. EXECUTE QUERY ---
     const [products, totalProducts] = await Promise.all([
       Product.find(query)
         .populate('category')
         .populate('subcategories')
         .populate('childCategory')
-        .sort(
-          keyword
-            ? { score: { $meta: 'textScore' } }
-            : { createdAt: -1 }
-        )
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
       Product.countDocuments(query)
     ]);
 
-    // --- 5. RESPONSE ---
+    // --- 6. RESPONSE ---
     return res.status(200).json({
       success: true,
       data: {

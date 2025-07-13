@@ -180,7 +180,7 @@ export const useProductByKeys= ()=>{
         try{
             const token  = localStorage.getItem('token')
             const response = await axios.post(`${homeUrl}/getProductbykeys`,{
-categoryIds:[categoryIds],
+subcategoryIds:[categoryIds],
 
 
             },
