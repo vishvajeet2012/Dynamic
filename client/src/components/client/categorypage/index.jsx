@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useProductByKeys } from "../../../hooks/Product/Product";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function CategroyPage() {
 const [categoryIds, setCategory] = useState(null);
