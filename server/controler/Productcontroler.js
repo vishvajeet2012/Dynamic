@@ -440,43 +440,38 @@ const { Types } = require('mongoose'); // Import Types for ObjectId validation
 exports.getProductbykeys = async (req, res) => {
  try {
     const { categoryId, subcategoryIds, childCategoryIds } = req.body;
-    
-    // Build the query object
+
     const query = {};
-    
+
     if (categoryId) {
       query.category = categoryId;
     }
-    
-    if (subcategoryIds) {
-      // Convert comma-separated string to array of IDs
-      const subcategoryArray = subcategoryIds.split(',');
-      query.subcategories = { $in: subcategoryArray };
+
+    if (subcategoryIds && Array.isArray(subcategoryIds)) {
+      query.subcategories = { $in: subcategoryIds };
     }
-    
-    if (childCategoryIds) {
-      // Convert comma-separated string to array of IDs
-      const childCategoryArray = childCategoryIds.split(',');
-      query.childCategory = { $in: childCategoryArray };
+
+    if (childCategoryIds && Array.isArray(childCategoryIds)) {
+      query.childCategory = { $in: childCategoryIds };
     }
-    
+
     const products = await Product.find(query)
       .populate('category')
       .populate('subcategories')
       .populate('childCategory');
-    
+
     res.status(200).json({
       success: true,
       count: products.length,
-      data: products
+      data: products,
     });
-    
+
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
       message: 'Server Error',
-      error: error.message
+      error: error.message,
     });
   }
 };
