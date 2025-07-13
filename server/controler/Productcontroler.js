@@ -142,9 +142,6 @@ exports.createProduct = async (req, res) => {
 
 
 
-
-
-
 exports.updateProduct = async (req, res) => {
   try {
     const {
@@ -155,7 +152,7 @@ exports.updateProduct = async (req, res) => {
       discount,
       category,
       subcategories,
-      childCategories,
+      childCategory,
       stock,
       isNewArrival,
       color,
@@ -167,68 +164,59 @@ exports.updateProduct = async (req, res) => {
       slug
     } = req.body;
 
-    // Validate product exists
+    // ✅ Check if product exists
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Product not found" 
+        message: "Product not found"
       });
     }
 
-    // Validate numeric fields
+    // ✅ Validate basePrice
     if (basePrice !== undefined) {
-      if (isNaN(basePrice)) {
-        return res.status(400).json({ 
+      if (isNaN(basePrice) || basePrice <= 0) {
+        return res.status(400).json({
           success: false,
-          message: "Base price must be a number" 
-        });
-      }
-      if (basePrice <= 0) {
-        return res.status(400).json({ 
-          success: false,
-          message: "Base price must be greater than 0" 
+          message: "basePrice must be a number greater than 0"
         });
       }
     }
 
+    // ✅ Validate discount
     if (discount !== undefined) {
-      if (isNaN(discount)) {
-        return res.status(400).json({ 
+      if (isNaN(discount) || discount < 0 || discount > 100) {
+        return res.status(400).json({
           success: false,
-          message: "Discount must be a number" 
-        });
-      }
-      if (discount < 0 || discount > 100) {
-        return res.status(400).json({ 
-          success: false,
-          message: "Discount must be between 0 and 100" 
+          message: "Discount must be a number between 0 and 100"
         });
       }
     }
 
-    // Validate stock
+    // ✅ Validate stock
     if (stock !== undefined && stock < 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Stock cannot be negative" 
+        message: "Stock cannot be negative"
       });
     }
 
-    // Validate category and subcategories
+    let givenSubIds = product.subcategories;
+    let givenChildIds = product.childCategory;
+
+    // ✅ Validate Category and Subcategories
     if (category) {
       const categoryDoc = await Category.findById(category).lean();
       if (!categoryDoc) {
-        return res.status(404).json({ 
+        return res.status(404).json({
           success: false,
-          message: "Category not found" 
+          message: "Category not found"
         });
       }
 
-      // Validate subcategories
       if (subcategories) {
         const validSubIds = categoryDoc.subcategories.map(id => id.toString());
-        const givenSubIds = Array.isArray(subcategories)
+        givenSubIds = Array.isArray(subcategories)
           ? subcategories.map(id => id.toString())
           : [subcategories.toString()];
 
@@ -240,45 +228,47 @@ exports.updateProduct = async (req, res) => {
           });
         }
 
-        // Validate child categories if provided
-        if (childCategories) {
-          const subDocs = await SubCategory.find({ _id: { $in: givenSubIds } }).lean();
+        // ✅ Validate ChildCategory based on selected subcategories
+        const subDocs = await SubCategory.find({ _id: { $in: givenSubIds } }).lean();
 
-          if (!subDocs || subDocs.length === 0) {
-            return res.status(404).json({
-              success: false,
-              message: "One or more subcategories not found"
-            });
-          }
+        if (!subDocs || subDocs.length === 0) {
+          return res.status(404).json({
+            success: false,
+            message: "One or more subcategories not found"
+          });
+        }
 
-          const validChildIds = subDocs.flatMap(sub =>
-            Array.isArray(sub.childCategory) ? sub.childCategory.map(id => id.toString()) : []
-          );
+        const validChildIds = subDocs.flatMap(sub =>
+          Array.isArray(sub.childCategory)
+            ? sub.childCategory.map(id => id.toString())
+            : []
+        );
 
-          const givenChildIds = Array.isArray(childCategories)
-            ? childCategories.map(id => id.toString())
-            : [childCategories.toString()];
+        if (childCategory) {
+          givenChildIds = Array.isArray(childCategory)
+            ? childCategory.map(id => id.toString())
+            : [childCategory.toString()];
 
           const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
           if (invalidChildIds.length > 0) {
             return res.status(400).json({
               success: false,
-              message: `Invalid child categories for these subcategories: ${invalidChildIds.join(", ")}`
+              message: `Invalid child categories for selected subcategories: ${invalidChildIds.join(", ")}`
             });
           }
         }
       }
     }
 
-    // Calculate selling price
+    // ✅ Recalculate Selling Price if needed
     let sellingPrice = product.sellingPrice;
     if (basePrice !== undefined || discount !== undefined) {
-      const newBasePrice = basePrice !== undefined ? basePrice : product.basePrice;
-      const newDiscount = discount !== undefined ? discount : product.discount;
-      sellingPrice = newBasePrice - (newBasePrice * newDiscount) / 100;
+      const newBase = basePrice !== undefined ? basePrice : product.basePrice;
+      const newDisc = discount !== undefined ? discount : product.discount;
+      sellingPrice = newBase - (newBase * newDisc) / 100;
     }
 
-    // Prepare update payload
+    // ✅ Build update payload
     const updatePayload = {
       name: name !== undefined ? name : product.name,
       description: description !== undefined ? description : product.description,
@@ -286,12 +276,8 @@ exports.updateProduct = async (req, res) => {
       discount: discount !== undefined ? discount : product.discount,
       sellingPrice,
       category: category !== undefined ? category : product.category,
-      subcategories: subcategories !== undefined
-        ? (Array.isArray(subcategories) ? subcategories : [subcategories])
-        : product.subcategories,
-      childCategory: childCategories !== undefined
-        ? (Array.isArray(childCategories) ? childCategories : [childCategories])
-        : product.childCategory,
+      subcategories: givenSubIds,
+      childCategory: givenChildIds,
       images: {
         publicId: publicId !== undefined ? publicId : product.images?.publicId,
         imagesUrls: imagesUrls !== undefined ? imagesUrls : product.images?.imagesUrls
@@ -305,7 +291,7 @@ exports.updateProduct = async (req, res) => {
       slug: slug !== undefined ? slug : product.slug
     };
 
-    // Update product
+    // ✅ Update the product
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       updatePayload,
@@ -319,7 +305,7 @@ exports.updateProduct = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Product update error:", err);
+    console.error("🔥 Product update error:", err);
 
     if (err.code === 11000) {
       const duplicateField = Object.keys(err.keyValue)[0];
@@ -331,20 +317,24 @@ exports.updateProduct = async (req, res) => {
 
     if (err.name === "ValidationError") {
       const errors = Object.values(err.errors).map(e => e.message);
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
         message: "Validation failed",
-        errors 
+        errors
       });
     }
 
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Internal Server Error",
       error: err.message
     });
   }
 };
+
+
+
+
 
 
 exports.productDelete = async(req,res)=>{
