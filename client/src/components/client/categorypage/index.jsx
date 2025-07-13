@@ -10,7 +10,7 @@ console.log(id);
 
   const {ProductByKeys   ,loading ,Product, error,success}= useProductByKeys()
   useEffect(() => {
-      setCategory([id])
+      setCategory(id)
       
       
       
