@@ -439,7 +439,7 @@ const { Types } = require('mongoose'); // Import Types for ObjectId validation
 
 exports.getProductbykeys = async (req, res) => {
  try {
-    const { categoryId, subcategoryIds, childCategoryIds } = req.query;
+    const { categoryId, subcategoryIds, childCategoryIds } = req.body;
     
     // Build the query object
     const query = {};
