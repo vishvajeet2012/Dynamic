@@ -164,3 +164,40 @@ export const useUpdateAdminPorduct = ()=>{
     }            }
             return {updateProduct,loading,error,success}    
 }
+
+
+export const useProductByKeys= ()=>{
+
+    const [Product, setProduct] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+
+    const ProductByKeys = async (keywords,categoryIds) => {
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+        try{
+            const token  = localStorage.getItem('token')
+            const response = await axios.post(`${homeUrl}/getProductbykeys`,{
+
+            },
+                {
+                   headers:{
+                consume:'application/json',
+                authorization:`Bearer ${token}`
+                
+            }
+                }
+            )
+            setProduct(response);
+            setSuccess(response?.data);
+            return response?.data
+        }catch(error){
+            setError(error)
+        }finally{
+            setLoading(false)       
+        }   
+       }
+       return {AdmingetProduct,loading ,Product, error,success}
+}

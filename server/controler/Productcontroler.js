@@ -413,3 +413,115 @@ exports.getProducts = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+
+/////////////////////// get product by cateogry /////////////////////
+
+// routes/productRoutes.js
+
+const { Types } = require('mongoose'); // Import Types for ObjectId validation
+
+/**
+ * @route   POST /api/products/search
+ * @desc    Search, filter, and paginate products
+ * @access  Public
+ * * This endpoint provides a robust and scalable way to search for products.
+ * It uses MongoDB's native text search for performance and supports pagination.
+ * * Request Body (JSON):
+ * {
+ * "keyword": "optional search term",
+ * "categoryIds": ["optional", "array", "of", "category", "IDs"]
+ * }
+ * * Query Parameters:
+ * ?page=1&limit=10
+ */
+exports.getProductbykeys= async (req, res) => {
+  
+
+  try {
+    // --- 1. VALIDATION & PAGINATION SETUP ---
+
+    const { keyword, categoryIds } = req.body;
+    
+    // Set up pagination from query parameters, with safe defaults.
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 12;
+    const skip = (page - 1) * limit;
+
+    // --- Input Validation ---
+    // Ensure categoryIds, if provided, is a valid array of ObjectIDs.
+    if (categoryIds) {
+      if (!Array.isArray(categoryIds)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'categoryIds must be an array.' 
+        });
+      }
+      for (const id of categoryIds) {
+        if (!Types.ObjectId.isValid(id)) {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid category ID provided: ${id}`
+          });
+        }
+      }
+    }
+
+    // --- 2. BUILD THE DATABASE QUERY ---
+
+    const query = {};
+
+    // Use MongoDB's high-performance text search.
+    // NOTE: This requires a text index on the relevant fields in your Product model.
+    // Example in productModel.js: 
+    // productSchema.index({ name: 'text', description: 'text', brand: 'text' });
+    if (keyword && typeof keyword === 'string' && keyword.trim() !== '') {
+      query.$text = { $search: keyword.trim() };
+    }
+
+    // Filter by an array of category IDs.
+    if (categoryIds && categoryIds.length > 0) {
+      query.category = { $in: categoryIds };
+    }
+
+    // --- 3. EXECUTE QUERIES CONCURRENTLY ---
+
+    // For production, it's more efficient to run the find and count queries in parallel.
+    const [products, totalProducts] = await Promise.all([
+      Product.find(query)
+        .populate('category')
+        .populate('subcategories')
+        .populate('childCategory')
+        .sort(keyword ? { score: { $meta: 'textScore' } } : { createdAt: -1 }) // Sort by relevance if searching
+        .skip(skip)
+        .limit(limit)
+        .lean(), // Use .lean() for faster, read-only operations
+      Product.countDocuments(query)
+    ]);
+
+    // --- 4. SEND THE RESPONSE ---
+
+    res.status(200).json({
+      success: true,
+      data: {
+        products,
+        pagination: {
+          totalProducts,
+          totalPages: Math.ceil(totalProducts / limit),
+          currentPage: page,
+          hasNextPage: page * limit < totalProducts,
+          hasPrevPage: page > 1,
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error searching products:', error); // Log the actual error on the server
+    res.status(500).json({ 
+      success: false, 
+      message: 'An error occurred while searching for products.' 
+    });
+  }
+}
+
