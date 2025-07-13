@@ -242,20 +242,23 @@ exports.createProduct = async (req, res) => {
         }
       }
     }
-    if(childCategories){
-      const validChildIds = categoryDoc?.subcategories?.childCategories.map(id => id.toString());
+        const subDoc = await SubCategory.findById( {_id: {$in: subcategories}}).lean();
+
+    const validChildIds = subDoc.childCategory.flatMap(sub=>ArrayisArray(sub.childCategory)? sub.childCategory.map(id=>id.toString()) :[])
       const givenChildIds = Array.isArray(childCategories)
       ? childCategories.map(id => id.toString())
-      : [childCategories.toString()];
-    
-    const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
-    if (invalidChildIds.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: `Invalid child categories for this category: ${invalidChildIds.join(", ")}`
-      });
-    }
-  }
+      : [childCategories.toString()]
+
+      const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
+      if (invalidChildIds.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid child categories for this subcategory: ${invalidChildIds.join(", ")}`
+        });
+      }
+
+
+   
     // Calculate selling price if basePrice or discount changes
     let sellingPrice = product.sellingPrice;
     if (basePrice !== undefined || discount !== undefined) {
@@ -275,7 +278,7 @@ exports.createProduct = async (req, res) => {
       subcategories: subcategories !== undefined 
         ? (Array.isArray(subcategories) ? subcategories : [subcategories])
         : product.subcategories,
-        childCategory: childCategories !== undefined ? childCategories : product.childCategories,
+        childCategory: childCategory !== undefined ? childCategory : product.childCategory,
       images: {
         publicId: publicId !== undefined ? publicId : product.images.publicId,
         imagesUrls: imagesUrls !== undefined ? imagesUrls : product.images.imagesUrls
