@@ -145,9 +145,8 @@ exports.createProduct = async (req, res) => {
 
 
 
- exports.updateProduct = async (req, res) => {
+exports.updateProduct = async (req, res) => {
   try {
-    
     const {
       id,
       name,
@@ -216,7 +215,7 @@ exports.createProduct = async (req, res) => {
       });
     }
 
-    // Handle category and subcategory updates
+    // Validate category and subcategories
     if (category) {
       const categoryDoc = await Category.findById(category).lean();
       if (!categoryDoc) {
@@ -226,7 +225,7 @@ exports.createProduct = async (req, res) => {
         });
       }
 
-      // If subcategories are provided, validate them
+      // Validate subcategories
       if (subcategories) {
         const validSubIds = categoryDoc.subcategories.map(id => id.toString());
         const givenSubIds = Array.isArray(subcategories)
@@ -240,26 +239,38 @@ exports.createProduct = async (req, res) => {
             message: `Invalid subcategories for this category: ${invalidSubIds.join(", ")}`
           });
         }
+
+        // Validate child categories if provided
+        if (childCategories) {
+          const subDocs = await SubCategory.find({ _id: { $in: givenSubIds } }).lean();
+
+          if (!subDocs || subDocs.length === 0) {
+            return res.status(404).json({
+              success: false,
+              message: "One or more subcategories not found"
+            });
+          }
+
+          const validChildIds = subDocs.flatMap(sub =>
+            Array.isArray(sub.childCategory) ? sub.childCategory.map(id => id.toString()) : []
+          );
+
+          const givenChildIds = Array.isArray(childCategories)
+            ? childCategories.map(id => id.toString())
+            : [childCategories.toString()];
+
+          const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
+          if (invalidChildIds.length > 0) {
+            return res.status(400).json({
+              success: false,
+              message: `Invalid child categories for these subcategories: ${invalidChildIds.join(", ")}`
+            });
+          }
+        }
       }
     }
-        const subDoc = await SubCategory.findById( {_id: {$in: subcategories}}).lean();
 
-    const validChildIds = subDoc.childCategory.flatMap(sub=>ArrayisArray(sub.childCategory)? sub.childCategory.map(id=>id.toString()) :[])
-      const givenChildIds = Array.isArray(childCategories)
-      ? childCategories.map(id => id.toString())
-      : [childCategories.toString()]
-
-      const invalidChildIds = givenChildIds.filter(id => !validChildIds.includes(id));
-      if (invalidChildIds.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid child categories for this subcategory: ${invalidChildIds.join(", ")}`
-        });
-      }
-
-
-   
-    // Calculate selling price if basePrice or discount changes
+    // Calculate selling price
     let sellingPrice = product.sellingPrice;
     if (basePrice !== undefined || discount !== undefined) {
       const newBasePrice = basePrice !== undefined ? basePrice : product.basePrice;
@@ -267,7 +278,7 @@ exports.createProduct = async (req, res) => {
       sellingPrice = newBasePrice - (newBasePrice * newDiscount) / 100;
     }
 
-    // Prepare update payload matching your structure
+    // Prepare update payload
     const updatePayload = {
       name: name !== undefined ? name : product.name,
       description: description !== undefined ? description : product.description,
@@ -275,13 +286,15 @@ exports.createProduct = async (req, res) => {
       discount: discount !== undefined ? discount : product.discount,
       sellingPrice,
       category: category !== undefined ? category : product.category,
-      subcategories: subcategories !== undefined 
+      subcategories: subcategories !== undefined
         ? (Array.isArray(subcategories) ? subcategories : [subcategories])
         : product.subcategories,
-        childCategory: childCategory !== undefined ? childCategory : product.childCategory,
+      childCategory: childCategories !== undefined
+        ? (Array.isArray(childCategories) ? childCategories : [childCategories])
+        : product.childCategory,
       images: {
-        publicId: publicId !== undefined ? publicId : product.images.publicId,
-        imagesUrls: imagesUrls !== undefined ? imagesUrls : product.images.imagesUrls
+        publicId: publicId !== undefined ? publicId : product.images?.publicId,
+        imagesUrls: imagesUrls !== undefined ? imagesUrls : product.images?.imagesUrls
       },
       stock: stock !== undefined ? stock : product.stock,
       isNewArrival: isNewArrival !== undefined ? isNewArrival : product.isNewArrival,
@@ -332,7 +345,6 @@ exports.createProduct = async (req, res) => {
     });
   }
 };
-
 
 
 exports.productDelete = async(req,res)=>{
