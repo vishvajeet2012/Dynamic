@@ -173,13 +173,15 @@ export const useProductByKeys= ()=>{
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
 
-    const ProductByKeys = async (keywords,categoryIds) => {
+    const ProductByKeys = async (keyword,categoryIds) => {
         setLoading(true);
         setError(null);
         setSuccess(null);
         try{
             const token  = localStorage.getItem('token')
             const response = await axios.post(`${homeUrl}/getProductbykeys`,{
+categoryIds:categoryIds,
+keyword:keyword
 
             },
                 {
@@ -199,5 +201,6 @@ export const useProductByKeys= ()=>{
             setLoading(false)       
         }   
        }
-       return {AdmingetProduct,loading ,Product, error,success}
+       return {ProductByKeys
+    ,loading ,Product, error,success}
 }

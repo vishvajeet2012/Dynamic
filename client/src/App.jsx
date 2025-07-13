@@ -16,6 +16,7 @@ import AdminProduct from './components/admin/Admin-Product';
 import AdminProductManagement from './components/admin/Admin-Product/adminGetproduct';
 import Footer from './shared/footer';
 import ForgetPassowrd from './components/client/auth/ForgetPassowrd';
+import CategroyPage from './components/client/categorypage';
 function App() {
   return (
     <>
@@ -37,6 +38,7 @@ function App() {
         <Route path= "/AdminProduct" element={<AdminProduct/>} />
         <Route path='/fogretPassword' element={<ForgetPassowrd/>} />
         <Route path='/productupdatedelete' element={<AdminProductManagement/>} />
+        <Route path="/category/:id" element={<CategroyPage />} />
         {/* Add other protected routes here */}
       </Route>
     </Routes>
