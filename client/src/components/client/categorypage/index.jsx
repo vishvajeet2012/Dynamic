@@ -12,9 +12,15 @@ console.log(id);
   useEffect(() => {
       setCategory(id)
       
-        ProductByKeys(categoryIds)
+      
       
   },[id])
+
+  useEffect(() => {
+    if (categoryIds) {
+      ProductByKeys(categoryIds);
+    }
+  }, [categoryIds]);
  
     return (
         <div>
