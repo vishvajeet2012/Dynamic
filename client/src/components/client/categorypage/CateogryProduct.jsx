@@ -32,6 +32,7 @@ console.log(Product)
 
         <div className=" w-full bg-red-600  text-white p-4">
           {/* Add your content here */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 ">
        {Product&& Product?.data?.data?.map((product, idx) => (
                 <div
                   key={idx}
@@ -40,6 +41,7 @@ console.log(Product)
                   <ProductCard item={product} />
                 </div>
               ))}
+              </div>
         </div>
       </div>
     </section> 
