@@ -2,14 +2,14 @@ import { useEffect } from "react";
 import Banner from "../../../shared/Banner";
 import { useGetAllCategories } from "../../../hooks/useCategories";
 import CategorySection from "../../../shared/HomePage/CategorySection";
-
-export default function CateogryProduct() {
+import ProductCard from "../../../shared/ProductCard"
+export default function CateogryProduct({Product}) {
 const { loading, error, categories, fetechCategories } = useGetAllCategories();
 
   useEffect(() => {
     fetechCategories();
   }, []);
-
+console.log(Product)
     
     return (
 <>          
@@ -32,7 +32,14 @@ const { loading, error, categories, fetechCategories } = useGetAllCategories();
 
         <div className=" w-full bg-red-600  text-white p-4">
           {/* Add your content here */}
-          <p>Right section (auto width)</p>
+       {Product&& Product?.data?.data?.map((product, idx) => (
+                <div
+                  key={idx}
+                  className="min-w-[50%] sm:min-w-[50%] lg:min-w-[20%] px-1 lg:px-2"
+                >
+                  <ProductCard item={product} />
+                </div>
+              ))}
         </div>
       </div>
     </section> 

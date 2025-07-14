@@ -21,13 +21,14 @@ console.log(id);
   useEffect(() => {
     if (categoryIds) {
       ProductByKeys(categoryIds);
+      
     }
   }, [categoryIds]);
- 
+
     return (
         <div>
            
-           <CateogryProduct/>
+           <CateogryProduct Product={Product}/>
         </div>
     )
 }
