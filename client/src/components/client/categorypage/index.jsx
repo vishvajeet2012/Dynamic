@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useProductByKeys } from "../../../hooks/Product/Product";
 import { useEffect, useState } from "react";
+import CateogryProduct from "./CateogryProduct";
+
 
 export default function CategroyPage() {
 const [categoryIds, setCategory] = useState([]);
@@ -25,6 +27,7 @@ console.log(id);
     return (
         <div>
            
+           <CateogryProduct/>
         </div>
     )
 }
