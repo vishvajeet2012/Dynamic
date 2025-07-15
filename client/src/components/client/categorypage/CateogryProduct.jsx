@@ -4,14 +4,17 @@ import { useGetAllCategories, useGetChildCategoryById } from "../../../hooks/use
 import CategorySection from "../../../shared/HomePage/CategorySection";
 import ProductCard from "../../../shared/ProductCard";
 
-export default function CategoryProduct({ Product }) {
-  const { loading, error, categories, fetechCategories } = useGetAllCategories();
+export default function CategoryProduct({ Product ,loading ,id }) {
+  const { loading:GetAllCategories, error, categories, fetechCategories } = useGetAllCategories();
   const {childCategory, getChildCategoryById, success }=useGetChildCategoryById()
 
   useEffect(() => {
     fetechCategories();
-    getChildCategoryById
+    
   }, []);
+  useEffect(()=>{
+getChildCategoryById(id)
+  },[id])
 
   // Mock filter options (replace with your actual filters)
   const filters = {
@@ -37,7 +40,7 @@ export default function CategoryProduct({ Product }) {
   // Mock pagination (replace with your actual pagination logic)
   const currentPage = 1;
   const totalPages = 5;
-console.log(childCategory,"childCategory");
+console.log(childCategory?.response,"childCategory");
   return (
     <>
       <section className="w-full">

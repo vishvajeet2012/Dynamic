@@ -28,7 +28,7 @@ console.log(id);
     return (
         <div>
            
-           <CateogryProduct Product={Product}/>
+           <CateogryProduct loading={loading} id={id} Product={Product}/>
         </div>
     )
 }
