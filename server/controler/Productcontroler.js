@@ -435,20 +435,88 @@ const { Types } = require('mongoose'); // Import Types for ObjectId validation
  * ?page=1&limit=10
  */
 
+// exports.getProductbykeys = async (req, res) => {
+//   try {
+//     const { categoryId, subcategoryIds, childCategoryIds, page = 1, limit = 10 } = req.body;
+
+//     const query = {};
+
+//     if (categoryId) {
+//       query.category = categoryId;
+//     }
+
+//     if (subcategoryIds && Array.isArray(subcategoryIds)) {
+//       query.subcategories = { $in: subcategoryIds };
+//     }
+
+//     if (childCategoryIds && Array.isArray(childCategoryIds)) {
+//       query.childCategory = { $in: childCategoryIds };
+//     }
+
+//     const skip = (page - 1) * limit;
+
+//     const [products, total] = await Promise.all([
+//       Product.find(query)
+//         .populate('category')
+//         .populate('subcategories')
+//         .populate('childCategory')
+//         .skip(skip)
+//         .limit(Number(limit)),
+//       Product.countDocuments(query)
+//     ]);
+
+//     res.status(200).json({
+//       success: true,
+//       count: products.length,
+//       total,
+//       page: Number(page),
+//       pages: Math.ceil(total / limit),
+//       data: products,
+//     });
+
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Server Error',
+//       error: error.message,
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
 exports.getProductbykeys = async (req, res) => {
   try {
-    const { categoryId, subcategoryIds, childCategoryIds, page = 1, limit = 10 } = req.body;
+    const {
+      categoryId,
+      subcategoryIds,
+      childCategoryIds,
+      page = 1,
+      limit = 10
+    } = req.body;
 
     const query = {};
 
+    // Main category filter
     if (categoryId) {
       query.category = categoryId;
     }
 
+    // Subcategories filter
     if (subcategoryIds && Array.isArray(subcategoryIds)) {
       query.subcategories = { $in: subcategoryIds };
     }
 
+    // Child categories filter
     if (childCategoryIds && Array.isArray(childCategoryIds)) {
       query.childCategory = { $in: childCategoryIds };
     }
