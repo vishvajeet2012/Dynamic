@@ -40,7 +40,7 @@ getChildCategoryById(id)
   // Mock pagination (replace with your actual pagination logic)
   const currentPage = 1;
   const totalPages = 5;
-console.log(childCategory?.response,"childCategory");
+console.log(childCategory?.data?.childCategory,"childCategory");
   return (
     <>
       <section className="w-full">

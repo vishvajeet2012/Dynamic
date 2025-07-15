@@ -114,7 +114,7 @@ exports.updateSubCategory = async (req, res) => {
 exports.getChildCategoryById = async (req, res) => {
   try {
     const { subCategoryId } = req.body;
-
+console.log(subCategoryId)
     if (!subCategoryId) {
       return res.status(400).json({
         success: false,
