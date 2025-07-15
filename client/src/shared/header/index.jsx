@@ -21,7 +21,7 @@ export default function Header() {
 
   useEffect(() => {
     // Your existing logic
-    const token = localStorage.getItem('token');
+ 
     getSingleUser();
   }, []);
 
@@ -31,6 +31,10 @@ export default function Header() {
     { href: user?.firstName ? "/profile" : "/login", icon: <CgProfile />, label: user?.firstName ? "Profile" : "Login" },
     { href: "/cart", icon: <CiShoppingCart />, label: "Cart" }
   ];
+  const token = localStorage.getItem('token');
+  useEffect(() => {
+    getSingleUser();
+  }, [token]);
 
   return (
     <>

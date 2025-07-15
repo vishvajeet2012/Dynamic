@@ -28,6 +28,7 @@ export default function Login() {
     async function handleClickForget () {
           await forgetPassword();  
         }
+        console.log(error?.response?.data.message)
   return (
     <div className="">
       <div className="w-full flex flex-row h-screen">
@@ -63,13 +64,13 @@ export default function Login() {
                 {loading ? 'Logging in...' : 'Login'}
               </button>
               
-              {error && <p className="text-red-500 mt-2">{error}</p>}
+              {error?.response?.data.message && <p className="text-red-500 mt-2">{error?.response?.data.message}</p>}
               {success && <p className="text-green-500 mt-2">{success}</p>}
               <div className="mt-4 flex  flex-row justify-between">
               <p className="">
                 Don't have an account? <Link to="/signup" className="text-blue-500 hover:underline">Sign up</Link>
               </p>
-            { error && <Link onClick={handleClickForget} to="/forget-password" className="text-blue-500 hover:underline">Forget Password</Link>}
+            { error?.response?.data?.message && <Link onClick={handleClickForget} to="/forget-password" className="text-blue-500 hover:underline">Forget Password</Link>}
               </div>
 
             </form> 
