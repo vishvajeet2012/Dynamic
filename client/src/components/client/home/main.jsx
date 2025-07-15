@@ -3,7 +3,7 @@ import Banner from "../../../shared/Banner";
 import Header from "../../../shared/header";
 import AboutUs from "../../../shared/HomePage/Aboutus";
 import NewArrivals from "../../../shared/NewArrivals";
-import UploadImageComponent from "./imageUpload";
+
 import { useGetProduct } from "../../../hooks/Product/Product";
 import CategorySection from "../../../shared/HomePage/CategorySection";
 import { useGetAllCategories } from "../../../hooks/useCategories";
