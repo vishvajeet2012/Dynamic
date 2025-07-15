@@ -15,9 +15,6 @@ export default function Login() {
     const email = formData.get('email');
     const password = formData.get('password');
     
-
-    
-
     const token = await loginApi({ email, password });
    
     if (token) {
