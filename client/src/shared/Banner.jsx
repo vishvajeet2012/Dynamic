@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGetBannnerData } from '../hooks/client/homePageHooks/use-banner';
 
-export default function Banner({ bannerType }) {    
+export default function Banner({ bannerType ,categoriesBanner }) {    
     const [bannerData, setBannerData] = useState([]);
     const { getAllBannerData, loading, error, success } = useGetBannnerData(bannerType);
 
@@ -26,7 +26,8 @@ export default function Banner({ bannerType }) {
         <div className="w-full p-8 text-center bg-gray-100 text-gray-800">
             Error loading banner
         </div>
-    );
+    )
+
     
     if (!success || !bannerData.length) return null;
 

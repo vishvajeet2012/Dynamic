@@ -3,10 +3,12 @@ import Banner from "../../../shared/Banner";
 import { useGetAllCategories, useGetChildCategoryById } from "../../../hooks/useCategories";
 import CategorySection from "../../../shared/HomePage/CategorySection";
 import ProductCard from "../../../shared/ProductCard";
+import RoundedCards from "../../../shared/roundedCard";
+import CategoryBanner from "../../../shared/CategoryBanner";
 
 export default function CategoryProduct({ Product ,loading ,id }) {
   const { loading:GetAllCategories, error, categories, fetechCategories } = useGetAllCategories();
-  const {childCategory, getChildCategoryById, success }=useGetChildCategoryById()
+  const {childCategory, getChildCategoryById, success ,loading:idLoading}=useGetChildCategoryById()
 
   useEffect(() => {
     fetechCategories();
@@ -40,17 +42,17 @@ getChildCategoryById(id)
   // Mock pagination (replace with your actual pagination logic)
   const currentPage = 1;
   const totalPages = 5;
-console.log(childCategory?.data?.childCategory,"childCategory");
+console.log(childCategory?.data?.bannerImage)
   return (
     <>
       <section className="w-full">
         <div className="">
-          <Banner bannerType="homepage" />
+          <CategoryBanner loading={idLoading} categoriesBanner={childCategory?.data?.bannerImage}/>
         </div>
+       
         <div>
-          <CategorySection categories={categories} />
-        </div>
-
+        <RoundedCards  loading={idLoading} categories={childCategory?.data?.childCategory}/>
+</div>
         <section className="w-full mt-10 px-4 lg:px-6 max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Filters Sidebar - Hidden on mobile, shown on desktop */}
