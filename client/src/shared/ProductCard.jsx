@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { cn } from "@/lib/utils";
-import { Heart, Star, ShoppingCart, Eye } from "lucide-react";
+import { cn } from "@/lib/utils"; // Assuming you have this utility for conditional classes
+import { FaHeart, FaStar } from "react-icons/fa";
 
-export default function ProductCard({ item }) {
+export default function AdaptiveProductCard({ item }) {
+  // Destructure props with default values
   const {
+    id,
     name,
     category,
     discount,
@@ -17,128 +19,107 @@ export default function ProductCard({ item }) {
 
   const [isWishlisted, setIsWishlisted] = useState(false);
 
+  // --- Event Handlers ---
+
   const handleWishlistClick = (e) => {
-    e.preventDefault();
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
+    setIsWishlisted((prev) => !prev);
+    console.log("Toggled wishlist for:", name);
   };
 
-  const handleAddToCart = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log("Added to cart:", name);
-    // Add your "add to cart" logic here
+  const handleCardClick = () => {
+    console.log("Navigating to product:", name);
+    // Add your navigation logic here, e.g., router.push(`/product/${id}`)
   };
 
-  const handleViewProduct = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log("Viewing product:", name);
-    // Add your navigation logic here, e.g., router.push(`/product/${item.id}`)
-  };
+  // --- Main Render ---
 
   return (
-    <div className="group relative w-full aspect-[3/4] cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl">
-      
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110"
-        style={{
-          backgroundImage: `url(${images?.[0]?.imagesUrls})`,
-        }}
-      />
-      
-      {/* Gradient Overlay for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-      
-      {/* Top Section - Discount Badge */}
-      <div className="absolute top-3 left-3 z-20">
-        {/* Discount Badge */}
-        {discount > 0 && (
-          <div className="rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+    <div
+      onClick={handleCardClick}
+      className={cn(
+        "group flex w-full md:max-w-[310px] cursor-pointer flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md transition-all duration-300 hover:shadow-xl"
+      )}
+    >
+      {/* ====== 1. IMAGE SECTION ====== */}
+      <div
+        className={cn(
+          "relative overflow-hidden",
+          // Mobile: A square aspect ratio with object-cover for a clean look.
+          "w-full aspect-[8/11]",
+          // Desktop: Uses your preferred aspect ratio and object-contain.
+          "md:aspect-[3/4]"
+        )}
+      >
+        <img
+          className={cn(
+            "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
+            // Switch to contain on desktop to show the full product.
+            "md:object-contain"
+          )}
+          src={images?.[0]?.imagesUrls}
+          alt={name}
+        />
+        {/* Badges */}
+        {discount > 0 && !isOutOfStock && (
+          <span className="absolute top-2 left-2 rounded-full bg-red-600 px-2 py-0.5 text-center text-xs font-medium text-white">
             {discount}% OFF
+          </span>
+        )}
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+            <span className="rounded-md bg-gray-800/80 px-3 py-1 text-sm font-bold text-white">
+              OUT OF STOCK
+            </span>
           </div>
         )}
-      </div>
-
-      {/* Wishlist Button - Right Bottom */}
-      <div className="absolute bottom-3 right-3 z-20">
+        {/* Wishlist button */}
         <button
           onClick={handleWishlistClick}
-          className="rounded-full bg-white/90 backdrop-blur-sm p-2 text-gray-600 shadow-lg transition-all duration-200 hover:bg-white hover:text-red-500"
+          className="absolute top-2 right-2 rounded-full bg-white/80 p-2 text-gray-500 shadow-sm backdrop-blur-sm transition-all hover:bg-white hover:text-red-500"
           aria-label="Add to wishlist"
         >
-          <Heart
+          <FaHeart
             size={18}
-            className={cn({ "fill-red-500 text-red-500": isWishlisted })}
+            className={cn(
+              "transition-all",
+              isWishlisted ? "text-red-500 scale-110" : "text-gray-400"
+            )}
           />
         </button>
       </div>
 
-      {/* Hover Overlay with Action Buttons */}
-      <div className="absolute inset-0 z-10 flex transform flex-col items-center justify-center space-y-3 bg-black/40 backdrop-blur-sm opacity-0 transition-all duration-300 group-hover:opacity-100">
-        <button 
-          onClick={handleAddToCart}
-          disabled={isOutOfStock}
-          className={cn(
-            "flex w-4/5 items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-bold text-white transition-all",
-            isOutOfStock 
-              ? "bg-gray-500 cursor-not-allowed" 
-              : "bg-blue-600 hover:bg-blue-700 shadow-lg"
-          )}
-        >
-          <ShoppingCart size={16} />
-          {isOutOfStock ? "Out of Stock" : "Add to Cart"}
-        </button>
-        <button 
-          onClick={handleViewProduct}
-          className="flex w-4/5 items-center justify-center gap-2 rounded-lg bg-white/90 backdrop-blur-sm py-3 px-4 text-sm font-bold text-gray-800 transition-all hover:bg-white shadow-lg"
-        >
-          <Eye size={16} />
-          View Product
-        </button>
-      </div>
-
-      {/* Bottom Content - Product Info */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 text-white z-20">
-        {/* Category */}
-        <p className="mb-1 text-xs text-white/80 capitalize truncate">
-          {category?.categoryName}
-        </p>
+      {/* ====== 2. CONTENT SECTION ====== */}
+      <div className="flex flex-grow flex-col p-4">
+        {/* Category & Rating */}
+        <div className="flex items-start justify-between">
+          <p className="truncate text-xs text-gray-500 capitalize">
+            {category?.categoryName}
+          </p>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <FaStar size={14} className="text-yellow-400" />
+            <span className="text-sm font-semibold">{rating}</span>
+            <span className="text-xs text-gray-400">({reviewCount})</span>
+          </div>
+        </div>
 
         {/* Product Name */}
-        <h3 className="text-sm font-semibold text-white line-clamp-2 mb-2">
+        <h3 className="mt-1 text-base font-bold text-slate-900 line-clamp-2 min-h-[2.5rem]">
           {name}
         </h3>
-        
-        {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <Star size={12} className="fill-yellow-400 text-yellow-400" />
-          <span className="text-xs text-white/90">{rating}</span>
-          <span className="text-xs text-white/60">({reviewCount})</span>
-        </div>
-        
+
         {/* Price */}
-        <div className="flex items-baseline gap-2">
-          <span className="text-lg font-bold text-white">
+        <div className="mt-auto flex items-baseline gap-2 pt-2">
+          <span className="text-xl font-bold text-slate-900">
             ₹{sellingPrice}
           </span>
           {discount > 0 && (
-            <span className="text-sm text-white/60 line-through">
+            <span className="text-sm text-slate-500 line-through">
               ₹{basePrice}
             </span>
           )}
         </div>
       </div>
-
-      {/* Out of Stock Overlay */}
-      {isOutOfStock && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-30">
-          <div className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm">
-            OUT OF STOCK
-          </div>
-        </div>
-      )}
     </div>
   );
 }
