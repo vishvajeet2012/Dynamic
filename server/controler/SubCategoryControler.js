@@ -101,3 +101,50 @@ exports.updateSubCategory = async (req, res) => {
     }
 
 }
+
+
+
+
+
+
+
+
+
+/////// get child categoryby subcategory//////////////////////
+exports.getChildCategoryById = async (req, res) => {
+  try {
+    const { subCategoryId } = req.body;
+
+    if (!subCategoryId) {
+      return res.status(400).json({
+        success: false,
+        message: 'subCategoryId is required',
+      });
+    }
+
+    // Find the subcategory by ID and populate active child categories
+    const subCategory = await SubCategoryModel.findById(subCategoryId).populate({
+      path: 'childCategory',
+      select: 'childCategoryName childCategoryImage isActive bannerImage',
+      match: { isActive: true },
+    });
+
+    if (!subCategory) {
+      return res.status(404).json({
+        success: false,
+        message: 'Subcategory not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: subCategory,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching subcategory',
+      error: error.message,
+    });
+  }
+};

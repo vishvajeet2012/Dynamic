@@ -4,7 +4,7 @@ const uploadImageonCloud= require("../../controler/ImageContoker")
 const { CreateCategory, GetAllCategories, GetCategoryById, UpdateCategory, DeleteCategory } = require('../../controler/categoryControler')
 const {CreateAboutusControler, getAboutUs } = require('../../controler/AboutusControler')
 const logoController = require("../../controler/HomePage/HomePage"); // Note: corrected spelling to "controllers"
-const {  createSubCategory, updateSubCategory } = require('../../controler/SubCategoryControler');
+const {  createSubCategory, updateSubCategory, getChildCategoryById } = require('../../controler/SubCategoryControler');
 const auth = require('../../middleware/authmiddleware');
 const uploadImageMiddleware = require('../../middleware/uploadImageMiddleware');
 const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBannersByType } = require('../../controler/BannerControler');
@@ -27,6 +27,7 @@ router.get('/getaboutus', getAboutUs)
 router.get('/getallcategory',GetAllCategories)
 router.post('/subcategorycreate',auth,createSubCategory)
 router.post('/updateSubCategory',auth,updateSubCategory)
+router.post('/getChildCategoryById',getChildCategoryById);
 
 router.post("/childcategory",auth,createChildCategory)
 

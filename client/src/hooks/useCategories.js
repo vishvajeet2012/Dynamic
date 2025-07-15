@@ -193,3 +193,40 @@ export const useChildCateogryCreate = ()=>{
   return {childCategory,loading , error,success}
 
 }
+
+
+
+
+
+export const useGetChildCategoryById = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [childCategory, setChildCategory] = useState();
+
+  const getChildCategoryById = async (subCategoryId) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+    try {
+      const response = await axios.post(`${homeUrl}/getChildCategoryById`, { subCategoryId },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+      );
+      setChildCategory(response.data);
+      setSuccess(true);
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch child category');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { childCategory, getChildCategoryById, loading, error, success };
+}
