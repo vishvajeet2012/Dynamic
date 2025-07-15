@@ -39,7 +39,7 @@ getChildCategoryById(id)
     ],
   };
 
-  // Mock pagination (replace with your actual pagination logic)
+  // Mock pagination (replace with your actual paginatio lsgic)
   const currentPage = 1;
   const totalPages = 5;
 console.log(childCategory?.data?.bannerImage)
@@ -97,8 +97,8 @@ console.log(childCategory?.data?.bannerImage)
                 </div>
               </div>
               
-              {/* Rating Filter */}
-              <div className="mb-6">
+              {/* Rater */}
+              <div className="mb-6 ">
                 <h4 className="font-medium mb-2">Customer Rating</h4>
                 <div className="space-y-2">
                   {filters.ratings.map((rating) => (
