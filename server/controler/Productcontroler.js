@@ -5,7 +5,7 @@ const Products = require('../models/ProductModel');
 const Category = require('../models/CategoryModel');
 const SubCategory = require('../models/SubCategoryModel');
 
-
+const child = require('../models/childCategoryModel'); // Assuming this is the correct path for ChildCategory model
 
 
 exports.createProduct = async (req, res) => {
@@ -494,31 +494,96 @@ const { Types } = require('mongoose'); // Import Types for ObjectId validation
 
 
 
+// exports.getProductbykeys = async (req, res) => {
+//   try {
+//     const {
+//       categoryId,
+//       subcategoryIds,
+//       childCategoryIds,
+//       page = 1,
+//       limit = 10
+//     } = req.body;
+
+//     const query = {};
+
+//     // Main category filter
+//     if (categoryId) {
+//       query.category = categoryId;
+//     }
+
+//     // Subcategories filter
+//     if (subcategoryIds && Array.isArray(subcategoryIds)) {
+//       query.subcategories = { $in: subcategoryIds };
+//     }
+
+//     // Child categories filter
+//     if (childCategoryIds && Array.isArray(childCategoryIds)) {
+//       query.childCategory = { $in: childCategoryIds };
+//     }
+
+//     const skip = (page - 1) * limit;
+
+//     const [products, total] = await Promise.all([
+//       Product.find(query)
+//         .populate('category')
+//         .populate('subcategories')
+//         .populate('childCategory')
+//         .skip(skip)
+//         .limit(Number(limit)),
+//       Product.countDocuments(query)
+//     ]);
+
+//     res.status(200).json({
+//       success: true,
+//       count: products.length,
+//       total,
+//       page: Number(page),
+//       pages: Math.ceil(total / limit),
+//       data: products,
+//     });
+
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Server Error',
+//       error: error.message,
+//     });
+//   }
+// };
 exports.getProductbykeys = async (req, res) => {
   try {
     const {
       categoryId,
-      subcategoryIds,
-      childCategoryIds,
+      minPrice,
+      maxPrice,
       page = 1,
       limit = 10
     } = req.body;
 
     const query = {};
 
-    // Main category filter
+    // Category filter
     if (categoryId) {
       query.category = categoryId;
     }
 
-    // Subcategories filter
-    if (subcategoryIds && Array.isArray(subcategoryIds)) {
-      query.subcategories = { $in: subcategoryIds };
-    }
+    // Price filter (convert string to number using $expr)
+    if (minPrice || maxPrice) {
+      const priceQuery = {};
+      if (minPrice !== undefined) {
+        priceQuery.$gte = Number(minPrice);
+      }
+      if (maxPrice !== undefined) {
+        priceQuery.$lte = Number(maxPrice);
+      }
 
-    // Child categories filter
-    if (childCategoryIds && Array.isArray(childCategoryIds)) {
-      query.childCategory = { $in: childCategoryIds };
+      query.$expr = {
+        $and: [
+          { $gte: [{ $toDouble: "$basePrice" }, priceQuery.$gte || 0] },
+          { $lte: [{ $toDouble: "$basePrice" }, priceQuery.$lte || Number.MAX_SAFE_INTEGER] }
+        ]
+      };
     }
 
     const skip = (page - 1) * limit;
@@ -526,8 +591,6 @@ exports.getProductbykeys = async (req, res) => {
     const [products, total] = await Promise.all([
       Product.find(query)
         .populate('category')
-        .populate('subcategories')
-        .populate('childCategory')
         .skip(skip)
         .limit(Number(limit)),
       Product.countDocuments(query)
@@ -551,3 +614,66 @@ exports.getProductbykeys = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+
+
+
+
+
+exports.getFiltersForSubcategory = async (req, res) => {
+  try {
+    const { subcategoryId } = req.params;
+
+    if (!subcategoryId) {
+      return res.status(400).json({ success: false, message: "Subcategory ID is required" });
+    }
+
+    // Step 1: Get all products having this subcategory
+    const products = await Product.find({
+      subcategories: subcategoryId
+    }).select("basePrice childCategory");
+
+    // Step 2: Extract min/max prices from basePrice (which is string)
+    const priceNumbers = products
+      .map(p => parseFloat(p.basePrice))
+      .filter(price => !isNaN(price));
+
+    const minPrice = Math.min(...priceNumbers);
+    const maxPrice = Math.max(...priceNumbers);
+
+    // Step 3: Get unique child category IDs from products
+    const childCategorySet = new Set();
+    products.forEach(p => {
+      p.childCategory?.forEach(id => {
+        childCategorySet.add(id.toString());
+      });
+    });
+
+    const childCategoryIds = Array.from(childCategorySet);
+
+    // Step 4: Fetch child category details
+    const childCategories = await child.find({
+      _id: { $in: childCategoryIds }
+    });
+
+    res.status(200).json({
+      success: true,
+      minPrice,
+      maxPrice,
+      childCategories
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
+};
+
