@@ -22,29 +22,11 @@ getChildCategoryById(id)
 getFiltersForSubcategory(id)
   },[id])
 
-console.log(Product?.data )
+console.log(selected, "selected");  
+
 
   // Mock filter options (replace with your actual filters)
-  const filterss = {
-    priceRanges: [
-      { id: 1, label: "Under $50", value: "0-50" },
-      { id: 2, label: "$50 - $100", value: "50-100" },
-      { id: 3, label: "$100 - $200", value: "100-200" },
-      { id: 4, label: "Over $200", value: "200-1000" },
-    ],
-    brands: [
-      { id: 1, label: "Brand A", value: "brand-a" },
-      { id: 2, label: "Brand B", value: "brand-b" },
-      { id: 3, label: "Brand C", value: "brand-c" },
-    ],
-    ratings: [
-      { id: 1, label: "4 Stars & Up", value: "4" },
-      { id: 2, label: "3 Stars & Up", value: "3" },
-      { id: 3, label: "2 Stars & Up", value: "2" },
-      { id: 4, label: "1 Star & Up", value: "1" },
-    ],
-  };
-
+  
   // Mock pagination (replace with your actual paginatio lsgic)
   const currentPage = 1;
   const totalPages = 5;
