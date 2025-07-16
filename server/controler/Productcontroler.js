@@ -623,29 +623,45 @@ exports.getProductbykeys = async (req, res) => {
 
 
 
-
 exports.getFiltersForSubcategory = async (req, res) => {
   try {
-    const { subcategoryId } = req.params;
+    const { subcategoryId } = req.body;
 
     if (!subcategoryId) {
       return res.status(400).json({ success: false, message: "Subcategory ID is required" });
     }
 
-    // Step 1: Get all products having this subcategory
+    // Step 1: Get all products with this subcategory
     const products = await Product.find({
       subcategories: subcategoryId
     }).select("basePrice childCategory");
 
-    // Step 2: Extract min/max prices from basePrice (which is string)
+    // Step 2: Convert basePrice strings to numbers
     const priceNumbers = products
-      .map(p => parseFloat(p.basePrice))
+      .map(p => parseFloat(p.basePrice?.replace(/[^\d.]/g, ''))) // Clean string like "Rs. 500"
       .filter(price => !isNaN(price));
 
-    const minPrice = Math.min(...priceNumbers);
-    const maxPrice = Math.max(...priceNumbers);
+    // Step 3: Count how many prices fall in each range
+    const priceRanges = [
+      { label: "₹0–₹500", min: 0, max: 500, count: 0 },
+      { label: "₹501–₹1000", min: 501, max: 1000, count: 0 },
+      { label: "₹1001–₹2000", min: 1001, max: 2000, count: 0 },
+      { label: "₹2000+", min: 2001, max: Infinity, count: 0 }
+    ];
 
-    // Step 3: Get unique child category IDs from products
+    priceNumbers.forEach(price => {
+      for (const range of priceRanges) {
+        if (price >= range.min && price <= range.max) {
+          range.count += 1;
+          break;
+        }
+      }
+    });
+
+    // Step 4: Filter only ranges that have products
+    const availablePriceFilters = priceRanges.filter(r => r.count > 0).map(r => r.label);
+
+    // Step 5: Get unique child category IDs
     const childCategorySet = new Set();
     products.forEach(p => {
       p.childCategory?.forEach(id => {
@@ -655,15 +671,14 @@ exports.getFiltersForSubcategory = async (req, res) => {
 
     const childCategoryIds = Array.from(childCategorySet);
 
-    // Step 4: Fetch child category details
+    // Step 6: Fetch child category details
     const childCategories = await child.find({
       _id: { $in: childCategoryIds }
     });
 
     res.status(200).json({
       success: true,
-      minPrice,
-      maxPrice,
+      priceFilters: availablePriceFilters,
       childCategories
     });
 
@@ -676,4 +691,3 @@ exports.getFiltersForSubcategory = async (req, res) => {
     });
   }
 };
-

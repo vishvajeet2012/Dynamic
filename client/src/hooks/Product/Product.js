@@ -204,3 +204,39 @@ subcategoryIds:[categoryIds],
        return {ProductByKeys
     ,loading ,Product, error,success}
 }
+
+
+
+
+
+
+
+export const useSubcategoryFilters = ()=>{
+
+  const [loading,setloading]= useState(false)
+  const [error,setError]= useState(null)
+  const [success,setSuccess]=useState(false)
+  const [filters, setFilters] = useState(null);
+  const getFiltersForSubcategory = async(subcategoryId)=>{
+    setloading(true)
+    try{
+   
+          const response = axios.post(`${homeUrl}/getFiltersForSubcategory`,{subcategoryId},{
+            headers:{
+              'Content-Type': 'application/json',
+              authorization:`Bearer ${localStorage.getItem('token')}`
+            }
+          })
+          setSuccess(true)
+          setFilters(response.data);
+          return response.data
+    }catch{
+      setError
+
+    }finally{
+      setloading(false)
+    }                     
+
+  }
+  return {getFiltersForSubcategory, filters,loading,error,success}
+}   

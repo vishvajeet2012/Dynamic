@@ -5,17 +5,19 @@ import CategorySection from "../../../shared/HomePage/CategorySection";
 import ProductCard from "../../../shared/ProductCard";
 import RoundedCards from "../../../shared/roundedCard";
 import CategoryBanner from "../../../shared/CategoryBanner";
+import { useSubcategoryFilters } from "../../../hooks/Product/Product";
 
 export default function CategoryProduct({ Product ,loading ,id }) {
   const { loading:GetAllCategories, error, categories, fetechCategories } = useGetAllCategories();
   const {childCategory, getChildCategoryById, success ,loading:idLoading}=useGetChildCategoryById()
-
+const  {getFiltersForSubcategory, filters:newFilter,loading:filterLoading,error:filterError,success:filterSuccess}  =useSubcategoryFilters()
   useEffect(() => {
     fetechCategories();
     
   }, []);
   useEffect(()=>{
 getChildCategoryById(id)
+getFiltersForSubcategory(id)
   },[id])
 
   // Mock filter options (replace with your actual filters)
