@@ -13,7 +13,7 @@ export default function Banner({ bannerType }) {
             }
         };
         fetchBannerData();
-    }, [bannerType, getAllBannerData]);
+    }, [bannerType]);
 
     if (loading) return (
         <div className="w-full max-w-[1920px] mx-auto" aria-label="Loading banner">

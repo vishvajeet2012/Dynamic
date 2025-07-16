@@ -4,6 +4,7 @@ const subCategoriesSchema = new mongoose.Schema({
     subCategoryName: { 
         type: String,
         required: true
+        ,unique: true
     },
     subCategoryImage: {  
         type: String,
