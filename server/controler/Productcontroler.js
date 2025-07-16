@@ -551,10 +551,15 @@ const { Types } = require('mongoose'); // Import Types for ObjectId validation
 //     });
 //   }
 // };
+
+
+
 exports.getProductbykeys = async (req, res) => {
   try {
     const {
       categoryId,
+      subcategoryIds,
+  childCategoryIds,
       minPrice,
       maxPrice,
       page = 1,
@@ -567,7 +572,12 @@ exports.getProductbykeys = async (req, res) => {
     if (categoryId) {
       query.category = categoryId;
     }
+      if (subcategoryIds && Array.isArray(subcategoryIds)) {
+           query.subcategories = { $in: subcategoryIds };  }
 
+           if (childCategoryIds && Array.isArray(childCategoryIds)) {
+    query.childCategory = { $in: childCategoryIds };
+    }
     // Price filter (convert string to number using $expr)
     if (minPrice || maxPrice) {
       const priceQuery = {};

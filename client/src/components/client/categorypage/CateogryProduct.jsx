@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Banner from "../../../shared/Banner";
 import { useGetAllCategories, useGetChildCategoryById } from "../../../hooks/useCategories";
 import CategorySection from "../../../shared/HomePage/CategorySection";
@@ -8,9 +8,11 @@ import CategoryBanner from "../../../shared/CategoryBanner";
 import { useSubcategoryFilters } from "../../../hooks/Product/Product";
 
 export default function CategoryProduct({ Product ,loading ,id }) {
+    const [selected, setSelected] = useState('');
+  
   const { loading:GetAllCategories, error, categories, fetechCategories } = useGetAllCategories();
   const {childCategory, getChildCategoryById, success ,loading:idLoading}=useGetChildCategoryById()
-const  {getFiltersForSubcategory, filters:newFilter,loading:filterLoading,error:filterError,success:filterSuccess}  =useSubcategoryFilters()
+const  {getFiltersForSubcategory, filters,loading:filterLoading,error:filterError,success:filterSuccess}  =useSubcategoryFilters()
   useEffect(() => {
     fetechCategories();
     
@@ -20,8 +22,10 @@ getChildCategoryById(id)
 getFiltersForSubcategory(id)
   },[id])
 
+console.log(Product?.data )
+
   // Mock filter options (replace with your actual filters)
-  const filters = {
+  const filterss = {
     priceRanges: [
       { id: 1, label: "Under $50", value: "0-50" },
       { id: 2, label: "$50 - $100", value: "50-100" },
@@ -44,7 +48,6 @@ getFiltersForSubcategory(id)
   // Mock pagination (replace with your actual paginatio lsgic)
   const currentPage = 1;
   const totalPages = 5;
-console.log(childCategory?.data?.bannerImage)
   return (
     <>
       <section className="w-full">
@@ -65,45 +68,47 @@ console.log(childCategory?.data?.bannerImage)
               <div className="mb-6">
                 <h4 className="font-medium mb-2">Price Range</h4>
                 <div className="space-y-2">
-                  {filters.priceRanges.map((range) => (
-                    <div key={range.id} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`price-${range.id}`}
-                        name="price-range"
-                        value={range.value}
-                        className="mr-2"
-                      />
-                      <label htmlFor={`price-${range.id}`}>{range.label}</label>
-                    </div>
-                  ))}
+                  {filters?.priceFilters.map((range) => (
+        <div key={range} className="flex items-center">
+          <input
+            type="radio"
+            id={`price-${range}`}
+            name="price-range"
+            value={range}
+            className="mr-2"
+            checked={selected === range}
+            onChange={(e) => setSelected(e.target.value)}
+          />
+          <label htmlFor={`price-${range}`}>{range}</label>
+        </div>
+      ))}
+                
                 </div>
               </div>
               
-              {/* Brand Filter */}
+            
               <div className="mb-6">
                 <h4 className="font-medium mb-2">Brand</h4>
                 <div className="space-y-2">
-                  {filters.brands.map((brand) => (
+                  {filters?.childCategories.map((brand) => (
                     <div key={brand.id} className="flex items-center">
                       <input
                         type="checkbox"
                         id={`brand-${brand.id}`}
                         name="brand"
-                        value={brand.value}
+                        value={brand.childCategoryName}
                         className="mr-2"
                       />
-                      <label htmlFor={`brand-${brand.id}`}>{brand.label}</label>
+                      <label htmlFor={`brand-${brand.id}`}>{brand.childCategoryName}</label>
                     </div>
                   ))}
                 </div>
               </div>
-              
-              {/* Rater */}
+{/*           
               <div className="mb-6 ">
                 <h4 className="font-medium mb-2">Customer Rating</h4>
                 <div className="space-y-2">
-                  {filters.ratings.map((rating) => (
+                  {filterss.ratings.map((rating) => (
                     <div key={rating.id} className="flex items-center">
                       <input
                         type="checkbox"
@@ -116,7 +121,7 @@ console.log(childCategory?.data?.bannerImage)
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
               
               <button className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600 transition-colors">
                 Apply Filters
@@ -138,8 +143,8 @@ console.log(childCategory?.data?.bannerImage)
               {/* Sort Options */}
               <div className="flex justify-between items-center mb-6">
                 <p className="text-sm text-gray-600">
-                  Showing {Product?.data?.data?.length || 0} products
-                </p>
+                  Showing {Product?.data?.count  || 0} products
+                </p><p>{Product?.data?.total} TotalProduct</p>
                 <div className="flex items-center">
                   <label htmlFor="sort" className="mr-2 text-sm text-gray-600">Sort by:</label>
                   <select

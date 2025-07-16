@@ -221,14 +221,14 @@ export const useSubcategoryFilters = ()=>{
     setloading(true)
     try{
    
-          const response = axios.post(`${homeUrl}/getFiltersForSubcategory`,{subcategoryId},{
+          const response = await axios.post(`${homeUrl}/getFiltersForSubcategory`,{subcategoryId},{
             headers:{
               'Content-Type': 'application/json',
               authorization:`Bearer ${localStorage.getItem('token')}`
             }
           })
           setSuccess(true)
-          setFilters(response.data);
+          setFilters(response?.data);
           return response.data
     }catch{
       setError
