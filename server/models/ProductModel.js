@@ -91,6 +91,35 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isWishlist: {
+    type: Boolean,
+    default: false
+  },
+  isFeatured: {
+    type: Boolean,
+    default: false
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false    },
+  isOutOfStock: {
+    type: Boolean,
+    default: false      },
+  isBestSeller: {
+    type: Boolean,
+    default: false},
+
+    theme:{
+    type: String,
+    default:""
+
+  },
+  
+
   createdAt: {
     type: Date,
     default: Date.now

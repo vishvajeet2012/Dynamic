@@ -27,7 +27,8 @@ exports.createProduct = async (req, res) => {
       gender,
       size,
       weight,
-      slug
+      slug,
+      theme
     } = req.body;
 
     // ✅ Required Fields Validation
@@ -109,7 +110,8 @@ exports.createProduct = async (req, res) => {
       gender,
       size,
       weight,
-      slug
+      slug,
+      theme
     });
 
     return res.status(201).json({

@@ -25,7 +25,8 @@ export default function CreateAdminProduct() {
     stock: 0,
     isNewArrival: false,
     images: [],
-    slug: ''
+    slug: '',
+    theme:""
   });
 
   const [imageFiles, setImageFiles] = useState([]);
@@ -145,6 +146,8 @@ export default function CreateAdminProduct() {
       size: productData.size,
       subcategories: productData.subcategories,
       childCategory: productData.childCategories // <-- Added for submission
+      ,
+      theme: productData.theme
     };
 
     await createProduct(productToCreate);
@@ -249,6 +252,19 @@ export default function CreateAdminProduct() {
                  className="w-full px-3 py-2 border rounded"
                  required
                />
+             </div>
+              <div className="mb-4">
+               <label className="block text-gray-700 mb-2">Theme*</label>
+              
+               <input
+                 type="text"
+                 name="theme"
+                 value={productData.theme}
+                 onChange={handleChange}
+                 className="w-full px-3 py-2 border rounded"
+                 
+               />
+                <p className='mt-2 cursor-none animate-pulse text-sm text-red-500'>Clothing Themem like (harry potter,sipeder man ,marvel ,hulk)</p>
              </div>
           </div>
 
