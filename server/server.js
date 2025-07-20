@@ -24,7 +24,7 @@ const connectToDatabase = async () => {
     });
     console.log('Database connected successfully ❤️💙');
   } catch (err) {
-    console.error('Database connection error: ', err);
+    console.error('Database connection err', err);
     process.exit(1); 
   }
 };
