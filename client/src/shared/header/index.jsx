@@ -83,7 +83,7 @@ export default function Header() {
       </header>
 
       {/* Mobile Header */}
-      <div className="md:hidden">
+      <header className="md:hidden ">
         {/* Top Bar */}
         <div className="w-full bg-[#e11b23] p-2 flex justify-between items-center">
           <Link to="/" className="w-24">
@@ -119,7 +119,7 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-      </div>
+      </header>
     </>
   );
 }
