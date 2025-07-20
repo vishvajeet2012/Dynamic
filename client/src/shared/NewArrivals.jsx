@@ -12,34 +12,25 @@ export default function NewArrivals() {
     getProduct()
   }, [])
 
-  return (
-    <section className="w-full py-6 px-4 sm:px-6 lg:px-8">
-      <div className="md:text-center mb-6">
-        <h1 className="md:text-3xl text-2xl font-semibold text-black tracking-tight">
+  return (  
+    <section className="w-full py-6 lg:px-6">
+      <div className="text-xl md:text-center mb-4">
+        <h1 className="  text-xl md:text-4xl font-semibold text-black tracking-tight">
           New Arrivals
         </h1>
+       
       </div>
 
-      {/* Mobile View: Carousel */}
-      <div className="block lg:hidden">
-        <Carousel>
-          {Product?.data?.map((product, idx) => (
-            <div
-              key={idx}
-              className="min-w-[50%] sm:min-w-[20%] px-1"
-            >
-              <ProductCard item={product} />
-            </div>
-          ))}
-        </Carousel>
-      </div>
-
-      {/* Desktop View: Grid */}
-      <div className="hidden lg:grid grid-cols-5 gap-4">
+      <Carousel>
         {Product?.data?.map((product, idx) => (
-          <ProductCard key={idx} item={product} />
+          <div
+            key={idx}
+            className="min-w-[50%] sm:min-w-[50%] lg:min-w-[19%] px-1 lg:px-1"
+          >
+            <ProductCard item={product} />
+          </div>
         ))}
-      </div>
+      </Carousel>
     </section>
   )
 }
