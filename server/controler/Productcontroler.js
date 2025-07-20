@@ -94,9 +94,9 @@ exports.createProduct = async (req, res) => {
     const newProduct = await Product.create({
       name,
       description,
-      basePrice,
-      discount,
-      sellingPrice,
+      basePrice:Number(basePrice),
+      discount:Number(discount),
+      sellingPrice:Number(sellingPrice),
       category,
       subcategories: givenSubIds,
       childCategory: givenChildIds,
@@ -153,6 +153,7 @@ exports.updateProduct = async (req, res) => {
       basePrice,
       discount,
       category,
+      
       subcategories,
       childCategory,
       stock,
@@ -274,9 +275,9 @@ exports.updateProduct = async (req, res) => {
     const updatePayload = {
       name: name !== undefined ? name : product.name,
       description: description !== undefined ? description : product.description,
-      basePrice: basePrice !== undefined ? basePrice : product.basePrice,
+      basePrice: basePrice !== undefined ? Number(basePrice) : product.basePrice,
       discount: discount !== undefined ? discount : product.discount,
-      sellingPrice,
+      sellingPrice:Number(sellingPrice),
       category: category !== undefined ? category : product.category,
       subcategories: givenSubIds,
       childCategory: givenChildIds,
@@ -703,3 +704,29 @@ exports.getFiltersForSubcategory = async (req, res) => {
     });
   }
 };
+
+
+
+
+exports.getProductSearchPage =async (req, res) => { 
+  try {
+    const { keyword } = req.body;
+
+    if (!keyword) {
+      return res.status(400).json({ message: "Keyword is required" });
+    }
+
+    const regex = new RegExp(keyword, 'i');
+
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: regex } },
+        { description: { $regex: regex } }
+      ]
+    }).populate('category').populate('subcategories').populate('childCategory');
+
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}

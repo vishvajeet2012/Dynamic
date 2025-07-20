@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useCreateProduct } from "../../../hooks/Product/Product";
 import { useUplaodImage } from '../../../hooks/client/homePageHooks/use-banner';
 import { useGetAllCategories } from '../../../hooks/useCategories';
@@ -57,9 +57,8 @@ export default function CreateAdminProduct() {
     });
   };
 
-  // Get selected category details
   const selectedCategory = categories?.find(cat => cat._id === productData.category);
-  // Get active subcategories only
+  
   const activeSubcategories = selectedCategory?.subcategories?.filter(sub => sub.isActive) || [];
 
   const handleSubcategoryChange = (e) => {
