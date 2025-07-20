@@ -14,8 +14,8 @@ export default function NewArrivals() {
 
   return (
     <section className="w-full py-6 px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-6">
-        <h1 className="text-3xl sm:text-4xl font-semibold text-black tracking-tight">
+      <div className="md:text-center mb-6">
+        <h1 className="md:text-3xl text-2xl font-semibold text-black tracking-tight">
           New Arrivals
         </h1>
       </div>
@@ -26,7 +26,7 @@ export default function NewArrivals() {
           {Product?.data?.map((product, idx) => (
             <div
               key={idx}
-              className="min-w-[80%] sm:min-w-[60%] px-1"
+              className="min-w-[50%] sm:min-w-[20%] px-1"
             >
               <ProductCard item={product} />
             </div>
