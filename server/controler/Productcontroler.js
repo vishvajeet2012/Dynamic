@@ -725,8 +725,8 @@ exports.getProductSearchPage =async (req, res) => {
       ]
     }).populate('category').populate('subcategories').populate('childCategory');
 
-    if(!products){
-      res.status(200).json({message:"no result "})
+    if(products.length==0){
+      res.status(200).json({message:"no result ",product:null,count:null})
     }
 
     res.status(200).json({product:products ,message:"MatchProduct",count:products.length});
