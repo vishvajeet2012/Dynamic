@@ -556,40 +556,51 @@ const { Types } = require('mongoose'); // Import Types for ObjectId validation
 // };
 
 
-
 exports.getProductbykeys = async (req, res) => {
   try {
     const {
-      categoryId,
-      subcategoryIds,
-  childCategoryIds,
-      minPrice,
-      maxPrice,
-      page = 1,
-      limit = 10
+      data: {
+        categoryId,
+        subcategoryIds,
+        childCategoryIds,
+        minPrice,
+        maxPrice,
+        page = 1,
+        limit = 10
+      }
     } = req.body;
+
+    // 🚫 Reject if no filters are provided
+    if (
+      !categoryId &&
+      (!subcategoryIds || subcategoryIds.length === 0) &&
+      (!childCategoryIds || childCategoryIds.length === 0) &&
+      minPrice === undefined &&
+      maxPrice === undefined
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one filter is required to fetch products."
+      });
+    }
 
     const query = {};
 
-    // Category filter
-    if (categoryId) {
-      query.category = categoryId;
-    }
-      if (subcategoryIds && Array.isArray(subcategoryIds)) {
-           query.subcategories = { $in: subcategoryIds };  }
+    // Filters
+    if (categoryId) query.category = categoryId;
 
-           if (childCategoryIds && Array.isArray(childCategoryIds)) {
-    query.childCategory = { $in: childCategoryIds };
+    if (subcategoryIds && Array.isArray(subcategoryIds) && subcategoryIds.length > 0) {
+      query.subcategories = { $in: subcategoryIds };
     }
-    // Price filter (convert string to number using $expr)
+
+    if (childCategoryIds && Array.isArray(childCategoryIds) && childCategoryIds.length > 0) {
+      query.childCategory = { $in: childCategoryIds };
+    }
+
     if (minPrice || maxPrice) {
       const priceQuery = {};
-      if (minPrice !== undefined) {
-        priceQuery.$gte = Number(minPrice);
-      }
-      if (maxPrice !== undefined) {
-        priceQuery.$lte = Number(maxPrice);
-      }
+      if (minPrice !== undefined) priceQuery.$gte = Number(minPrice);
+      if (maxPrice !== undefined) priceQuery.$lte = Number(maxPrice);
 
       query.$expr = {
         $and: [
@@ -627,8 +638,6 @@ exports.getProductbykeys = async (req, res) => {
     });
   }
 };
-
-
 
 
 

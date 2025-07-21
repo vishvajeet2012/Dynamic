@@ -37,13 +37,13 @@ export default function Header() {
   return (
     <>
       {/* Desktop Header */}
-      <header className="hidden md:block">
-        <div className="w-full bg-[#e11b23] text-white font-bold h-16">
+      <header className="hidden bg-[#e11b23]  md:block ">
+        <div className="w-full bg-[#e11b23] 2xl:max-w-[83rem] 2xl:mx-auto text-white font-bold h-16">
           <div className="flex justify-between items-center h-full px-8">
-            <Link to="/" className="w-32">
+            <Link to="/" className="w-36">
               {success?.logo?.url && (
                 <img
-                  className="h-16 w-32 object-contain"
+                  className="h-16 w-32 object-cover aspect-[4/5]"
                   src={success.logo.url}
                   alt="Logo"
                 />

@@ -86,7 +86,7 @@ export default function SearchBar() {
   const { searchPage, searchResult, loading, error } = useSearchPage();
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const debouncedSearchTerm = useDebounce(searchTerm, 200);
   const searchBarRef = useRef(null);
 
   // Effect for handling debounced search
@@ -113,9 +113,9 @@ export default function SearchBar() {
   }, [searchBarRef]);
 
   return (
-    <div className="relative w-64 lg:w-96" ref={searchBarRef}>
+    <div className=" w-64 lg:w-[40rem]" ref={searchBarRef}>
       {/* Search Input */}
-      <div className="relative">
+      <div className="relative w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
         <input
           onChange={(e) => setSearchTerm(e.target.value)}
