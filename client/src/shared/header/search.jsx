@@ -97,7 +97,7 @@ export default function SearchBar() {
     } else {
       setShowResults(false);
     }
-  }, [debouncedSearchTerm, searchPage]);
+  }, [debouncedSearchTerm]);
   
   // Effect for closing results when clicking outside
   useEffect(() => {
