@@ -1,168 +1,130 @@
 // src/components/SearchBar/SearchBar.js
-
 import { useState, useEffect, useRef } from "react";
-import { useSearchPage } from "../../hooks/use-searchpage";
 import { Search, X, ImageOff, LoaderCircle } from "lucide-react";
+import { useSearchPage } from "../../hooks/use-searchpage";
 
-// Custom hook for debouncing a value
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
-
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    // Cleanup function to cancel the timeout if value changes
-    return () => {
-      clearTimeout(handler);
-    };
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
   }, [value, delay]);
-
   return debouncedValue;
 };
 
-// --- Sub-components for cleaner structure ---
-
-const SearchResultItem = ({ product }) => (
-  <div className="p-3 hover:bg-gray-100/80 flex flex-col md:flex-row md:items-center transition-colors duration-150">
-    {/* Image Container */}
-    <div className="flex-shrink-0 w-full h-40 md:w-16 md:h-16 bg-gray-200 rounded-md overflow-hidden">
-      {product.images?.[0]?.imagesUrls ? (
-        <img
-          src={product.images[0].imagesUrls}
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100">
-          <ImageOff size={24} />
-        </div>
-      )}
-    </div>
-
-    {/* Details Container */}
-    <div className="mt-3 md:mt-0 md:ml-4 flex-1">
-      <h4 className="text-base font-semibold text-gray-800">{product.name}</h4>
-      <div className="flex items-baseline mt-1">
-        <span className="text-base font-bold text-black">
-          ₹{product.sellingPrice}
-        </span>
-        {product.discount > 0 && (
-          <>
-            <span className="ml-2 text-sm line-through text-gray-500">
-              ₹{product.basePrice}
-            </span>
-            <span className="ml-2 text-sm font-medium text-emerald-600">
-              {product.discount}% off
-            </span>
-          </>
-        )}
-      </div>
-      <div className="mt-2 text-xs text-gray-500">
-        {product.category?.categoryName} • {product.color}
-      </div>
-    </div>
-  </div>
-);
-
-const SearchSkeleton = () => (
-  <div className="p-4 space-y-4">
-    {[...Array(3)].map((_, i) => (
-      <div key={i} className="flex items-center animate-pulse">
-        <div className="w-16 h-16 bg-gray-300 rounded-md"></div>
-        <div className="ml-4 flex-1 space-y-2">
-          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-          <div className="h-3 bg-gray-300 rounded w-1/2"></div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-// --- Main SearchBar Component ---
-
 export default function SearchBar() {
-  const { searchPage, searchResult, loading, error } = useSearchPage();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showResults, setShowResults] = useState(false);
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const searchBarRef = useRef(null);
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 300);
+  const [isOpen, setIsOpen] = useState(false);
+  const searchRef = useRef(null);
 
-  // Effect for handling debounced search
+  const { searchPage, searchResult, loading, error } = useSearchPage();
+
   useEffect(() => {
-    if (debouncedSearchTerm.length >= 1) {
-      searchPage(debouncedSearchTerm);
-      setShowResults(true);
+    if (debouncedQuery.trim().length > 0) {
+      searchPage(debouncedQuery);
+      setIsOpen(true);
     } else {
-      setShowResults(false);
+      setIsOpen(false);
     }
-  }, [debouncedSearchTerm]);
-  
-  // Effect for closing results when clicking outside
+  }, [debouncedQuery]);
+
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
-        setShowResults(false);
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setIsOpen(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [searchBarRef]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className=" w-64 lg:w-[40rem]" ref={searchBarRef}>
+    <div className="relative w-full max-w-2xl mx-auto" ref={searchRef}>
       {/* Search Input */}
-      <div className="relative w-full">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+      <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+        <Search size={18} className="text-gray-400 mr-2" />
         <input
-          onChange={(e) => setSearchTerm(e.target.value)}
           type="text"
-          placeholder="Search products..."
-          className="w-full rounded-md py-2 pl-10 pr-4 outline-none border-2 border-transparent bg-white text-black focus:border-blue-500 shadow-sm"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search for products..."
+          className="w-full outline-none text-sm text-black placeholder-gray-400 bg-transparent"
         />
+        {query && (
+          <button onClick={() => setQuery("")} className="text-gray-400 hover:text-gray-700">
+            <X size={18} />
+          </button>
+        )}
       </div>
-      
-      {/* Search Results Dropdown */}
-      {showResults && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white shadow-lg rounded-lg max-h-[70vh] overflow-y-auto">
-          {/* Header */}
-          <div className="flex justify-between items-center p-3 border-b sticky top-0 bg-white/95 backdrop-blur-sm">
-            <h3 className="font-semibold text-gray-800">
+
+      {/* Search Dropdown */}
+      {isOpen && (
+        <div className="absolute left-0 right-0 mt-2 bg-white border rounded-md shadow-lg max-h-[70vh] overflow-y-auto z-50">
+          <div className="sticky top-0 bg-white px-4 py-3 border-b flex justify-between items-center">
+            <span className="text-sm font-medium text-gray-700">
               {loading ? (
-                <span className="flex items-center text-gray-600">
-                   <LoaderCircle size={16} className="mr-2 animate-spin" /> Searching...
+                <span className="flex items-center gap-1 text-gray-500">
+                  <LoaderCircle size={16} className="animate-spin" /> Searching...
                 </span>
               ) : (
                 `${searchResult?.count || 0} results found`
               )}
-            </h3>
-            <button 
-              onClick={() => setShowResults(false)}
-              className="text-gray-500 hover:text-gray-800 p-1 rounded-full hover:bg-gray-100"
-              aria-label="Close search results"
+            </span>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-400 hover:text-gray-600"
             >
               <X size={20} />
             </button>
           </div>
-          
-          {/* Body */}
-          <div className="overflow-hidden">
-            {loading && !searchResult ? (
+
+          <div>
+            {loading ? (
               <SearchSkeleton />
             ) : error ? (
               <div className="p-4 text-center text-red-500">{error}</div>
             ) : searchResult?.product?.length > 0 ? (
-              <div className="divide-y divide-gray-100">
-                {searchResult.product.map((product) => (
-                  <SearchResultItem key={product._id} product={product} />
-                ))}
-              </div>
+              searchResult.product.map((product) => (
+                <div
+                  key={product._id}
+                  className="flex gap-4 items-start hover:bg-gray-50 transition px-4 py-3 border-b"
+                >
+                  <div className="w-16 h-16 rounded-md bg-gray-200 overflow-hidden flex-shrink-0">
+                    {product.images?.[0]?.imagesUrls ? (
+                      <img
+                        src={product.images[0].imagesUrls}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <ImageOff size={20} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm text-gray-800">{product.name}</h4>
+                    <div className="text-sm text-black font-bold mt-1">
+                      ₹{product.sellingPrice}
+                      {product.discount > 0 && (
+                        <span className="ml-2 text-xs line-through text-gray-500">
+                          ₹{product.basePrice}
+                        </span>
+                      )}
+                      {product.discount > 0 && (
+                        <span className="ml-2 text-xs text-green-600">{product.discount}% off</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {product.category?.categoryName} • {product.color}
+                    </div>
+                  </div>
+                </div>
+              ))
             ) : (
-              <div className="p-8 text-center text-gray-500">
-                No products found for "{debouncedSearchTerm}"
+              <div className="p-6 text-center text-gray-500 text-sm">
+                No products found for "{debouncedQuery}"
               </div>
             )}
           </div>
@@ -171,3 +133,17 @@ export default function SearchBar() {
     </div>
   );
 }
+
+const SearchSkeleton = () => (
+  <div className="p-4 space-y-4">
+    {[...Array(3)].map((_, i) => (
+      <div key={i} className="flex items-center gap-4 animate-pulse">
+        <div className="w-16 h-16 bg-gray-300 rounded-md"></div>
+        <div className="flex-1 space-y-2">
+          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+          <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
