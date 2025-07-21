@@ -13,11 +13,11 @@ const [loading, setLoading] = useState(false);
 
 
 
-        const searchPage = async (keywords)=>{
+        const searchPage = async (keyword)=>{
 
 
             try{
-    const response = await axios.post(`${homeUrl}/getproductsearchpage`,{keywords},
+    const response = await axios.post(`${homeUrl}/getproductsearchpage`,{keyword},
 {
         headers: {
           'Content-Type': 'application/json',

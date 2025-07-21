@@ -8,12 +8,12 @@ export default function SearchBar() {
 
 const handleSearchValue= (e)=>{
 
-const keywords= e.target?.value
+const keyword= e.target?.value
 
-        if(keywords.length  >=3)
+        if(keyword.length  >=3)
         {
-            console.log(keywords)
-            searchPage(keywords)
+            console.log(keyword)
+            searchPage(keyword)
         }
 
 }

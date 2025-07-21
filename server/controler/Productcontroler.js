@@ -725,7 +725,11 @@ exports.getProductSearchPage =async (req, res) => {
       ]
     }).populate('category').populate('subcategories').populate('childCategory');
 
-    res.status(200).json(products);
+    if(!products){
+      res.status.(200).json({message:"no result "})
+    }
+
+    res.status(200).json({product:products ,message:"MatchProduct",count:products.length});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
