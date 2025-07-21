@@ -86,7 +86,7 @@ export default function SearchBar() {
   const { searchPage, searchResult, loading, error } = useSearchPage();
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const debouncedSearchTerm = useDebounce(searchTerm, 200);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const searchBarRef = useRef(null);
 
   // Effect for handling debounced search
