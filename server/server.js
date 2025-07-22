@@ -8,8 +8,12 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const cors = require('cors');
+const configureCors = require('./config/corsConfig');
+const requestLogger = require('./middleware/logger');
 
-app.use(cors()); 
+app.use(configureCors()); 
+app.use(requestLogger)// Middleware to log requests
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '50mb' })); // Increased for base64 images
