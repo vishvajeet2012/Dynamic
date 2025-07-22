@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils"; // Assuming you have this utility for conditional classes
 import { FaHeart, FaStar } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export default function AdaptiveProductCard({ item }) {
   // Destructure props with default values
   const {
-    id,
+    _id,
     name,
     category,
     discount,
@@ -15,6 +16,7 @@ export default function AdaptiveProductCard({ item }) {
     rating = 4.5,
     reviewCount = 87,
     isOutOfStock = false,
+    slug
   } = item;
 
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -42,7 +44,7 @@ export default function AdaptiveProductCard({ item }) {
       )}
     >
       {/* ====== 1. IMAGE SECTION ====== */}
-      <div
+      <Link to={`/${_id}`}
         className={cn(
           "relative overflow-hidden",
           // Mobile: A square aspect ratio with object-cover for a clean look.
@@ -87,7 +89,7 @@ export default function AdaptiveProductCard({ item }) {
             )}
           />
         </button>
-      </div>
+      </Link>
 
       {/* ====== 2. CONTENT SECTION ====== */}
       <div className="flex flex-grow flex-col p-4">

@@ -17,6 +17,7 @@ import AdminProductManagement from './components/admin/Admin-Product/adminGetpro
 import Footer from './shared/footer';
 import ForgetPassowrd from './components/client/auth/ForgetPassowrd';
 import CategroyPage from './components/client/categorypage';
+import ProductPage from './components/client/pdppage/productpage';
 function App() {
   return (
     <>
@@ -26,7 +27,7 @@ function App() {
       <Route path='/login' element={<Login />} />
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
-
+    <Route path="/:id" element={<ProductPage />} />
       <Route element={<ProtectedRoute />}>
       <Route path="/profile" element={<UserProfile />} />
         <Route path="/category-update" element={<CategoryUpdateForm />} />
