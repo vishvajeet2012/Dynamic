@@ -85,6 +85,8 @@ guestExpiry: {
     },
     mobileNumber: {
         type: String,
+        unique: true,
+        
         default: ""
     },
     address: {

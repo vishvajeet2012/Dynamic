@@ -373,7 +373,11 @@ exports.productDelete = async(req,res)=>{
 // Get single product by ID
 exports.getProduct = async (req, res) => {
   try {
-    const product = await Products.findById(req.params.id);
+    const {slug}=req.body //slug is used to find the product
+    if (!slug) {
+      return res.status(400).json({ message: 'Product slug is required' });
+    }
+    const product = await Products.find(slug);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }

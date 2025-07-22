@@ -107,6 +107,14 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  slug: {
+    type: String,
+    default: name => name.toLowerCase().replace(/ /g, '-'),
+    unique: true,
+    trim: true,
+    lowercase: true,
+    maxlength: [100, 'Product slug cannot exceed 100 characters']
+  },
 
   
   isDeleted: {
