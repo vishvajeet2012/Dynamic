@@ -16,7 +16,7 @@ app.use(requestLogger)// Middleware to log requests
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ limit: '50mb' })); // Increased for base64 images
+app.use(express.json({ limit: '50mb' })); // Increased for base64 image
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Database connection
 
