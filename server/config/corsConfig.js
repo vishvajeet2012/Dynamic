@@ -4,7 +4,7 @@ const configureCors= (app)=>{
         return cors({
 
             origin:(origin , callback)=>{
-                const allowedOrigins = [`http://localhost:3000`, `http://example.com`];
+                const allowedOrigins = [`http://localhost:5173`, `https://dynamicvstore.vercel.app/`];
                 if(!origin || allowedOrigins.indexOf(origin) !== -1){
                     callback(null, true);
                 }
