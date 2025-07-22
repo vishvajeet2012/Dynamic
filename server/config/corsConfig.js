@@ -18,7 +18,7 @@ const configureCors= (app)=>{
           //  credentials:true,// Allow cookies to be sent with requests,// enable support fo cookies
             preflightContinue:false, // Pass the CORS preflight response to the next handler
             maxAge: 600, // Cache preflight response for 10 minutes ->avoid  sending option  requests multiople times
-            optionsSuccessStatus: 204 // Use 204 for successful OPTIONS requests
+            optionsSuccessStatus: 204 // Use 204 for successful OPTIONS request
 
 
         })
