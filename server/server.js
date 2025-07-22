@@ -12,7 +12,7 @@ const configureCors = require('./config/corsConfig');
 const requestLogger = require('./middleware/logger');
 app.use(cors())
 ///app.use(configureCors()); 
-app.use(requestLogger)// Middleware to log requests
+//app.use(requestLogger)// Middleware to log requests
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
