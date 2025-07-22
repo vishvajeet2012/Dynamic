@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaStar, FaRegStar, FaMinus, FaPlus } from 'react-icons/fa';
-import ProductImage from './ProductImage';
+import ProductImage from './productImage';
 
 const ProductPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -42,7 +42,7 @@ const ProductPage = () => {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Product Image Section */}
         <div className="w-full md:w-1/2">
-          <ProductImage 
+          <ProductImage
             images={product.images} 
             altText={product.name}
             selectedImageIndex={selectedImageIndex}
