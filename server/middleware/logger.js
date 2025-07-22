@@ -2,7 +2,7 @@ const requestLogger = (req, res, next) => {
     const StrartTime = new Date().toString()
         const methods = req.method;
         const url = req.url
-        const userAgent = req.headers['User-Agent'];// Get the User-Agent header
+        const userAgent = req.headers['User-Agent'];// Get the User-Agent headeadd
         console.log(`[${StrartTime}] ${methods} ${url} - User-Agent: ${userAgent}`);
         next();
     
