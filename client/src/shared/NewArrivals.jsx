@@ -15,7 +15,7 @@ export default function NewArrivals() {
   return (  
     <section className="w-full py-6 lg:px-6">
       <div className="text-xl md:text-center mb-4">
-        <h1 className="  text-xl md:text-4xl font-semibold text-black tracking-tight">
+        <h1 className=" pl-2 md:pl-0 text-xl md:text-4xl font-semibold text-black tracking-tight">
           New Arrivals
         </h1>
        

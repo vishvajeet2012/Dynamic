@@ -35,7 +35,7 @@ export default function AdminProductManagement() {
             basePrice: product.basePrice,
             discount: product.discount,
             sellingPrice: product.sellingPrice,
-            stock: product.stock,
+            stock: product.stock,   
             color: product.color,
             gender: product.gender,
             size: product.size || [],

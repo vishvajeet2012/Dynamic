@@ -103,6 +103,12 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isAddToCart: {
+    type: Boolean,
+    default: false
+  },
+
+  
   isDeleted: {
     type: Boolean,
     default: false    },
