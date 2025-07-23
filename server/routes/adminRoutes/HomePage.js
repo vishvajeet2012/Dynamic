@@ -32,7 +32,9 @@ router.post('/getChildCategoryById',getChildCategoryById);
 router.post("/childcategory",auth,createChildCategory)
 
 
-router.post('/uploadImage' ,auth,uploadImageMiddleware.single('image'), uploadImageonCloud.uploadImageController)
+// router.post('/uploadImage' ,auth,uploadImageMiddleware.single('image'), uploadImageonCloud.uploadImageController)
+router.post('/uploadImage' ,auth,uploadImageMiddleware.array("images", 10), uploadImageonCloud.uploadImageController)
+
 router.get("/get", auth, uploadImageonCloud.fetchImagesController);
 
 //delete image route

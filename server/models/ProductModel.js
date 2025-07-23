@@ -18,6 +18,13 @@ const productSchema = new mongoose.Schema({
     maxlength: [8, 'Price cannot exceed 8 characters'],
     default: 0.0
   },
+  details: {
+    type: String,
+default: '',
+    trim: true,
+    minlength: [10, 'Details must be at least 10 characters'],  
+    maxlength: [500, 'Details cannot exceed 500 characters']
+  },
   sellingPrice: {
     type: Number,
     maxlength: [8, 'Discount price cannot exceed 8 characters']

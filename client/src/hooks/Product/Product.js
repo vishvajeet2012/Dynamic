@@ -266,7 +266,8 @@ export const useProductDetail =()=>{
                 }
             })
             setSuccess(true)
-            setProductDetail(response?.data);
+            setProductDetail(response?.data?.product
+);
             return response.data
         }catch{
             setError

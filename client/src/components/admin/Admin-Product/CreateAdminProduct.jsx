@@ -27,6 +27,8 @@ export default function CreateAdminProduct() {
     images: [],
     slug: '',
     theme:""
+  , isFeatured:false,
+  details: '',
   });
 
   const [imageFiles, setImageFiles] = useState([]);
@@ -102,7 +104,7 @@ export default function CreateAdminProduct() {
     if (files.length === 0) return;
 
     const formData = new FormData();
-    formData.append("image", files[0]);
+    formData.append("image", files); /// [files[0]]); // Assuming you want to upload multiple images
 
     try {
         const v = await uploadImage(formData);
@@ -130,7 +132,9 @@ export default function CreateAdminProduct() {
     // Prepare the product object to send
     const productToCreate = {
       name: productData.name,
+      isFeatured:productData.isFeatured,
       slug: productData.slug,
+      details: productData.details,
       description: productData.description,
       basePrice: parseFloat(productData.basePrice),
       sellingPrice: parseFloat(productData.sellingPrice),
@@ -192,6 +196,20 @@ export default function CreateAdminProduct() {
                 required
               />
             </div>
+
+             <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Product Details</label>
+              <textarea
+                name="Details"
+                value={productData.details}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded"
+                rows="4"
+                required
+              />
+            </div>
+
+                  
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
@@ -398,7 +416,20 @@ export default function CreateAdminProduct() {
                 className="mr-2"
               />
               <label htmlFor="isNewArrival" className="text-gray-700">Mark as New Arrival</label>
+            </div> 
+                    <div className="flex items-center mb-4">
+              <input
+                type="checkbox"
+                name="isFeatured"
+                id="isFeatured"
+                checked={productData.isFeatured}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              <label htmlFor="isFeatured" className="text-gray-700">Mark as Feature Product</label>
             </div>
+
+
           </div>
         </div>
 

@@ -6,19 +6,22 @@ const ProductImage = ({ images, altText }) => {
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
 
+  // Get the array of image URLs from the images prop
+  const imageUrls = images?.map(img => img?.imagesUrls) || [];
+
   // Handle keyboard navigation for accessibility
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowRight') {
-        setSelectedImageIndex(prev => (prev + 1) % images.length);
+        setSelectedImageIndex(prev => (prev + 1) % imageUrls.length);
       } else if (e.key === 'ArrowLeft') {
-        setSelectedImageIndex(prev => (prev - 1 + images.length) % images.length);
+        setSelectedImageIndex(prev => (prev - 1 + imageUrls.length) % imageUrls.length);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [images.length]);
+  }, [imageUrls.length]);
 
   const handleMouseMove = (e) => {
     if (!isZoomed) return;
@@ -28,6 +31,8 @@ const ProductImage = ({ images, altText }) => {
     const y = ((e.clientY - top) / height) * 100;
     setZoomPosition({ x, y });
   };
+
+  if (!imageUrls.length) return <div className="w-full h-96 bg-gray-100 rounded-lg"></div>;
 
   return (
     <div className="flex flex-col gap-4">
@@ -39,9 +44,9 @@ const ProductImage = ({ images, altText }) => {
         onMouseMove={handleMouseMove}
       >
         <img 
-          src={images[selectedImageIndex]} 
+          src={imageUrls[selectedImageIndex]} 
           alt={altText} 
-          className={`object-contain w-full h-full transition-transform duration-300 ${
+          className={`object-contain aspect-[5/6] w-full h-full transition-transform duration-300 ${
             isZoomed ? 'scale-150' : 'scale-100'
           }`}
           style={{
@@ -52,7 +57,7 @@ const ProductImage = ({ images, altText }) => {
         {/* Image navigation arrows */}
         <button
           className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hover:bg-white transition-colors"
-          onClick={() => setSelectedImageIndex(prev => (prev - 1 + images.length) % images.length)}
+          onClick={() => setSelectedImageIndex(prev => (prev - 1 + imageUrls.length) % imageUrls.length)}
           aria-label="Previous image"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -61,7 +66,7 @@ const ProductImage = ({ images, altText }) => {
         </button>
         <button
           className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hover:bg-white transition-colors"
-          onClick={() => setSelectedImageIndex(prev => (prev + 1) % images.length)}
+          onClick={() => setSelectedImageIndex(prev => (prev + 1) % imageUrls.length)}
           aria-label="Next image"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -73,7 +78,7 @@ const ProductImage = ({ images, altText }) => {
       {/* Thumbnail gallery with scrollable container */}
       <div className="relative">
         <div className="flex gap-2 overflow-x-auto py-2 scrollbar-hide">
-          {images.map((image, index) => (
+          {imageUrls.map((image, index) => (
             <button
               key={index}
               className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
@@ -100,7 +105,12 @@ const ProductImage = ({ images, altText }) => {
 };
 
 ProductImage.propTypes = {
-  images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  images: PropTypes.arrayOf(
+    PropTypes.shape({
+      imagesUrls: PropTypes.string.isRequired,
+      _id: PropTypes.string.isRequired
+    })
+  ).isRequired,
   altText: PropTypes.string.isRequired
 };
 

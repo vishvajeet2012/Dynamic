@@ -31,8 +31,12 @@ export default function AdminProductManagement() {
         setFormData({
             id: product._id,
             name: product.name,
+            details: product.details, // Assuming details is a new field
             description: product.description,
+            slug: product.slug,
+            isFeatured: product.isFeatured,
             basePrice: product.basePrice,
+            details: product.details,
             discount: product.discount,
             sellingPrice: product.sellingPrice,
             stock: product.stock,   
@@ -161,6 +165,11 @@ export default function AdminProductManagement() {
                                     <label className="block text-sm font-medium">Description</label>
                                     <textarea name="description" value={formData.description || ''} onChange={handleChange} rows="3" className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></textarea>
                                 </div>
+                                 <div>
+                                    <label className="block text-sm font-medium">Product Details</label>
+                                    <textarea name="Details" value={formData.details || ''} onChange={handleChange} rows="3" className="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></textarea>
+                                </div>
+
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium">Base Price</label>
