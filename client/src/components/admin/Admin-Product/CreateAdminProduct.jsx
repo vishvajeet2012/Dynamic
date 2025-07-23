@@ -104,7 +104,7 @@ export default function CreateAdminProduct() {
     if (files.length === 0) return;
 
     const formData = new FormData();
-    formData.append("image", files); /// [files[0]]); // Assuming you want to upload multiple images
+    formData.append("image", files[0]); /// [files[0]]); // Assuming you want to upload multiple images
 
     try {
         const v = await uploadImage(formData);
