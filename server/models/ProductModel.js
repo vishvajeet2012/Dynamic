@@ -66,7 +66,7 @@ default: '',
     {
       publicIds: {
         type: String,
-       // required: true
+       // required: tru
       },
       imagesUrls: {
         type: String,
