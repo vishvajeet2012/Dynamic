@@ -13,18 +13,18 @@ const productSchema = new mongoose.Schema({
     maxlength: [1000, 'Description cannot exceed 1000 characters']
   },
   basePrice: {
-    type:String,
+    type:Number,
     required: [true, 'Product Baseprice is required'],
     maxlength: [8, 'Price cannot exceed 8 characters'],
     default: 0.0
   },
   sellingPrice: {
-    type: String,
+    type: Number,
     maxlength: [8, 'Discount price cannot exceed 8 characters']
   },
   discount:{
     type: String,
-    default: 0
+    default:Number
   },
   color: {
     type: String,
@@ -111,9 +111,6 @@ const productSchema = new mongoose.Schema({
     type: String,
     default: name => name.toLowerCase().replace(/ /g, '-'),
     unique: true,
-    trim: true,
-    lowercase: true,
-    maxlength: [100, 'Product slug cannot exceed 100 characters']
   },
 
   

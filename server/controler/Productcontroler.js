@@ -275,7 +275,7 @@ exports.updateProduct = async (req, res) => {
     const updatePayload = {
       name: name !== undefined ? name : product.name,
       description: description !== undefined ? description : product.description,
-      basePrice: basePrice !== undefined ? Number(basePrice) : product.basePrice,
+      basePrice: basePrice !== undefined ? Number(basePrice) : Number(product.basePrice),
       discount: discount !== undefined ? discount : product.discount,
       sellingPrice:Number(sellingPrice),
       category: category !== undefined ? category : product.category,
@@ -744,6 +744,33 @@ exports.getProductSearchPage =async (req, res) => {
 
     res.status(200).json({product:products ,message:"MatchProduct",count:products.length});
   } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+
+exports.getProductBySlug = async (req, res) => {
+  try {
+    const { slug } = req.body;
+
+    if (!slug) {
+      return res.status(400).json({ message: "Product slug is required" });
+    }
+
+    const product = await Product.findOne({ slug })
+      .populate('category')
+      .populate('subcategories')
+      .populate('childCategory')
+
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }else{
+      
+      res.status(200).json({ product, message: "Product found",status: true });
+    }
+
+  }catch (err) {
     res.status(500).json({ message: err.message });
   }
 }

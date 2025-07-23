@@ -8,7 +8,7 @@ const {  createSubCategory, updateSubCategory, getChildCategoryById } = require(
 const auth = require('../../middleware/authmiddleware');
 const uploadImageMiddleware = require('../../middleware/uploadImageMiddleware');
 const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBannersByType } = require('../../controler/BannerControler');
-const { createProduct, getProducts, productDelete, updateProduct, getProductbykeys, getFiltersForSubcategory, getProductSearchPage } = require('../../controler/Productcontroler');
+const { createProduct, getProducts, productDelete, updateProduct, getProductbykeys, getFiltersForSubcategory, getProductSearchPage, getProductBySlug } = require('../../controler/Productcontroler');
 const { createChildCategory } = require('../../controler/childCategoryControler');
 
 router.post("/homelogo", logoController.createLogo);
@@ -53,7 +53,7 @@ router.patch('/:id/toggle-active',auth, toggleBannerActive);
 router.post('/updateproduct',auth,updateProduct)
 router.post("/getProductbykeys",getProductbykeys)
 router.post("/getproductsearchpage",getProductSearchPage)
-
+router.post('/productdetail',getProductBySlug)
 
 
 //////////////fitlers////////////////

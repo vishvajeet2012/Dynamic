@@ -246,3 +246,34 @@ export const useSubcategoryFilters = ()=>{
   }
   return {getFiltersForSubcategory, filters,loading,error,success}
 }   
+
+
+
+export const useProductDetail =()=>{
+
+
+    const [loading,setloading]= useState(false)
+    const [error,setError]= useState(null)
+    const [success,setSuccess]=useState(false)
+    const [productDetail, setProductDetail] = useState(null);
+    const getProductBySlug = async(slug)=>{
+        setloading(true)
+        try{
+            const response = await axios.post(`${homeUrl}/productdetail`,{slug},{
+                headers:{
+                    'Content-Type': 'application/json',
+                    authorization:`Bearer ${localStorage.getItem('token')}`
+                }
+            })
+            setSuccess(true)
+            setProductDetail(response?.data);
+            return response.data
+        }catch{
+            setError
+        }finally{
+            setloading(false)
+        }                     
+
+    }
+    return {getProductBySlug, productDetail,loading,error,success}
+}

@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState ,useEffect} from 'react';
+import { useParams } from 'react-router-dom';
 import { FaStar, FaRegStar, FaMinus, FaPlus } from 'react-icons/fa';
 import ProductImage from './productImage';
+import { useProductDetail } from '../../../hooks/Product/Product';
 
 const ProductPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState('Black');
-  
-  // Sample product data
+  const {getProductBySlug, productDetail,loading,error,success}= useProductDetail();
+  const {id}  = useParams();
+  console.log("Product Detail:", id);
   const product = {
     name: "Premium Wireless Headphones",
     price: 199.99,
@@ -32,10 +35,16 @@ const ProductPage = () => {
 
   const handleImageSelect = (index) => {
     setSelectedImageIndex(index);
-  };
+  }
+
+      useEffect(() => {
+
+
+      }, []);
 
   const increaseQuantity = () => setQuantity(prev => prev + 1);
-  const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
+  const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1))
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">

@@ -44,7 +44,7 @@ export default function AdaptiveProductCard({ item }) {
       )}
     >
       {/* ====== 1. IMAGE SECTION ====== */}
-      <Link to={`/${_id}`}
+      <Link to={`/${slug}`}
         className={cn(
           "relative overflow-hidden",
           // Mobile: A square aspect ratio with object-cover for a clean look.
@@ -106,9 +106,9 @@ export default function AdaptiveProductCard({ item }) {
         </div>
 
         {/* Product Name */}
-        <h3 className="mt-1 text-base font-bold text-slate-900 line-clamp-2 min-h-[2.5rem]">
+        <Link to={`/${slug}`} className="mt-1 text-base font-bold text-slate-900 line-clamp-2 min-h-[2.5rem]">
           {name}
-        </h3>
+        </Link>
 
         {/* Price */}
         <div className="mt-auto flex items-baseline gap-2 pt-2">
