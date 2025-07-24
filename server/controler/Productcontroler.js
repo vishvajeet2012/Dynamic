@@ -6,6 +6,7 @@ const Category = require('../models/CategoryModel');
 const SubCategory = require('../models/SubCategoryModel');
 
 const child = require('../models/childCategoryModel'); // Assuming this is the correct path for ChildCategory model
+const slugify = require('slugify');
 
 
 exports.createProduct = async (req, res) => {
@@ -52,6 +53,18 @@ exports.createProduct = async (req, res) => {
     if (!categoryDoc) {
       return res.status(404).json({ message: "Category not found" });
     }
+
+
+
+ let productSlug = slug;
+    if (!productSlug) {
+      productSlug = slugify(name, {
+        lower: true,           // Convert to lowercase
+        strict: true,          // Strip special characters except replacement
+        remove: /[*+~.()'"!:@]/g // Remove specific characters
+      });
+    }
+
 
     // ✅ Validate Subcategories belong to Category
     const validSubIds = categoryDoc.subcategories.map(id => id.toString());
@@ -164,7 +177,7 @@ exports.updateProduct = async (req, res) => {
       gender,
       size,
       weight,
-      slug
+      slug:productSlug
     } = req.body;
 
     // ✅ Check if product exists

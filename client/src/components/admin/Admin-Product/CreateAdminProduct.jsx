@@ -29,7 +29,7 @@ export default function CreateAdminProduct() {
     slug: '',
     theme:""
   , isFeatured:false,
-  details: '',
+
   });
 
   const [imageFiles, setImageFiles] = useState([]);
@@ -140,7 +140,6 @@ export default function CreateAdminProduct() {
       name: productData.name,
       isFeatured:productData.isFeatured,
       slug: productData.slug,
-      details: productData.details,
       description: productData.description,
       basePrice: parseFloat(productData.basePrice),
       sellingPrice: parseFloat(productData.sellingPrice),
@@ -203,18 +202,7 @@ export default function CreateAdminProduct() {
               />
             </div>
 
-             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Product Details</label>
-              <textarea
-                name="Details"
-                value={productData.details}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded"
-                rows="4"
-                
-              />
-            </div>
-
+             
                   
 
             <div className="grid grid-cols-2 gap-4 mb-4">
