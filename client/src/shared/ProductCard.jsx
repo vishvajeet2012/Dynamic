@@ -4,9 +4,12 @@ import { FaHeart, FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import WishlistButton from "../components/client/wishlist/wishlistButton";
 import { useAddtoWishlist } from "../hooks/Product/Product";
+import { useWishlist } from "../../context/wishListhContext";
 
 export default function AdaptiveProductCard({ item }) {
    const  { addtoWishlist, loading, wishlist, error, success } = useAddtoWishlist()
+     const { toggleWishlist, isInWishlist, } = useWishlist();
+
   
   // Destructure props with default values
   const {
@@ -33,7 +36,7 @@ export default function AdaptiveProductCard({ item }) {
    /// console.log("Toggled wishlist for:", name);
         
 console.log("Toggling wishlist for product:", _id);
-    addtoWishlist(_id)
+    toggleWishlist(_id)
     setIsWishlisted((prev) => !prev);
     console.log("Wishlist status:", e);
     // Optionally, you can show a toast or notification here

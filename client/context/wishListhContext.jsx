@@ -1,22 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-
-const homeUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+import { homeUrl } from '../src/lib/baseUrl.js';
+import { toast } from "sonner"
 
 const WishlistContext = createContext();
 
 export const WishlistProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
     const [wishlistItems, setWishlistItems] = useState([]);
     const [productsWithWishlistStatus, setProductsWithWishlistStatus] = useState([]);
 
     // Toggle wishlist status (add/remove)
     const toggleWishlist = async (productId) => {
         setLoading(true);
-        setError(null);
-        setSuccess(null);
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(`${homeUrl}/addtoWishlist`, { productId }, {
@@ -27,16 +23,24 @@ export const WishlistProvider = ({ children }) => {
             });
             
             // Update local state based on response
-            setWishlistItems(response.data.wishlist || response.data);
-            setSuccess(response.data.message || 'Wishlist updated successfully');
+            setWishlistItems(response.data.wishlist || response?.data);
             
-            // Refresh products with wishlist status
+            // Show success notification
+           toast (response.data.message || 'Wishlist updated successfully',
+               
+           );
+            
+            // Automatically refresh the wishlist and products
+            setProductsWithWishlistStatus([])
             await fetchProductsWithWishlistStatus();
             
             return response.data;
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Failed to update wishlist';
-            setError(errorMsg);
+            
+            // Show error notification
+            toast(errorMsg)
+            
             throw new Error(errorMsg);
         } finally {
             setLoading(false);
@@ -46,7 +50,6 @@ export const WishlistProvider = ({ children }) => {
     // Get all products with wishlist status
     const fetchProductsWithWishlistStatus = async () => {
         setLoading(true);
-        setError(null);
         try {
             const token = localStorage.getItem('token');
             const response = await axios.post(`${homeUrl}/getAllProductsWithWishlist`, {}, {
@@ -56,12 +59,14 @@ export const WishlistProvider = ({ children }) => {
                 }
             });
             
-            setProductsWithWishlistStatus(response.data.products);
+            setProductsWithWishlistStatus(response.data);
             setWishlistItems(response.data.wishlist || []);
             return response.data;
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Failed to load products';
-            setError(errorMsg);
+            
+          toast(errorMsg)   
+            
             throw new Error(errorMsg);
         } finally {
             setLoading(false);
@@ -73,12 +78,6 @@ export const WishlistProvider = ({ children }) => {
         return wishlistItems.some(item => item._id === productId || item.productId === productId);
     };
 
-    // Clear messages
-    const clearMessages = () => {
-        setError(null);
-        setSuccess(null);
-    };
-
     // Initial data load
     useEffect(() => {
         fetchProductsWithWishlistStatus();
@@ -88,14 +87,11 @@ export const WishlistProvider = ({ children }) => {
         <WishlistContext.Provider
             value={{
                 loading,
-                error,
-                success,
                 wishlistItems,
                 productsWithWishlistStatus,
                 toggleWishlist,
                 fetchProductsWithWishlistStatus,
-                isInWishlist,
-                clearMessages
+                isInWishlist
             }}
         >
             {children}
