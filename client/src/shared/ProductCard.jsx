@@ -3,8 +3,11 @@ import { cn } from "@/lib/utils"; // Assuming you have this utility for conditio
 import { FaHeart, FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import WishlistButton from "../components/client/wishlist/wishlistButton";
+import { useAddtoWishlist } from "../hooks/Product/Product";
 
 export default function AdaptiveProductCard({ item }) {
+   const  { addtoWishlist, loading, wishlist, error, success } = useAddtoWishlist()
+  
   // Destructure props with default values
   const {
     _id,
@@ -24,12 +27,16 @@ export default function AdaptiveProductCard({ item }) {
 
   // --- Event Handlers ---
 
-  const handleWishlistClick = (e) => {
+  const handleWishlistClick = async(e) => {
    /// e.stopPropagation();
    /// setIsWishlisted((prev) => !prev);
    /// console.log("Toggled wishlist for:", name);
         
-
+console.log("Toggling wishlist for product:", _id);
+    addtoWishlist(_id)
+    setIsWishlisted((prev) => !prev);
+    console.log("Wishlist status:", e);
+    // Optionally, you can show a toast or notification here
 
   };
 

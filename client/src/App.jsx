@@ -18,6 +18,7 @@ import Footer from './shared/footer';
 import ForgetPassowrd from './components/client/auth/ForgetPassowrd';
 import CategroyPage from './components/client/categorypage';
 import ProductPage from './components/client/pdppage/productpage';
+import Wishlistpage from './components/client/wishlist/wishlistPage';
 function App() {
   return (
     <>
@@ -28,6 +29,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
     <Route path="/:id" element={<ProductPage />} />
+    <Route path="/wishlist" element={<Wishlistpage/>} />
       <Route element={<ProtectedRoute />}>
       <Route path="/profile" element={<UserProfile />} />
         <Route path="/category-update" element={<CategoryUpdateForm />} />

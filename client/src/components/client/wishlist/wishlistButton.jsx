@@ -5,18 +5,18 @@ import { cn } from "@/lib/utils"; // Assuming you have this utility for conditio
 
 export default function WishlistButton({ isWishlisted, handleWishlistClick ,prodcutId}) {
  
- const  { addtoWishlist, loading, wishlist, error, success } = useAddtoWishlist()
+ const  { getAllProductsWithWishlist, loading, productsWithWishlist, error, success }= useAddtoWishlist()
+
+    
+    
+ if(loading) return <div>Loading...</div>;
 
 
- useEffect(() => {
 
-addtoWishlist()
-  }
-, []);
 
     return (
      <button
-            onClick={handleWishlistClick}
+            onClick={()=>(handleWishlistClick(prodcutId))}
             className="absolute top-2 right-2 rounded-full bg-white/80 p-2 text-gray-500 shadow-sm backdrop-blur-sm transition-all hover:bg-white hover:text-red-500"
             aria-label="Add to wishlist"
           >

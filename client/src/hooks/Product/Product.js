@@ -375,5 +375,5 @@ export const useGetAllProductsWithWishlist = () => {
         }
     };
 
-    return { getAllProductsWithWishlist, loading, productsWithWishlist, error, success };
+    return { getAllProductsWithWishlist, loading, productsWithWishlist, error, success }
 };  

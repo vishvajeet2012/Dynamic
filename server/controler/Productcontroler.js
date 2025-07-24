@@ -392,7 +392,9 @@ exports.getProducts = async (req, res) => {
   try {
     // Build filter object based on query parameters
     const filter = {};
-    
+        const userId = req?.user;
+
+        console.log(userId)
     // Add filters for enum fields if they exist in query
     if (req.query.gender) filter.gender = req.query.gender;
     if (req.query.category) filter.category = req.query.category;
