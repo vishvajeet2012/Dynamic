@@ -13,25 +13,25 @@ const productSchema = new mongoose.Schema({
     maxlength: [1000, 'Description cannot exceed 1000 characters']
   },
   basePrice: {
-    type:Number,
+    type: Number,
     required: [true, 'Product Baseprice is required'],
     maxlength: [8, 'Price cannot exceed 8 characters'],
     default: 0.0
   },
   details: {
     type: String,
-default: '',
+    default: '',
     trim: true,
-    minlength: [10, 'Details must be at least 10 characters'],  
+    minlength: [10, 'Details must be at least 10 characters'],
     maxlength: [500, 'Details cannot exceed 500 characters']
   },
   sellingPrice: {
     type: Number,
     maxlength: [8, 'Discount price cannot exceed 8 characters']
   },
-  discount:{
+  discount: {
     type: String,
-    default:Number
+    default: Number
   },
   color: {
     type: String,
@@ -46,18 +46,18 @@ default: '',
     enum: ['men', 'women', 'unisex'],
     required: true
   },
-  category:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Category'
-    },
-   subcategories: [{
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'SubCategory'
-        }],
-        childCategory: [{
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'ChildCategory'
-                  }],
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category'
+  },
+  subcategories: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'SubCategory'
+  }],
+  childCategory: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ChildCategory'
+  }],
   ratings: {
     type: Number,
     default: 0
@@ -66,11 +66,11 @@ default: '',
     {
       publicIds: {
         type: String,
-       // required: tru
+        // required: tru
       },
       imagesUrls: {
         type: String,
-       // required: true
+        // required: true
       }
     }
   ],
@@ -93,7 +93,7 @@ default: '',
     type: Number,
     default: 0
   },
- 
+
   isNewArrival: {
     type: Boolean,
     default: false
@@ -120,23 +120,26 @@ default: '',
     unique: true,
   },
 
-  
+
   isDeleted: {
     type: Boolean,
-    default: false    },
+    default: false
+  },
   isOutOfStock: {
     type: Boolean,
-    default: false      },
+    default: false
+  },
   isBestSeller: {
     type: Boolean,
-    default: false},
+    default: false
+  },
 
-    theme:{
+  theme: {
     type: String,
-    default:""
+    default: ""
 
   },
-  
+
 
   createdAt: {
     type: Date,

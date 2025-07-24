@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useCreateProduct } from "../../../hooks/Product/Product";
+import { useCreateProduct, useSearchThemeNames } from "../../../hooks/Product/Product";
 import { useUplaodImage } from '../../../hooks/client/homePageHooks/use-banner';
 import { useGetAllCategories } from '../../../hooks/useCategories';
 
@@ -9,6 +9,7 @@ export default function CreateAdminProduct() {
   const [imagesUrls, setImageUrls] = useState(null);
   const [publicIds, setPublicId] = useState(null);
   const { categories, loading: categoriesLoading, error: categoriesError, fetechCategories } = useGetAllCategories();
+  const { searchThemeNames, themeNames } =useSearchThemeNames()
 
   const [productData, setProductData] = useState({
     name: '',
@@ -45,7 +46,11 @@ export default function CreateAdminProduct() {
       [name]: type === 'checkbox' ? checked : value,
       // Reset subcategories and child categories when category changes
       ...(name === 'category' && { subcategories: [], childCategories: [] })
-    }));
+    }));if (name === 'theme') {
+      searchThemeNames(value);
+    }
+    // For debugging purposes
+  
   };
 
   const handleSizeChange = (e) => {

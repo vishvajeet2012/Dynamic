@@ -774,3 +774,27 @@ exports.getProductBySlug = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 }
+
+
+// Search for unique theme names
+
+exports.searchThemeNames = async (req, res) => {
+  try {
+    let { keyword } = req.body;
+
+    if (!keyword || typeof keyword !== 'string' || keyword.trim() === '') {
+      return res.status(400).json({ message: 'Keyword is required' });
+    }
+
+    keyword = keyword.trim();
+
+    const themes = await Product.distinct('theme', {
+      theme: { $regex: keyword, $options: 'i' }
+    });
+
+    res.status(200).json({ themes });
+  } catch (error) {
+    console.error('Error fetching themes:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
+  }
+};

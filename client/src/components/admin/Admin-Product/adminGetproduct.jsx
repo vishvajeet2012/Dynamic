@@ -36,7 +36,7 @@ export default function AdminProductManagement() {
             slug: product.slug,
             isFeatured: product.isFeatured,
             basePrice: product.basePrice,
-            details: product.details,
+         
             discount: product.discount,
             sellingPrice: product.sellingPrice,
             stock: product.stock,   
@@ -44,7 +44,7 @@ export default function AdminProductManagement() {
             gender: product.gender,
             size: product.size || [],
             isNewArrival: product.isNewArrival,
-            slug: product.slug,
+           
             images: product.images, // Assuming images are handled separately
             // Correctly map category objects to arrays of IDs
             category: product.category?._id || '',

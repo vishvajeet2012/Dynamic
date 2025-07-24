@@ -278,3 +278,36 @@ export const useProductDetail =()=>{
     }
     return {getProductBySlug, productDetail,loading,error,success}
 }
+
+
+
+export const useSearchThemeNames = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+    const [themeNames, setThemeNames] = useState([]);
+
+    const searchThemeNames = async (keyoword) => {
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post(`${homeUrl}/searchthemenames`, { keyoword }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${token}`
+                }
+            });
+            setThemeNames(response.data);
+            setSuccess(response.data);
+            return response.data;
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { searchThemeNames, loading, themeNames, error, success };
+};  
