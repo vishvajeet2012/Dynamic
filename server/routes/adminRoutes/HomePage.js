@@ -8,8 +8,9 @@ const {  createSubCategory, updateSubCategory, getChildCategoryById } = require(
 const auth = require('../../middleware/authmiddleware');
 const uploadImageMiddleware = require('../../middleware/uploadImageMiddleware');
 const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBannersByType } = require('../../controler/BannerControler');
-const { createProduct, getProducts, productDelete, updateProduct, getProductbykeys, getFiltersForSubcategory, getProductSearchPage, searchThemeNames } = require('../../controler/Productcontroler');
+const { createProduct, getProducts, productDelete, updateProduct, getProductbykeys, getFiltersForSubcategory, getProductSearchPage, searchThemeNames, getProductBySlug } = require('../../controler/Productcontroler');
 const { createChildCategory } = require('../../controler/childCategoryControler');
+const { addtoWishlist, getAllProductsWithWishlist } = require('../../controler/wishlist');
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
@@ -54,6 +55,14 @@ router.post('/updateproduct',auth,updateProduct)
 router.post("/getProductbykeys",getProductbykeys)
 router.post("/getproductsearchpage",getProductSearchPage)
 router.post('/searchthemenames' , searchThemeNames);
+router.post('/getProductBySlug', getProductBySlug);
+
+///////////////wishlist ////////////////
+router.post('/addtoWishlist', auth, addtoWishlist);
+
+router.post('/getAllProductsWithWishlist',auth,getAllProductsWithWishlist)
+
+
 
 
 //////////////fitlers////////////////

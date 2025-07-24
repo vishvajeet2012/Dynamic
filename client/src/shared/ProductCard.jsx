@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { cn } from "@/lib/utils"; // Assuming you have this utility for conditional classes
 import { FaHeart, FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import WishlistButton from "../components/client/wishlist/wishlistButton";
 
 export default function AdaptiveProductCard({ item }) {
   // Destructure props with default values
@@ -24,9 +25,12 @@ export default function AdaptiveProductCard({ item }) {
   // --- Event Handlers ---
 
   const handleWishlistClick = (e) => {
-    e.stopPropagation();
-    setIsWishlisted((prev) => !prev);
-    console.log("Toggled wishlist for:", name);
+   /// e.stopPropagation();
+   /// setIsWishlisted((prev) => !prev);
+   /// console.log("Toggled wishlist for:", name);
+        
+
+
   };
 
   const handleCardClick = () => {
@@ -44,7 +48,7 @@ export default function AdaptiveProductCard({ item }) {
       )}
     >
       {/* ====== 1. IMAGE SECTION ====== */}
-      <Link to={`/${slug}`}
+      <div 
         className={cn(
           "relative overflow-hidden",
           // Mobile: A square aspect ratio with object-cover for a clean look.
@@ -52,7 +56,7 @@ export default function AdaptiveProductCard({ item }) {
           // Desktop: Uses your preferred aspect ratio and object-contain.
           "md:aspect-[3/4]"
         )}
-      >
+      > <Link to={`/${slug}`} className="absolute inset-0">
         <img
           className={cn(
             "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
@@ -61,7 +65,7 @@ export default function AdaptiveProductCard({ item }) {
           )}
           src={images?.[0]?.imagesUrls}
           alt={name}
-        />
+        /></Link>
         {/* Badges */}
         {discount > 0 && !isOutOfStock && (
           <span className="absolute top-2 left-2 rounded-full bg-red-600 px-2 py-0.5 text-center text-xs font-medium text-white">
@@ -75,21 +79,9 @@ export default function AdaptiveProductCard({ item }) {
             </span>
           </div>
         )}
-        {/* Wishlist button */}
-        <button
-          onClick={handleWishlistClick}
-          className="absolute top-2 right-2 rounded-full bg-white/80 p-2 text-gray-500 shadow-sm backdrop-blur-sm transition-all hover:bg-white hover:text-red-500"
-          aria-label="Add to wishlist"
-        >
-          <FaHeart
-            size={18}
-            className={cn(
-              "transition-all",
-              isWishlisted ? "text-red-500 scale-110" : "text-gray-400"
-            )}
-          />
-        </button>
-      </Link>
+        {/* Wishlist button    isWishlisted, handleWishlistClick*/}
+     <WishlistButton productId={_id}  isWishlisted={isWishlisted} handleWishlistClick={handleWishlistClick}/>
+      </div>
 
       {/* ====== 2. CONTENT SECTION ====== */}
       <div className="flex flex-grow flex-col p-4">

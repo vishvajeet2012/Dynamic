@@ -2,7 +2,6 @@ const categoryModel = require("../models/CategoryModel");
 const SubCategoryModel = require('../models/SubCategoryModel');
 exports.CreateCategory =async(req,res)=>{
     try{
-        console.log(req.body ,"dsf   ")
         const {categoryName,categoryImage,categoryDescription,isActive ,bannerImage}=req.body
     if(!categoryName  || !categoryDescription ){
         return res.status(400).json({message:"Please provide all required fields"})

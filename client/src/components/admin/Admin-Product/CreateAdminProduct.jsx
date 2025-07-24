@@ -48,6 +48,7 @@ export default function CreateAdminProduct() {
       ...(name === 'category' && { subcategories: [], childCategories: [] })
     }));if (name === 'theme') {
       searchThemeNames(value);
+      
     }
     // For debugging purposes
   
@@ -275,19 +276,30 @@ export default function CreateAdminProduct() {
                  required
                />
              </div>
-              <div className="mb-4">
-               <label className="block text-gray-700 mb-2">Theme*</label>
-              
-               <input
-                 type="text"
-                 name="theme"
-                 value={productData.theme}
-                 onChange={handleChange}
-                 className="w-full px-3 py-2 border rounded"
-                 
-               />
-                <p className='mt-2 cursor-none animate-pulse text-sm text-red-500'>Clothing Themem like (harry potter,sipeder man ,marvel ,hulk)</p>
-             </div>
+             <div className="mb-4">
+  <label className="block text-gray-700 mb-2">Theme*</label>
+
+  <input
+    type="text"
+    name="theme"
+    value={productData.theme}
+    onChange={handleChange}
+    className="w-full px-3 py-2 border rounded"
+  />
+
+  <p className="mt-2 animate-pulse text-sm text-red-500">
+    Clothing Theme like (Harry Potter, Spiderman, Marvel, Hulk)
+  </p>
+
+  {/* ✅ Theme List */}
+  {themeNames?.themes&& themeNames?.themes?.length > 0 && (
+    <ul className="mt-3 list-disc list-inside text-sm text-gray-700">
+      {themeNames?.themes.map((theme, index) => (
+        <li key={index}>{theme}</li>
+      ))}
+    </ul>
+  )}
+</div>
           </div>
 
           {/* Category & Attributes */}

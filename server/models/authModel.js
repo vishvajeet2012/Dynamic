@@ -58,6 +58,19 @@ const userSchema = new Schema({
         linkedin: String,
         instagram: String
     },
+ wishlist: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product'
+    }
+  ],
+  addedToCart: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product'
+    }
+  ],
+
     isVerified: {
         type: Boolean,
         default: false

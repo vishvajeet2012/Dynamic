@@ -259,7 +259,7 @@ export const useProductDetail =()=>{
     const getProductBySlug = async(slug)=>{
         setloading(true)
         try{
-            const response = await axios.post(`${homeUrl}/productdetail`,{slug},{
+            const response = await axios.post(`${homeUrl}/getProductBySlug`,{slug},{
                 headers:{
                     'Content-Type': 'application/json',
                     authorization:`Bearer ${localStorage.getItem('token')}`
@@ -293,7 +293,7 @@ export const useSearchThemeNames = () => {
         setSuccess(null);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post(`${homeUrl}/searchthemenames`, { keyoword }, {
+            const response = await axios.post(`${homeUrl}/searchthemenames`, {keyword:keyoword }, {
                 headers: {
                     'Content-Type': 'application/json',
                     authorization: `Bearer ${token}`
@@ -310,4 +310,70 @@ export const useSearchThemeNames = () => {
     };
 
     return { searchThemeNames, loading, themeNames, error, success };
+};  
+
+
+
+
+
+export const useAddtoWishlist =()=>{
+    const [loading ,setLoading] = useState(false);
+    const [error,setError] = useState(null);
+    const [success,setSuccess] = useState(null);
+    const [wishlist, setWishlist] = useState([]);   
+
+    const addtoWishlist = async (productId) => {
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post(`${homeUrl}/addtoWishlist`, { productId }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${token}`
+                }
+            });
+            setWishlist(response.data);
+            setSuccess(response.data);
+            return response.data;
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    return { addtoWishlist, loading, wishlist, error, success };
+}
+
+
+export const useGetAllProductsWithWishlist = () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+    const [productsWithWishlist, setProductsWithWishlist] = useState([]);
+
+    const getAllProductsWithWishlist = async () => {
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post(`${homeUrl}/getAllProductsWithWishlist`, {}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${token}`
+                }
+            });
+            setProductsWithWishlist(response.data.products);
+            setSuccess(response.data);
+            return response.data;
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { getAllProductsWithWishlist, loading, productsWithWishlist, error, success };
 };  
