@@ -23,10 +23,10 @@ export const WishlistProvider = ({ children }) => {
             });
             
             // Update local state based on response
-            setWishlistItems(response.data.wishlist || response?.data);
+           /// setWishlistItems(response?.data);
             
             // Show success notification
-           toast (response.data.message || 'Wishlist updated successfully',
+           toast (response.data.message || 'Wishlist updated successflly',
                
            );
             
@@ -59,8 +59,8 @@ export const WishlistProvider = ({ children }) => {
                 }
             });
             
-            setProductsWithWishlistStatus(response.data);
-            setWishlistItems(response.data.wishlist || []);
+            setProductsWithWishlistStatus(response?.data);
+            setWishlistItems(response.data || []);
             return response.data;
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Failed to load products';
@@ -98,11 +98,12 @@ export const WishlistProvider = ({ children }) => {
         </WishlistContext.Provider>
     );
 };
-
-export const useWishlist = () => {
-    const context = useContext(WishlistContext);
-    if (!context) {
-        throw new Error('useWishlist must be used within a WishlistProvider');
-    }
-    return context;
+const useWishlist = () => {
+  const context = useContext(WishlistContext);
+  if (!context) {
+    throw new Error('useWishlist must be used within a WishlistProvider');
+  }
+  return context;
 };
+
+export { useWishlist };

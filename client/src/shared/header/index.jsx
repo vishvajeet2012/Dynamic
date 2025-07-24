@@ -17,7 +17,7 @@ import { useWishlist } from "../../../context/wishListhContext";
 export default function Header() {
   const { getLogo, success } = getLogoheader();
   const { getSingleUser, laoding: userLoading, user } = useGetSingleUser();
-     const { toggleWishlist, isInWishlist,productsWithWishlistStatus } = useWishlist();
+     const { toggleWishlist,wishlistItems, isInWishlist,productsWithWishlistStatus } = useWishlist();
 
   const token = localStorage.getItem('token');
 
@@ -27,7 +27,7 @@ export default function Header() {
 
  
 
-  console.log(productsWithWishlistStatus?.products?.length)
+  console.log(wishlistItems)
   const wishlistCount =productsWithWishlistStatus?.products?.length|| 0;
 
   const mobileNavLinks = [
