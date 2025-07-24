@@ -211,7 +211,7 @@ export default function CreateAdminProduct() {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded"
                 rows="4"
-                required
+                
               />
             </div>
 
