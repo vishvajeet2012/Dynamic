@@ -12,6 +12,7 @@ const slugify = require('slugify');
 exports.createProduct = async (req, res) => {
   try {
     const {
+      isFeatured,
       name,
       description,
       basePrice,
@@ -124,7 +125,8 @@ exports.createProduct = async (req, res) => {
       size,
       weight,
       slug,
-      theme
+      theme ,
+      isFeatured
     });
 
     return res.status(201).json({
@@ -166,7 +168,7 @@ exports.updateProduct = async (req, res) => {
       basePrice,
       discount,
       category,
-      
+      isFeatured,
       subcategories,
       childCategory,
       stock,
@@ -400,42 +402,78 @@ exports.getProduct = async (req, res) => {
   }
 };
 
-// Get all products with optional filtering
-exports.getProducts = async (req, res) => {
-  try {
-    // Build filter object based on query parameters
-    const filter = {};
-        const userId = req?.user;
+// // Get all products with optional filtering
+// exports.getProducts = async (req, res) => {
+//   try {
+//     // Build filter object based on query parameters
+//     const filter = {};
+//         const userId = req?.user;
 
-        console.log(userId)
-    // Add filters for enum fields if they exist in query
-    if (req.query.gender) filter.gender = req.query.gender;
-    if (req.query.category) filter.category = req.query.category;
-    if (req.query.subCategory) filter.subCategory = req.query.subCategory;
-    if (req.query.color) filter.color = req.query.color;
-    if (req.query.size) filter.size = { $in: [req.query.size] };
-    if (req.query.isNewArrival) filter.isNewArrival = req.query.isNewArrival === 'true';
-
-  const products = await Product.find(filter).populate({
-                    path: 'category',
-                    select: 'categoryName categoryImage categoryDescription isActive'
-                }).populate({
-                    path: 'subcategories',
-                    select: 'subCategoryName subCategoryImage subCategoryDescription isActive',
-                    match: { isActive: true }, // Only populate active subcategories
+//         console.log(userId)
+//     // Add filters for enum fields if they exist in query
+//     if (req.query.gender) filter.gender = req.query.gender;
+//     if (req.query.category) filter.category = req.query.category;
+//     if (req.query.subCategory) filter.subCategory = req.query.subCategory;
+//     if (req.query.color) filter.color = req.query.color;
+//     if (req.query.size) filter.size = { $in: [req.query.size] };
+//     if (req.query.isNewArrival) filter.isNewArrival = req.query.isNewArrival === 'true';
+//     if (req.query.isFeatured) filter.theme = req.query.theme =
+    
+//   const products = await Product.find(filter).populate({
+//                     path: 'category',
+//                     select: 'categoryName categoryImage categoryDescription isActive'
+//                 }).populate({
+//                     path: 'subcategories',
+//                     select: 'subCategoryName subCategoryImage subCategoryDescription isActive',
+//                     match: { isActive: true }, // Only populate active subcategories
                
               
-                  }).populate ({
-                    path: 'childCategory',
-                    select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
-                    match: { isActive: true } // Only populate active child categories
-                })
+//                   }).populate ({
+//                     path: 'childCategory',
+//                     select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
+//                     match: { isActive: true } // Only populate active child categories
+//                 })
+//     res.status(200).json(products);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+exports.getProducts = async (req, res) => {
+  try {
+    const filter = {};
+    const userId = req?.user;
+
+    // Add filters from request body
+    if (req.body.gender) filter.gender = req.body.gender;
+    if (req.body.category) filter.category = req.body.category;
+    if (req.body.subCategory) filter.subCategory = req.body.subCategory;
+    if (req.body.color) filter.color = req.body.color;
+    if (req.body.size) filter.size = { $in: [req.body.size] };
+    if (req.body.isNewArrival !== undefined) filter.isNewArrival = req.body.isNewArrival;
+    if (req.body.isFeatured !== undefined) filter.isFeatured = req.body.isFeatured;
+
+    const products = await Product.find(filter)
+      .populate({
+        path: 'category',
+        select: 'categoryName categoryImage categoryDescription isActive'
+      })
+      .populate({
+        path: 'subcategories',
+        select: 'subCategoryName subCategoryImage subCategoryDescription isActive',
+        match: { isActive: true }
+      })
+      .populate({
+        path: 'childCategory',
+        select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
+        match: { isActive: true }
+      });
+
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 
 /////////////////////// get product by cateogry /////////////////////
