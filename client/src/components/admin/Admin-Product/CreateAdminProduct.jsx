@@ -26,6 +26,7 @@ export default function CreateAdminProduct() {
     stock: 0,
     isNewArrival: false,
     images: [],
+    
     slug: '',
     theme:""
   , isFeatured:false,
