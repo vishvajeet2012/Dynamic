@@ -12,7 +12,8 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AuthProvider>
         <WishlistProvider>
-          <App />
+         <div className='overflow-hidden'>
+          <App /></div>
           <Toaster />
         </WishlistProvider>
       </AuthProvider>

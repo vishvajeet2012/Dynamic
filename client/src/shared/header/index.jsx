@@ -2,11 +2,8 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import SerachBar from "./search";
 import Menu from "./Menu";
-import { useAuth } from "../../../context/authConext";
-import { getLogoheader } from "../../hooks/client/homePageHooks/use-headerLogo";
 import { useGetSingleUser } from "../../hooks/auth/use-Auth";
-
-// Icons
+import { getLogoheader } from "../../hooks/client/homePageHooks/use-headerLogo";
 import { RiAccountCircleLine } from "react-icons/ri";
 import { CiHeart, CiShoppingCart } from "react-icons/ci";
 import { AiOutlineHome } from "react-icons/ai";
@@ -17,7 +14,7 @@ import { useWishlist } from "../../../context/wishListhContext";
 export default function Header() {
   const { getLogo, success } = getLogoheader();
   const { getSingleUser, laoding: userLoading, user } = useGetSingleUser();
-  const { wishlistItems, productsWithWishlistStatus } = useWishlist();
+  const { productsWithWishlistStatus } = useWishlist();
 
   const token = localStorage.getItem("token");
 
@@ -64,17 +61,10 @@ export default function Header() {
                 className="flex items-center space-x-2 text-lg hover:text-gray-200"
               >
                 <RiAccountCircleLine className="text-2xl" />
-                {userLoading ? (
-                  <span>...</span>
-                ) : (
-                  <span>{user?.firstName || "Login"}</span>
-                )}
+                {userLoading ? <span>...</span> : <span>{user?.firstName || "Login"}</span>}
               </Link>
 
-              <Link
-                to="/wishlist"
-                className="relative flex items-center space-x-2 text-lg hover:text-gray-200"
-              >
+              <Link to="/wishlist" className="relative flex items-center space-x-2 text-lg hover:text-gray-200">
                 <CiHeart className="text-2xl" />
                 <span>Wishlist</span>
                 {wishlistCount > 0 && (
@@ -84,10 +74,7 @@ export default function Header() {
                 )}
               </Link>
 
-              <Link
-                to="/cart"
-                className="flex items-center space-x-2 text-lg hover:text-gray-200"
-              >
+              <Link to="/cart" className="flex items-center space-x-2 text-lg hover:text-gray-200">
                 <CiShoppingCart className="text-2xl" />
                 <span>Cart</span>
               </Link>
@@ -107,11 +94,7 @@ export default function Header() {
         <div className="w-full bg-[#e11b23] p-2 flex justify-between items-center">
           <Link to="/" className="w-24">
             {success?.logo?.url && (
-              <img
-                className="h-12 w-24 object-contain"
-                src={success.logo.url}
-                alt="Logo"
-              />
+              <img className="h-12 w-24 object-contain" src={success.logo.url} alt="Logo" />
             )}
           </Link>
 
@@ -130,8 +113,8 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Bottom Nav (STATIC) */}
-        <nav className="bg-white border-t flex justify-around items-center h-14 text-gray-700 mt-2">
+        {/* Bottom Nav (Fixed + Always Visible) */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-14 text-gray-700 z-40">
           {mobileNavLinks.map((link) => (
             <Link
               key={link.href}
@@ -144,6 +127,9 @@ export default function Header() {
           ))}
         </nav>
       </header>
+
+      {/* Padding for Mobile Bottom Nav */}
+      <div className="md:hidden pb-14" />
     </>
   );
 }
