@@ -17,17 +17,15 @@ import { useWishlist } from "../../../context/wishListhContext";
 export default function Header() {
   const { getLogo, success } = getLogoheader();
   const { getSingleUser, laoding: userLoading, user } = useGetSingleUser();
-     const { toggleWishlist,wishlistItems, isInWishlist,productsWithWishlistStatus } = useWishlist();
+  const { wishlistItems, productsWithWishlistStatus } = useWishlist();
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     getSingleUser();
   }, [token]);
 
- 
-
-  const wishlistCount =productsWithWishlistStatus?.totalItems|| 0;
+  const wishlistCount = productsWithWishlistStatus?.totalItems || 0;
 
   const mobileNavLinks = [
     { href: "/", icon: <AiOutlineHome />, label: "Home" },
@@ -66,10 +64,17 @@ export default function Header() {
                 className="flex items-center space-x-2 text-lg hover:text-gray-200"
               >
                 <RiAccountCircleLine className="text-2xl" />
-                {userLoading ? <span>...</span> : <span>{user?.firstName || "Login"}</span>}
+                {userLoading ? (
+                  <span>...</span>
+                ) : (
+                  <span>{user?.firstName || "Login"}</span>
+                )}
               </Link>
 
-              <Link to="/wishlist" className="relative flex items-center space-x-2 text-lg hover:text-gray-200">
+              <Link
+                to="/wishlist"
+                className="relative flex items-center space-x-2 text-lg hover:text-gray-200"
+              >
                 <CiHeart className="text-2xl" />
                 <span>Wishlist</span>
                 {wishlistCount > 0 && (
@@ -79,7 +84,10 @@ export default function Header() {
                 )}
               </Link>
 
-              <Link to="/cart" className="flex items-center space-x-2 text-lg hover:text-gray-200">
+              <Link
+                to="/cart"
+                className="flex items-center space-x-2 text-lg hover:text-gray-200"
+              >
                 <CiShoppingCart className="text-2xl" />
                 <span>Cart</span>
               </Link>
@@ -122,8 +130,8 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Bottom Nav */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-14 text-gray-700 z-50">
+        {/* Bottom Nav (STATIC) */}
+        <nav className="bg-white border-t flex justify-around items-center h-14 text-gray-700 mt-2">
           {mobileNavLinks.map((link) => (
             <Link
               key={link.href}
