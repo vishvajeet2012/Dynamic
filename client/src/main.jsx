@@ -8,7 +8,7 @@ import { WishlistProvider } from '../context/wishListhContext.jsx';
 import { Toaster } from "@/components/ui/sonner"
 
 createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+
     <BrowserRouter>
       <AuthProvider>
         <WishlistProvider>
@@ -18,5 +18,5 @@ createRoot(document.getElementById('root')).render(
         </WishlistProvider>
       </AuthProvider>
     </BrowserRouter>
-  </React.StrictMode>
+
 );
