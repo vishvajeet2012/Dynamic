@@ -5,12 +5,12 @@ import { useGetProduct } from '../hooks/Product/Product'
 import ProductCard from './ProductCard'
 import { Carousel } from '@/components/ui/carousel'
 
-export default function NewArrivals() {
+export default function NewArrivals({query}) {
   const { getProduct, loading, Product } = useGetProduct()
 
   useEffect(() => {
-    getProduct()
-  }, [])
+    getProduct(query)
+  }, [query])
 
   return (  
     <section className="w-full py-6 lg:px-6">

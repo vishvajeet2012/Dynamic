@@ -22,7 +22,7 @@ const { loading, error, categories, fetechCategories } = useGetAllCategories();
   
    <Banner bannerType="homepage"/>
   
-   <NewArrivals />
+   <NewArrivals query ={{isNewArrival:isNewArrival}} />
    <CategorySection categories={categories}/>
    <AboutUs/>
 
