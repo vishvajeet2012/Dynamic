@@ -31,7 +31,7 @@ export const WishlistProvider = ({ children }) => {
            );
             
             // Automatically refresh the wishlist and products
-            setProductsWithWishlistStatus([])
+          ///  setProductsWithWishlistStatus([])
             await fetchProductsWithWishlistStatus();
             
             return response.data;

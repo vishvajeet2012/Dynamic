@@ -28,7 +28,7 @@ export default function Header() {
  
 
   console.log(wishlistItems)
-  const wishlistCount =productsWithWishlistStatus?.products?.length|| 0;
+  const wishlistCount =productsWithWishlistStatus?.totalItems|| 0;
 
   const mobileNavLinks = [
     { href: "/", icon: <AiOutlineHome />, label: "Home" },
