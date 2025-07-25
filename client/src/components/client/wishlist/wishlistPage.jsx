@@ -6,16 +6,12 @@ import { useWishlist } from "../../../../context/wishListhContext";
 export default function Wishlistpage() {
      const { toggleWishlist,wishlistItems, isInWishlist,productsWithWishlistStatus } = useWishlist();
 
-  useEffect(() => {
-
-    getAllProductsWithWishlist();
-  }, []);
-      
+  
   return (
     <div className="wishlist-page w-full p-4">
       <h1 className="text-3xl font-bold mb-4 border-b">Wishlist</h1>
 
-      {productsWithWishlist?.wishlist?.length === 0 ? (
+      {productsWithWishlistStatus?.wishlist?.length === 0 ? (
         <div className="flex items-center justify-center h-full">
           <p>Your wishlist is empty.</p>
         </div>

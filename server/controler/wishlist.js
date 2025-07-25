@@ -191,7 +191,7 @@ exports.getUserWishlist = async (req, res) => {
     const user = await User.findById(userId).populate({
       path: 'wishlist',
       model: 'Product', // Make sure this matches your Product model name
-      select: 'name price image description category' // Select only needed fields
+      select: 'name price basePrice discount images ratings sellingPrice slug subcategories theme size numOfReviews isNewArrival color description category' // Select only needed fields
     });
 
     if (!user) {
