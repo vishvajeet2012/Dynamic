@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useGetAllProductsWithWishlist } from "../../../hooks/Product/Product";
 import AdaptiveProductCard from "../../../shared/ProductCard";
+import { useWishlist } from "../../../../context/wishListhContext";
 
 export default function Wishlistpage() {
      const { toggleWishlist,wishlistItems, isInWishlist,productsWithWishlistStatus } = useWishlist();
