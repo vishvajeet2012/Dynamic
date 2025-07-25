@@ -10,7 +10,7 @@ const uploadImageMiddleware = require('../../middleware/uploadImageMiddleware');
 const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBannersByType } = require('../../controler/BannerControler');
 const { createProduct, getProducts, productDelete, updateProduct, getProductbykeys, getFiltersForSubcategory, getProductSearchPage, searchThemeNames, getProductBySlug } = require('../../controler/Productcontroler');
 const { createChildCategory } = require('../../controler/childCategoryControler');
-const { addtoWishlist, getAllProductsWithWishlist } = require('../../controler/wishlist');
+const { addtoWishlist, getAllProductsWithWishlist, getUserWishlist } = require('../../controler/wishlist');
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
@@ -60,7 +60,7 @@ router.post('/getProductBySlug', getProductBySlug);
 ///////////////wishlist ////////////////
 router.post('/addtoWishlist', auth, addtoWishlist);
 
-router.post('/getAllProductsWithWishlist',auth,getAllProductsWithWishlist)
+router.post('/getAllProductsWithWishlist',auth,getUserWishlist)
 
 
 
