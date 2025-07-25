@@ -47,7 +47,7 @@ export const   useGetProduct=()=>{
         setSuccess(null);
         try{
             const token  = localStorage.getItem('token')
-            const response = await axios.post(`${homeUrl}/getallproduct`,{query},
+            const response = await axios.post(`${homeUrl}/getallproduct`,query,
                 {
                    headers:{
                 
