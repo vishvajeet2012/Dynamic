@@ -49,7 +49,7 @@ router.patch('/:id/toggle-active',auth, toggleBannerActive);
 
     /////////////////////////Product ////////////////
     router.post('/productcreate', auth, createProduct);
-    router.get('/getallproduct',getProducts)
+    router.post('/getallproduct',getProducts)
     router.post("/productdetele",auth,productDelete)
 router.post('/updateproduct',auth,updateProduct)
 router.post("/getProductbykeys",getProductbykeys)
