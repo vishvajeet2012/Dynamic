@@ -118,3 +118,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+
+
+
+
+
+
+@layer utilities {
+  .animate-loading-bar {
+    animation: loading-bar 1.2s infinite linear;
+    background-size: 200% 100%;
+  }
+
+  @keyframes loading-bar {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
