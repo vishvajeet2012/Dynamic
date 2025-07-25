@@ -5,18 +5,24 @@
     background-color: #e11b23; }
     
 
+
+
+/* styles/globals.css */
 @layer utilities {
-  .animate-loading-bar {
-    animation: loading-bar 1.2s infinite linear;
-    background-size: 200% 100%;
+  .animate-wave {
+    animation: wave 2s infinite ease-in-out;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(225, 27, 35, 0.8) 25%, 
+      #e11b23 50%, 
+      rgba(225, 27, 35, 0.8) 75%, 
+      transparent 100%
+    );
   }
 
-  @keyframes loading-bar {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
+  @keyframes wave {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
   }
 }
