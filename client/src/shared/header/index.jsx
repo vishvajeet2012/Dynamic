@@ -27,7 +27,6 @@ export default function Header() {
 
  
 
-  console.log(wishlistItems)
   const wishlistCount =productsWithWishlistStatus?.totalItems|| 0;
 
   const mobileNavLinks = [
