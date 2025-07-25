@@ -6,7 +6,7 @@ import WishlistButton from "../components/client/wishlist/wishlistButton";
 import { useAddtoWishlist } from "../hooks/Product/Product";
 import { useWishlist } from "../../context/wishListhContext";
 
-export default function AdaptiveProductCard({ item }) {
+export default function AdaptiveProductCard({ item ,wishlistDelete}) {
    const  { addtoWishlist, loading, wishlist, error, success } = useAddtoWishlist()
      const { toggleWishlist, isInWishlist, } = useWishlist();
 
@@ -35,7 +35,6 @@ export default function AdaptiveProductCard({ item }) {
    /// setIsWishlisted((prev) => !prev);
    /// console.log("Toggled wishlist for:", name);
         
-console.log("Toggling wishlist for product:", _id);
     toggleWishlist(_id)
     setIsWishlisted((prev) => !prev);
     console.log("Wishlist status:", e);
@@ -90,7 +89,7 @@ console.log("Toggling wishlist for product:", _id);
           </div>
         )}
         {/* Wishlist button    isWishlisted, handleWishlistClick*/}
-     <WishlistButton productId={_id}  isWishlisted={isWishlisted} handleWishlistClick={handleWishlistClick}/>
+     <WishlistButton productId={_id} wishlistDelete={wishlistDelete}  isWishlisted={isWishlisted} handleWishlistClick={handleWishlistClick}/>
       </div>
 
       {/* ====== 2. CONTENT SECTION ====== */}

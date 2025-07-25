@@ -27,7 +27,7 @@ export default function Wishlistpage() {
                 key={product._id || idx}
                 className="min-w-[70%] sm:min-w-[70%] lg:min-w-[19%] px-1 lg:px-1"
               >
-                <AdaptiveProductCard wishlistButton item={product} />
+                <AdaptiveProductCard wishlistDelete={true} item={product} />
               </div>
             ))}
         </div>
