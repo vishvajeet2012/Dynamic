@@ -189,23 +189,27 @@ exports.getUserWishlist = async (req, res) => {
     }
 
     const user = await User.findById(userId).populate({
-      path: 'wishlist',
-      model: 'Product', // Make sure this matches your Product model name
-      select: 'name price basePrice discount images ratings sellingPrice slug subcategories theme size numOfReviews isNewArrival color subcategories description category' // Select only needed fields
-    })  .populate({
-        path: 'category',
-        select: 'categoryName categoryImage categoryDescription isActive'
-      })
-    .populate({
-                path: 'subcategories',
-                select: 'subCategoryName subCategoryImage subCategoryDescription isActive bannerImage',
-                match: { isActive: true }, // Only populate active subcategories
-                populate: {
-                    path: 'childCategory',
-                    select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
-                    match: { isActive: true } // Only populate active child categories
-                }
-            })
+  path: 'wishlist',
+  model: 'Product',
+  select: 'name price basePrice discount images ratings sellingPrice slug subcategories theme size numOfReviews isNewArrival color description category',
+  populate: [
+    {
+      path: 'category',
+      select: 'categoryName categoryImage categoryDescription isActive'
+    },
+    {
+      path: 'subcategories',
+      select: 'subCategoryName subCategoryImage subCategoryDescription isActive bannerImage',
+      match: { isActive: true },
+      populate: {
+        path: 'childCategory',
+        select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
+        match: { isActive: true }
+      }
+    }
+  ]
+});
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
