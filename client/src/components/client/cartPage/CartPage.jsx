@@ -29,7 +29,7 @@ return (
                                         
                                       
 </div>    <p className="font-bold ">{product?.name}</p>
-        <p  className="text-gray-300">{product?.category?.categoryName}</p>
+        <p  className="text-gray-300">Color:{product?.color}</p>
                                       </div>
                                     ))}
                                 </div>

@@ -192,8 +192,20 @@ exports.getUserWishlist = async (req, res) => {
       path: 'wishlist',
       model: 'Product', // Make sure this matches your Product model name
       select: 'name price basePrice discount images ratings sellingPrice slug subcategories theme size numOfReviews isNewArrival color subcategories description category' // Select only needed fields
-    });
-
+    })  .populate({
+        path: 'category',
+        select: 'categoryName categoryImage categoryDescription isActive'
+      })
+    .populate({
+                path: 'subcategories',
+                select: 'subCategoryName subCategoryImage subCategoryDescription isActive bannerImage',
+                match: { isActive: true }, // Only populate active subcategories
+                populate: {
+                    path: 'childCategory',
+                    select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
+                    match: { isActive: true } // Only populate active child categories
+                }
+            })
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

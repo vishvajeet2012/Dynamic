@@ -91,7 +91,7 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
         <div className="flex items-start justify-between">
         
           <p className="truncate text-xs text-gray-500 capitalize">
-            {childCategory[0]?.childCategoryName||category?.categoryName || "THE V Store"}
+            {childCategory?.[0]?.childCategoryName||category?.categoryName || "THE V Store"}
           </p>
           <div className="flex shrink-0 items-center gap-1.5">
             <FaStar size={14} className="text-yellow-400" />
