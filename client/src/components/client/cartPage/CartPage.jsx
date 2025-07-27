@@ -20,7 +20,7 @@ export default function CartPageProduct() {
           <div className=" border-b p-4">
             {productsWithWishlistStatus?.wishlist &&
               productsWithWishlistStatus?.wishlist?.map((product, idx) => (console.log(product),
-                <div className="flex   gap-4 border-b border-gray-200 p-4"
+                <div className="flex gap-4 border-b border-gray-400 p-4"
                   key={product._id || idx}
                 >
                   <div className="h-52 " >
