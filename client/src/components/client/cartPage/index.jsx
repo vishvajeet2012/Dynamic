@@ -5,7 +5,7 @@ export default function CartPage() {
     const location = useLocation()  /// use hota hai pathname ko check kane ke liye
 
     const isActive = (path) => {
-        return location.pathname === path ? "text-red-500 font-bold  capitalize" : "text-gray-500 capitalize font-bold";
+        return location.pathname === path ?  "text-primaryReds font-bold  capitalize" : "text-gray-500 capitalize font-bold";
     }
 
 
@@ -20,14 +20,14 @@ export default function CartPage() {
                 <p className="border-dashed border-black border mx-2 w-14"></p>
 
                 {location?.pathname === "/cart" && (
-                    <p className={`text-base ${isActive("/cart")} `}>Address</p>
+                    <p className={`text-base ${isActive("/shipment")} `}>Address</p>
                 )}
 
                 <p className="border-dashed border-black border mx-2 w-14"></p>
 
 
                 {location?.pathname === "/cart" && (
-                    <p className={`text-base ${isActive("/cart")} `}>Payment</p>
+                    <p className={`text-base ${isActive("/payment")} `}>Payment</p>
                 )}
 
 

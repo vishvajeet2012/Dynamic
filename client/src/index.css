@@ -3,7 +3,11 @@
 
 .bg-primaryReds {
     background-color: #e11b23; }
-    
+ 
+    .primaryReds{
+
+        color: #e11b23; 
+    }
 
 
 @layer utilities {

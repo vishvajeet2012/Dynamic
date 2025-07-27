@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGetBannnerData } from '../hooks/client/homePageHooks/use-banner';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default function Banner({ bannerType }) {    
     const [bannerData, setBannerData] = useState([]);
@@ -49,7 +50,7 @@ export default function Banner({ bannerType }) {
                         <picture>
                             <source media="(min-width: 1200px)" srcSet={banner.url} />
                             <source media="(min-width: 768px)" srcSet={banner.url} />
-                            <img 
+                            <LazyLoadImage 
                                 src={banner.url} 
                                 alt={banner.altText || ''}
                                 // 2. Using your original, preferred classes for the image

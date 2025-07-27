@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import WishlistButton from "../components/client/wishlist/wishlistButton";
 import { useAddtoWishlist } from "../hooks/Product/Product";
 import { useWishlist } from "../../context/wishListhContext";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default function AdaptiveProductCard({ item ,wishlistDelete}) {
    const  { addtoWishlist, loading, wishlist, error, success } = useAddtoWishlist()
@@ -61,13 +62,13 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
           "md:aspect-[3/4]"
         )}
       > <Link to={`/${slug}`} className="absolute inset-0">
-        <img
+        <LazyLoadImage
           className={cn(
             "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
             "md:object-contain"
           )}
           src={images?.[0]?.imagesUrls}
-          alt={name}
+  lazyloading          alt={name}
         /></Link>
     
         {discount > 0 && !isOutOfStock && (

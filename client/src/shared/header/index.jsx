@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SerachBar from "./search";
 import Menu from "./Menu";
@@ -10,17 +10,34 @@ import { AiOutlineHome } from "react-icons/ai";
 import { BiCategoryAlt } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { useWishlist } from "../../../context/wishListhContext";
+import { FaGrinTongueWink } from "react-icons/fa";
 
 export default function Header() {
   const { getLogo, success } = getLogoheader();
   const { getSingleUser, laoding: userLoading, user } = useGetSingleUser();
   const { productsWithWishlistStatus } = useWishlist();
-
-  const token = localStorage.getItem("token");
+const [token, setToken] = useState(() => localStorage.getItem("token"));
 
   useEffect(() => {
-    getSingleUser();
-  }, [token]);
+      getSingleUser();
+  }, []);
+
+
+  useEffect(() => {
+  const checkToken = () => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken && storedToken !== token) {
+      setToken(storedToken);
+    }
+  };
+
+  window.addEventListener("storage", checkToken);
+  checkToken();
+
+  return () => {
+    window.removeEventListener("storage", checkToken);
+  };
+}, [token]);
 
   const wishlistCount = productsWithWishlistStatus?.totalItems || 0;
 
@@ -34,6 +51,13 @@ export default function Header() {
     },
     { href: "/cart", icon: <CiShoppingCart />, label: "Cart" },
   ];
+  
+useEffect(() => {
+ 
+    getSingleUser();
+ 
+}, [token]);
+
 
   return (
     <>
@@ -94,7 +118,7 @@ export default function Header() {
         <div className="w-full bg-[#e11b23] p-2 flex justify-between items-center">
           <Link to="/" className="w-24">
             {success?.logo?.url && (
-              <img className="h-12 w-24 object-contain" src={success.logo.url} alt="Logo" />
+              <img className="h-12 w-24 object-contain" src={success?.logo?.url} alt="Logo" />
             )}
           </Link>
 
