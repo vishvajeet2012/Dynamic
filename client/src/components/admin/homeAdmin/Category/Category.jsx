@@ -955,9 +955,9 @@ export default function AdminCategory() {
                                   </div>
                                   {expandedSubcategories[sub._id] && (
                                     <div className="pl-4 pr-2 pb-2">
-                                      {sub.childCategories?.length > 0 ? (
+                                      {sub.childCategory?.length > 0 ? (
                                         <ul className="space-y-1">
-                                          {sub.childCategories.map(child => (
+                                          {sub.childCategory.map(child => (
                                             <li key={`child-${child._id}`} className={`flex items-center justify-between p-1 text-xs rounded ${selectedChildCategory?._id === child._id ? 'bg-blue-100' : 'bg-gray-100'}`}>
                                               <div className="flex items-center space-x-2">
                                                 <img src={child.childCategoryImage || 'https://via.placeholder.com/20'} alt={child.childCategoryName} className="h-4 w-4 rounded object-cover bg-gray-300"/>

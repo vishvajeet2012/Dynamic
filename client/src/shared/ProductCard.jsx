@@ -23,7 +23,8 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
     rating = 4.5,
     reviewCount = 87,
     isOutOfStock = false,
-    slug
+    slug,
+    childCategory
   } = item;
 
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -38,16 +39,13 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
     toggleWishlist(_id)
     setIsWishlisted((prev) => !prev);
     console.log("Wishlist status:", e);
-    // Optionally, you can show a toast or notification here
 
   };
 
   const handleCardClick = () => {
     console.log("Navigating to product:", name);
-    // Add your navigation logic here, e.g., router.push(`/product/${id}`)
   };
 
-  // --- Main Render ---
 
   return (
     <div
@@ -56,26 +54,22 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
         "group flex w-full md:max-w-[310px] cursor-pointer flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md transition-all duration-300 hover:shadow-xl"
       )}
     >
-      {/* ====== 1. IMAGE SECTION ====== */}
       <div 
         className={cn(
           "relative overflow-hidden",
-          // Mobile: A square aspect ratio with object-cover for a clean look.
           "w-full aspect-[8/11]",
-          // Desktop: Uses your preferred aspect ratio and object-contain.
           "md:aspect-[3/4]"
         )}
       > <Link to={`/${slug}`} className="absolute inset-0">
         <img
           className={cn(
             "h-full w-full object-cover transition-transform duration-300 group-hover:scale-105",
-            // Switch to contain on desktop to show the full product.
             "md:object-contain"
           )}
           src={images?.[0]?.imagesUrls}
           alt={name}
         /></Link>
-        {/* Badges */}
+    
         {discount > 0 && !isOutOfStock && (
           <span className="absolute top-2 left-2 rounded-full bg-red-600 px-2 py-0.5 text-center text-xs font-medium text-white">
             {discount}% OFF
@@ -88,16 +82,16 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
             </span>
           </div>
         )}
-        {/* Wishlist button    isWishlisted, handleWishlistClick*/}
      <WishlistButton productId={_id} wishlistDelete={wishlistDelete}  isWishlisted={isWishlisted} handleWishlistClick={handleWishlistClick}/>
       </div>
 
-      {/* ====== 2. CONTENT SECTION ====== */}
+  
       <div className="flex flex-grow flex-col p-4">
-        {/* Category & Rating */}
+       
         <div className="flex items-start justify-between">
+        
           <p className="truncate text-xs text-gray-500 capitalize">
-            {category?.categoryName}
+            {childCategory[0]?.childCategoryName||category?.categoryName || "THE V Store"}
           </p>
           <div className="flex shrink-0 items-center gap-1.5">
             <FaStar size={14} className="text-yellow-400" />
@@ -106,14 +100,13 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
           </div>
         </div>
 
-        {/* Product Name */}
-        <Link to={`/${slug}`} className="mt-1 text-base font-bold text-slate-900 line-clamp-2 min-h-[2.5rem]">
+        <Link to={`/${slug}`} className=" text-base  font-bold text-slate-900 truncate ">
           {name}
         </Link>
 
         {/* Price */}
-        <div className="mt-auto flex items-baseline gap-2 pt-2">
-          <span className="text-xl font-bold text-slate-900">
+        <div className=" flex items-baseline gap-2 "> 
+          <span className=" text-lg font-bold text-slate-900">
             ₹{sellingPrice}
           </span>
           {discount > 0 && (

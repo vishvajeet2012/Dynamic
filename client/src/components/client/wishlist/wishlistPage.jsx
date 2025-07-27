@@ -19,7 +19,7 @@ export default function Wishlistpage() {
         <div className="wishlist-items flex  ">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
           {productsWithWishlistStatus?.wishlist &&
-          productsWithWishlistStatus?.wishlist?.map((product, idx) => (
+          productsWithWishlistStatus?.wishlist?.map((product, idx) => ( 
               <div
                 key={product._id || idx}
                 className="min-w-[70%] sm:min-w-[70%] lg:min-w-[19%] px-1 lg:px-1"

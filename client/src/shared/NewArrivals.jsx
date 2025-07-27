@@ -16,10 +16,10 @@ export default function NewArrivals({ query, titile }) {
 
   return (
     <section className="w-full py-6 lg:px-6">
-      {/* Loading Top Bar */}
+     
       {loading && <LoadingBar />}
 
-      {/* Title */}
+    
      <div className="text-xl md:text-center mb-4">
   {loading ? (
     <div className="w-48 h-8 mx-auto bg-gray-300 rounded-md animate-pulse"></div>
@@ -30,7 +30,7 @@ export default function NewArrivals({ query, titile }) {
   )}
 </div>
 
-      {/* Carousel */}
+    
       <Carousel>
         {loading
           ? Array.from({ length: 5 }).map((_, idx) => (
