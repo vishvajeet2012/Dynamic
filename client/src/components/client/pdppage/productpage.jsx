@@ -135,7 +135,6 @@ className={`px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 ${
             </div>
           )}
           
-          {/* Description */}
           <div className="pt-4">
             <h3 className="text-lg font-medium text-gray-900">Description</h3>
             <p className="text-gray-700 leading-relaxed whitespace-pre-line">
@@ -143,14 +142,13 @@ className={`px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 ${
             </p>
           </div>
           
-          {/* Stock Status */}
+       
           <div className="pt-2">
             <p className={`text-sm font-medium ${productDetail?.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
               {productDetail?.stock > 0 ? `In Stock (${productDetail.stock} available)` : 'Out of Stock'}
             </p>
           </div>
           
-          {/* Quantity and Add to Cart */}
           <div className="flex items-center gap-4 pt-4">
             <div className="flex items-center border border-gray-300 rounded-md">
               <button

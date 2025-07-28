@@ -102,14 +102,14 @@ export const CartProvider = ({ children }) => {
     };
 
     // Remove cart item
-    const removeCartItem = async (itemId) => {
+    const removeCartItem = async (productId, quantity, size, color) => {
         setLoading(true);
         setError(null);
         
         try {
             const token = getToken();
             const response = await axios.post(`${homeUrl}/removeCartItem`, {
-                itemId
+            productId, quantity, size, color
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -119,6 +119,7 @@ export const CartProvider = ({ children }) => {
             
             // Refresh cart items after removing
             await getCartItems();
+            toast(response?.data?.message)
             return response.data;
         } catch (error) {
             setError(error.response?.data?.message || 'Failed to remove cart item');

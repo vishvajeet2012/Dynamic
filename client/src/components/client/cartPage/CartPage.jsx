@@ -97,6 +97,7 @@
 import { useEffect } from "react";
 import { useCart } from "../../../../context/cartContext";
 import { useWishlist } from "../../../../context/wishListhContext";
+import RemoveCartProduct from "./RemoveCartProduct";
 
 export default function CartPageProduct() {
 
@@ -117,7 +118,6 @@ export default function CartPageProduct() {
     },[])
 
 
-  const { toggleWishlist, productsWithWishlistStatus } = useWishlist();
 
  //// const cartItems = productsWithWishlistStatus?.wishlist || [];
   const totalItems = cartItems?.cart?.length;
@@ -180,12 +180,8 @@ export default function CartPageProduct() {
                         <span className="text-gray-500">Price: </span>
                         <span className="text-black font-bold">₹{product?.sellingPrice}</span>
                       </p>
-                      <button
-                        onClick={() => toggleWishlist(product._id)}
-                        className="text-red-500 hover:text-red-700 font-semibold text-sm"
-                      >
-                        Remove
-                      </button>
+                   <RemoveCartProduct   productId={product?.id} quantity={product?.quantity} size={product?.size} color={product?.color} />
+
                     </div>
                   </div>
                 </div>
