@@ -43,6 +43,7 @@ exports.addToCartControler = async (req, res) => {
       });
     }
 
+    // New cart item
     user.cart.push({
       product: productId,
       quantity,
@@ -54,12 +55,50 @@ exports.addToCartControler = async (req, res) => {
 
     return res.status(200).json({
       message: 'Product added to cart successfully',
-      hello:"vishvajeet",
       cart: user.cart,
       status: true,
     });
   } catch (error) {
     return res.status(500).json({ message: 'Internal server error', status: false });
+  }
+};
+
+exports.getCartItems = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).populate('cart.product');
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const cartItem = user.cart.map((item) => {
+      const product = item.product;
+      const totalPrice = product.sellingPrice * item.quantity;
+
+      return {
+        id: product?._id,
+        name: product?.name,
+        images: product?.images,
+        color: item?.color,
+        size: item?.size,
+        sellingPrice: product?.sellingPrice,
+        theme: product?.theme,
+        quantity: item?.quantity,
+        totalPrice: totalPrice,
+      };
+    });
+
+    const totalAmount = cartItem.reduce((sum, item) => sum + item.totalPrice, 0);
+
+    res.status(200).json({
+      cart: cartItem,
+      totalAmount: totalAmount,
+      status: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Internal server error',
+      status: false,
+    });
   }
 };
 
