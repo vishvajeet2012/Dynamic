@@ -155,7 +155,6 @@ export default function CartPageProduct() {
                         </p>
                     </div>
 
-                    {/* Price and Actions */}
                     <div className="flex flex-col items-start md:items-end justify-between gap-4">
                        <p className="text-base">
                         <span className="text-gray-500">Price: </span>

@@ -36,7 +36,7 @@ export default function NewArrivals({ query, titile }) {
           ? Array.from({ length: 5 }).map((_, idx) => (
               <div
                 key={idx}
-                className="min-w-[50%] sm:min-w-[50%] lg:min-w-[19%] px-1 lg:px-1"
+                className="min-w-[40%] sm:min-w-[50%] md:min-w-[20%] lg:min-w-[19%] px-1 lg:px-1"
               >
              <SkeletonProductCard />
               </div>
@@ -44,7 +44,7 @@ export default function NewArrivals({ query, titile }) {
           : Product?.data?.map((product, idx) => (
               <div
                 key={idx}
-                className="min-w-[50%] sm:min-w-[50%] lg:min-w-[19%] px-1 lg:px-1"
+                className="min-w-[40%] sm:min-w-[28%] md:min-w-[26%] lg:min-w-[19%] px-1 lg:px-1"
               >
                 <ProductCard item={product} />
               </div>

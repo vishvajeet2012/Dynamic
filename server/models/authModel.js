@@ -7,21 +7,21 @@ const jwt = require('jsonwebtoken');
 const userSchema = new Schema({
     firstName: {
         type: String,
-        default:"guest"
+        default: "guest"
     },
     lastName: {
         type: String,
-   default:"user"
+        default: "user"
     },
     email: {
         type: String,
-       default:"",
-      
+        default: "",
+
         lowercase: true
     },
     password: {
         type: String,
-       
+
         minlength: [6, 'Password must be at least 6 characters']
     },
     isAdmin: {
@@ -58,18 +58,18 @@ const userSchema = new Schema({
         linkedin: String,
         instagram: String
     },
- wishlist: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product'
-    }
-  ],
-  addedToCart: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product'
-    }
-  ],
+    wishlist: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+        }
+    ],
+    addedToCart: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+        }
+    ],
 
     isVerified: {
         type: Boolean,
@@ -80,15 +80,15 @@ const userSchema = new Schema({
 
     },
     isGuest: {
-  type: Boolean,
-  default: false
-},
-guestToken: {
-  type: String
-},
-guestExpiry: {
-  type: Date
-},
+        type: Boolean,
+        default: false
+    },
+    guestToken: {
+        type: String
+    },
+    guestExpiry: {
+        type: Date
+    },
     otpExpiry: {
         type: Date,
 
@@ -99,24 +99,53 @@ guestExpiry: {
     mobileNumber: {
         type: String,
         unique: true,
-        
+
         default: ""
     },
     address: {
         type: String,
-        default: ""  
+        default: ""
     },
     state: {
         type: String,
-        default: ""  
+        default: ""
     },
     city: {
         type: String,
-        default: ""  
+        default: ""
     },
+    cart: [
+        {
+            product: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
+                required: true,
+                
+            },
+            quantity: {
+                type: Number,
+                default: 1,
+            },
+            color: {
+                type: String,
+                required: true
+
+            }, 
+            size: {
+      type: String,
+      enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'OS'],
+      required: true
+    },
+
+        }
+
+    ],
+
+
+
     pincode: {
         type: String,
-        default: ""  
+        default: ""
     },
     preferences: {
         newsletter: {
@@ -136,21 +165,21 @@ guestExpiry: {
 }, { timestamps: true });
 
 // Generate JWT Token
-userSchema.methods.generateAuthToken = function() {
+userSchema.methods.generateAuthToken = function () {
     return jwt.sign(
         {
             _id: this._id,
             email: this.email,
             isAdmin: this.isAdmin,
             isSeller: this.isSeller
-        }, 
-        process.env.JWT_KEY, 
+        },
+        process.env.JWT_KEY,
         { expiresIn: '30d' }
     );
 };
 
 // Generate OTP
-userSchema.methods.generateOTP = function() {
+userSchema.methods.generateOTP = function () {
     // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     this.otp = otp;
@@ -159,5 +188,5 @@ userSchema.methods.generateOTP = function() {
     return otp;
 };
 
-const User = model('User', userSchema);  
+const User = model('User', userSchema);
 module.exports = User;

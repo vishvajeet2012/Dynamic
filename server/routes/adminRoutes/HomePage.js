@@ -11,6 +11,7 @@ const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBanners
 const { createProduct, getProducts, productDelete, updateProduct, getProductbykeys, getFiltersForSubcategory, getProductSearchPage, searchThemeNames, getProductBySlug } = require('../../controler/Productcontroler');
 const { createChildCategory } = require('../../controler/childCategoryControler');
 const { addtoWishlist, getAllProductsWithWishlist, getUserWishlist } = require('../../controler/wishlist');
+const { addToCartControler, getCartItems, updateCartItem, removeCartItem } = require('../../controler/cart');
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
@@ -62,7 +63,11 @@ router.post('/addtoWishlist', auth, addtoWishlist);
 
 router.post('/getAllProductsWithWishlist',auth,getUserWishlist)
 
-
+////////////////////// Add to Cart ///////////////////////////////
+router.post('/addToCart',auth ,addToCartControler)
+router.get('/getallcart',auth,getCartItems)
+router.post('/updateCartItem', auth,updateCartItem)
+router.post('/removeCartItem',auth , removeCartItem)
 
 
 //////////////fitlers////////////////

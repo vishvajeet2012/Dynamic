@@ -3,13 +3,14 @@ import { useParams } from 'react-router-dom';
 import { FaStar, FaRegStar, FaMinus, FaPlus } from 'react-icons/fa';
 import ProductImage from './productImage';
 import { useProductDetail } from '../../../hooks/Product/Product';
+import AddToCart from '../cartPage/AddToCart';
 
 const ProductPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const { getProductBySlug, productDetail, loading, error, success } = useProductDetail();
   const { id } = useParams();
-
+  const [selectedSize,SetSelectedSize]=useState()
   useEffect(() => {
     if (id) {
       getProductBySlug(id);
@@ -23,13 +24,14 @@ const ProductPage = () => {
   const increaseQuantity = () => setQuantity(prev => prev + 1);
   const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
 
-  // Format price with currency symbol
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR'
     }).format(price);
   };
+
+  
 
   // Render star ratings
   const renderRating = (rating) => {
@@ -50,13 +52,19 @@ const ProductPage = () => {
     return stars;
   };
 
+        const handleSize =(e)=>{
+SetSelectedSize(e)
+        }
+
+
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading product</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Product Image Section */}
+   
         {productDetail?.images && (
           <div className="w-full md:w-1/2">
             <ProductImage
@@ -68,11 +76,11 @@ const ProductPage = () => {
           </div>
         )}
         
-        {/* Product Details Section */}
+      
         <div className="w-full md:w-1/2 space-y-6">
           <h1 className="text-3xl font-bold text-gray-900">{productDetail?.name}</h1>
           
-          {/* Rating */}
+      
           {productDetail?.ratings > 0 && (
             <div className="flex items-center gap-1">
               <div className="flex">
@@ -115,8 +123,9 @@ const ProductPage = () => {
               <div className="flex gap-2 mt-2">
                 {productDetail.size.map((size, index) => (
                   <button
+                  onClick={()=>handleSize(size)}
                     key={index}
-                    className="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100"
+                    className={`px-3 ${selectedSize ? "bg-primaryReds text-white":"bg-white text-black"} py-1 border border-gray-300 rounded-md hover:bg-gray-100`}
                   >
                     {size}
                   </button>
@@ -159,12 +168,9 @@ const ProductPage = () => {
                 <FaPlus className="w-3 h-3" />
               </button>
             </div>
-            <button 
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md font-medium transition-colors"
-              disabled={productDetail?.stock <= 0}
-            >
-              {productDetail?.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
-            </button>
+
+           <AddToCart   productDetail={productDetail}  productId={productDetail?._id} quantity={quantity} size={selectedSize} color={productDetail?.color} />
+
           </div>
         </div>
       </div>
