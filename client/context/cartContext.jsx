@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext } from "react";
 import axios from "axios";
 import { homeUrl } from "../src/lib/baseUrl";
+import { toast } from "sonner"
 
 const CartContext = createContext();
 
@@ -30,8 +31,14 @@ export const CartProvider = ({ children }) => {
                     authorization: `Bearer ${token}`
                 }
             });
-            
-            // Refresh cart items after adding
+                
+                if(response?.data?.message=== "Product already in cart, quantity updated"){
+
+                toast.error(response?.data?.message)    }
+                else{
+                    toast(response?.data?.message)
+                }
+        
             await getCartItems();
             return response.data;
         } catch (error) {
