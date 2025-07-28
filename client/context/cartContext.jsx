@@ -19,12 +19,12 @@ export const CartProvider = ({ children }) => {
         
         try {
             const token = getToken();
-            const response = await axios.post(`${homeUrl}/addToCart`, 
+            const response = await axios.post(`${homeUrl}/addToCart`, {
                 productId, 
                 quantity, 
                 size, 
                 color 
-            , {
+            }, {
                 headers: {
                     'Content-Type': 'application/json',
                     authorization: `Bearer ${token}`
