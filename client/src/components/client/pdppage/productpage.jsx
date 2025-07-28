@@ -125,8 +125,9 @@ SetSelectedSize(e)
                   <button
                   onClick={()=>handleSize(size)}
                     key={index}
-                    className={`px-3 ${selectedSize ? "bg-primaryReds text-white":"bg-white text-black"} py-1 border border-gray-300 rounded-md hover:bg-gray-100`}
-                  >
+className={`px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-100 ${
+  selectedSize === size ? "bg-primaryReds text-white" : "bg-white text-black"
+}`}                  >
                     {size}
                   </button>
                 ))}
