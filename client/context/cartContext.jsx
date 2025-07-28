@@ -74,15 +74,19 @@ export const CartProvider = ({ children }) => {
     };
 
     // Update cart item
-    const updateCartItem = async (itemId, quantity) => {
+    const updateCartItem = async ( productId) => {
+            const { color, productId:NewID, quantity, size } = productId;
+
         setLoading(true);
         setError(null);
         
         try {
             const token = getToken();
             const response = await axios.post(`${homeUrl}/updateCartItem`, {
-                itemId,
-                quantity
+              productId:NewID ,
+                                quantity,
+                                size,
+                                color,
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -101,7 +105,6 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Remove cart item
     const removeCartItem = async (productId, quantity, size, color) => {
         setLoading(true);
         setError(null);
@@ -117,7 +120,6 @@ export const CartProvider = ({ children }) => {
                 }
             });
             
-            // Refresh cart items after removing
             await getCartItems();
             toast(response?.data?.message)
             return response.data;
@@ -134,19 +136,18 @@ export const CartProvider = ({ children }) => {
         return cartItems.reduce((total, item) => total + item.quantity, 0);
     };
 
-    // Calculate total price
     const getTotalPrice = () => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
  
     const value = {
-        // State
+       
         loading,
         cartItems,
         error,
         
-        // Functions
+      
         addToCart,
         getCartItems,
         updateCartItem,
@@ -154,7 +155,6 @@ export const CartProvider = ({ children }) => {
         getTotalItems,
         getTotalPrice,
         
-        // Clear error
         clearError: () => setError(null)
     };
 

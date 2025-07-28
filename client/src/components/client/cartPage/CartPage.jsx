@@ -1,131 +1,21 @@
-// import { useWishlist } from "../../../../context/wishListhContext";
-
-// export default function CartPageProduct() {
-//   const { toggleWishlist, wishlistItems, isInWishlist, productsWithWishlistStatus } = useWishlist();
-
-
-//   return (
-//     <>
-
-//       <div className="border      h-auo">
-//         <div className=" border-black  "
-//         >
-
-//           <div className=" border-b py-2 px-4 ">
-//             <p className="text-base font-bold">My Bag (0 item)</p>
-//           </div>
-
-
-
-//           <div className=" border-b p-4">
-//             {productsWithWishlistStatus?.wishlist &&
-//               productsWithWishlistStatus?.wishlist?.map((product, idx) => (console.log(product),
-//                 <div className="flex gap-4 border-b border-gray-400 p-4"
-//                   key={product._id || idx}
-//                 >
-//                   <div className="h-52 " >
-//                     <img className="h-52 object-contain aspect-[4/5]" src={product?.images?.[0]?.imagesUrls} alt="product image" />
-
-
-
-//                   </div>
-//                   <div className="flex flex-col md:flex-row justify-between w-full">
-//                     <div className="flex flex-col gap-2">
-//                       <p className="font-bold ">{product?.name}</p>
-//                       <div className="flex flex-row items-center text-sm gap-2">
-//                         <p className="font-bold">{product?.category?.categoryName} :</p>
-//                         <p>{product?.subcategories?.[0]?.subCategoryName}</p></div>
-//                       <p className="text-sm text-gray-400"><span className="text-black pr-1 font-bold text-sm">Color:</span>{product?.color}</p>
-//                      {product?.theme&& <p className="text-sm text-gray-400"> <span className="text-black pr-1 font-bold text-sm">Color:</span> {product?.theme}</p>}
-//                       <p className="text-sm text-gray-500">Quantity: <span className="text-black font-bold">{product?.quantity||"1"}</span></p>
-
-//                     </div>
-//                     <div classNa me="flex flex-row md:flex-col gap-2">
-//                       <p className="text-base text-gray-500">Price: <span className="text-black font-bold">{product?.sellingPrice}</span></p>
-
-//                     </div>
-//                   </div>
-//                 </div>
-//               ))}
-
-//             <div className="flex justify-between items-center border-b p-4">
-//               <p className="text-sm text-gray-500">Total:</p>
-
-//             </div>
-
-
-
-//           </div>
-
-
-
-
-//         </div>
-
-
-
-
-
-
-
-//       </div>
-
-
-
-
-//     </>
-
-
-//   )
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useEffect } from "react";
 import { useCart } from "../../../../context/cartContext";
-import { useWishlist } from "../../../../context/wishListhContext";
 import RemoveCartProduct from "./RemoveCartProduct";
 
 export default function CartPageProduct() {
+  const {
+    loading,
+    cartItems,
+    error,
+    getCartItems,
+    updateCartItem,
+  } = useCart();
 
-   const {
-      loading,
-      cartItems,
-      error,
-      addToCart,
-      getCartItems,
-      updateCartItem,
-      removeCartItem,
-      getTotalItems,
-      getTotalPrice,
-    } = useCart();
+  useEffect(() => {
+    getCartItems();
+  }, []);
 
-    useEffect(()=>{
-      getCartItems()
-    },[])
-
-
-
- //// const cartItems = productsWithWishlistStatus?.wishlist || [];
   const totalItems = cartItems?.cart?.length;
-
-  const totalPrice = cartItems?.cart?.reduce((acc, product) => {
-    const price = Number(product?.sellingPrice) || 0;
-    return acc + price;
-  }, 0);
 
   return (
     <>
@@ -169,19 +59,58 @@ export default function CartPageProduct() {
                           <span className="text-gray-500">{product?.theme}</span>
                         </p>
                       )}
-                       <p className="text-sm">
-                          <span className="font-bold text-black pr-1">Quantity:</span>
-                          <span className="text-gray-500">{product?.quantity || "1"}</span>
-                        </p>
+                      
+                      {/* --- START: Quantity Buttons --- */}
+                      <div className="flex items-center gap-2 text-sm mt-2">
+                        <span className="font-bold text-black">Quantity:</span>
+                        <div className="flex items-center border rounded">
+                          <button
+                            onClick={() =>
+                              updateCartItem({
+                                productId: product.id,
+                                quantity: product.quantity ,
+                                size: product.size,
+                                color: product.color,
+                              })
+                            }
+                            disabled={product.quantity <= 1}
+                            className="px-2 py-0.5 font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            -
+                          </button>
+                          <span className="px-3 py-0.5 bg-white border-x">
+                            {product.quantity}
+                          </span>
+                          <button
+                            onClick={() =>
+                              updateCartItem({
+                                productId: product.id,
+                                quantity: product.quantity + 1,
+                                size: product.size,
+                                color: product.color,
+                              })
+                            }
+                            className="px-2 py-0.5 font-semibold"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      {/* --- END: Quantity Buttons --- */}
+
                     </div>
 
                     <div className="flex flex-col items-start md:items-end justify-between gap-4">
-                       <p className="text-base">
+                      <p className="text-base">
                         <span className="text-gray-500">Price: </span>
                         <span className="text-black font-bold">₹{product?.sellingPrice}</span>
                       </p>
-                   <RemoveCartProduct   productId={product?.id} quantity={product?.quantity} size={product?.size} color={product?.color} />
-
+                      <RemoveCartProduct
+                        productId={product?.id}
+                        quantity={product?.quantity}
+                        size={product?.size}
+                        color={product?.color}
+                      />
                     </div>
                   </div>
                 </div>
