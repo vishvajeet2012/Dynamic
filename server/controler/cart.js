@@ -54,7 +54,7 @@ exports.addToCartControler = async (req, res) => {
 
     return res.status(200).json({
       message: 'Product added to cart successfully',
-      hello:"vishvajeet"
+      hello:"vishvajeet",
       cart: user.cart,
       status: true,
     });
