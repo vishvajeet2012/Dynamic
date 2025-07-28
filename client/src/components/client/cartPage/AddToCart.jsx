@@ -1,7 +1,22 @@
+import { useCart } from "../../../../context/cartContext"
+
 export default function AddToCart({productDetail, productId, quantity, size, color}){
+const {  loading,
+        cartItems,
+        error,
+        
+        // Functions
+        addToCart,
+        getCartItems,
+        updateCartItem,
+        removeCartItem,
+        getTotalItems,
+        getTotalPrice,
+        }=  useCart()
 
       const handleAddToCart =(e)=>{
         console.log(e,"thisb ")
+        addToCart(e)
       }
 
   return(
