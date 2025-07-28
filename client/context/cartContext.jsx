@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext } from "react";
 import axios from "axios";
 import { homeUrl } from "../src/lib/baseUrl";
 import { toast } from "sonner"
+import { useEffect } from "react";
 
 const CartContext = createContext();
 
@@ -62,7 +63,7 @@ export const CartProvider = ({ children }) => {
                 }
             });
             
-            setCartItems(response.data.cartItems || []);
+            setCartItems(response?.data || []);
             return response.data;
         } catch (error) {
             setError(error.response?.data?.message || 'Failed to fetch cart items');
@@ -137,6 +138,7 @@ export const CartProvider = ({ children }) => {
         return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
+ 
     const value = {
         // State
         loading,
@@ -160,6 +162,8 @@ export const CartProvider = ({ children }) => {
             {children}
         </CartContext.Provider>
     );
+
+
 };
 
 // Custom hook to use cart context

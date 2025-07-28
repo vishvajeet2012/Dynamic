@@ -94,15 +94,35 @@
 
 
 
+import { useEffect } from "react";
+import { useCart } from "../../../../context/cartContext";
 import { useWishlist } from "../../../../context/wishListhContext";
 
 export default function CartPageProduct() {
+
+   const {
+      loading,
+      cartItems,
+      error,
+      addToCart,
+      getCartItems,
+      updateCartItem,
+      removeCartItem,
+      getTotalItems,
+      getTotalPrice,
+    } = useCart();
+
+    useEffect(()=>{
+      getCartItems()
+    },[])
+
+
   const { toggleWishlist, productsWithWishlistStatus } = useWishlist();
 
-  const cartItems = productsWithWishlistStatus?.wishlist || [];
-  const totalItems = cartItems.length;
+ //// const cartItems = productsWithWishlistStatus?.wishlist || [];
+  const totalItems = cartItems?.cart?.length;
 
-  const totalPrice = cartItems.reduce((acc, product) => {
+  const totalPrice = cartItems?.cart?.reduce((acc, product) => {
     const price = Number(product?.sellingPrice) || 0;
     return acc + price;
   }, 0);
@@ -119,7 +139,7 @@ export default function CartPageProduct() {
 
           <div className="p-4">
             {totalItems > 0 ? (
-              cartItems.map((product, idx) => (
+              cartItems?.cart?.map((product, idx) => (
                 <div
                   className="flex gap-4 border-b border-gray-200 p-4"
                   key={product._id || idx}
@@ -179,7 +199,7 @@ export default function CartPageProduct() {
             {totalItems > 0 && (
               <div className="flex justify-between items-center p-4 mt-4">
                 <p className="text-lg font-bold">Total:</p>
-                <p className="text-lg font-bold">₹{totalPrice.toFixed(2)}</p>
+                <p className="text-lg font-bold">₹{cartItems?.totalAmount?.toFixed(2)}</p>
               </div>
             )}
           </div>

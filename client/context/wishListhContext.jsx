@@ -47,7 +47,6 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
-    // Get all products with wishlist status
     const fetchProductsWithWishlistStatus = async () => {
         setLoading(true);
         try {
