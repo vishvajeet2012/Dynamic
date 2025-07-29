@@ -479,6 +479,7 @@ exports.getProduct = async (req, res) => {
 // };
 
 
+
 exports.getProducts = async (req, res) => {
   try {
     const filter = {};
@@ -493,16 +494,13 @@ exports.getProducts = async (req, res) => {
     if (req.body.isNewArrival !== undefined) filter.isNewArrival = req.body.isNewArrival;
     if (req.body.isFeatured !== undefined) filter.isFeatured = req.body.isFeatured;
 
-    // Create a unique cache key based on the filter object
     const cacheKey = `products:${JSON.stringify(filter)}`;
-
-    // Check cache first
     const cachedData = cache.get(cacheKey);
+
     if (cachedData) {
-      return res.status(200).json(cachedData);
+      return res.status(200).json(cachedData); // plain JS object, no populate here
     }
 
-    // If not in cache, fetch from DB
     const products = await Product.find(filter)
       .populate({
         path: 'category',
@@ -519,15 +517,13 @@ exports.getProducts = async (req, res) => {
         match: { isActive: true }
       });
 
-    // Store in cache
-    cache.set(cacheKey, products);
+    cache.set(cacheKey, products); // store plain result
 
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 
 
