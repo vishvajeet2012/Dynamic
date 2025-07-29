@@ -439,11 +439,48 @@ exports.getProduct = async (req, res) => {
 //   }
 // };
 
+// exports.getProducts = async (req, res) => {
+//   try {
+//     const filter = {};
+//     const userId = req?.user;
+
+//     // Add filters from request body
+//     if (req.body.gender) filter.gender = req.body.gender;
+//     if (req.body.category) filter.category = req.body.category;
+//     if (req.body.subCategory) filter.subCategory = req.body.subCategory;
+//     if (req.body.color) filter.color = req.body.color;
+//     if (req.body.size) filter.size = { $in: [req.body.size] };
+//     if (req.body.isNewArrival !== undefined) filter.isNewArrival = req.body.isNewArrival;
+//     if (req.body.isFeatured !== undefined) filter.isFeatured = req.body.isFeatured;
+
+//     const products = await Product.find(filter)
+//       .populate({
+//         path: 'category',
+//         select: 'categoryName categoryImage categoryDescription isActive'
+//       })
+//       .populate({
+//         path: 'subcategories',
+//         select: 'subCategoryName subCategoryImage subCategoryDescription isActive',
+//         match: { isActive: true }
+//       })
+//       .populate({
+//         path: 'childCategory',
+//         select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
+//         match: { isActive: true }
+//       });
+
+//     res.status(200).json(products);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+
 exports.getProducts = async (req, res) => {
   try {
     const filter = {};
     const userId = req?.user;
-
+    
     // Add filters from request body
     if (req.body.gender) filter.gender = req.body.gender;
     if (req.body.category) filter.category = req.body.category;
@@ -452,7 +489,18 @@ exports.getProducts = async (req, res) => {
     if (req.body.size) filter.size = { $in: [req.body.size] };
     if (req.body.isNewArrival !== undefined) filter.isNewArrival = req.body.isNewArrival;
     if (req.body.isFeatured !== undefined) filter.isFeatured = req.body.isFeatured;
-
+    
+    // Create a unique cache key based on the filter object
+    const cacheKey = `products:${JSON.stringify(filter)}`;
+    
+    // Check cache first
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      // Convert cached plain objects back to proper format
+      return res.status(200).json(JSON.parse(JSON.stringify(cachedData)));
+    }
+    
+    // If not in cache, fetch from DB
     const products = await Product.find(filter)
       .populate({
         path: 'category',
@@ -468,9 +516,16 @@ exports.getProducts = async (req, res) => {
         select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
         match: { isActive: true }
       });
-
-    res.status(200).json(products);
+    
+    // Convert to plain objects for caching (to avoid populated references issues)
+    const plainProducts = JSON.parse(JSON.stringify(products));
+    
+    // Store plain objects in cache
+    cache.set(cacheKey, plainProducts);
+    
+    res.status(200).json(plainProducts);
   } catch (err) {
+    console.error('Error in getProducts:', err);
     res.status(500).json({ message: err.message });
   }
 };
