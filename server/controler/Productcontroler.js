@@ -483,7 +483,7 @@ exports.getProduct = async (req, res) => {
 exports.getProducts = async (req, res) => {
   try {
     const filter = {};
-    const userId = req?.user;
+    
 
     // Add filters from request body
     if (req.body.gender) filter.gender = req.body.gender;
