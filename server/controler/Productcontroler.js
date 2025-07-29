@@ -4,7 +4,7 @@ const Product = require('../models/ProductModel');
 const Products = require('../models/ProductModel');
 const Category = require('../models/CategoryModel');
 const SubCategory = require('../models/SubCategoryModel');
-
+const cache = require('../utils/cache')
 const child = require('../models/childCategoryModel'); // Assuming this is the correct path for ChildCategory model
 const slugify = require('slugify');
 
