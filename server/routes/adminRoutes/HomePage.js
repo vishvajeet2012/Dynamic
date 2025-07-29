@@ -12,6 +12,7 @@ const { createProduct, getProducts, productDelete, updateProduct, getProductbyke
 const { createChildCategory } = require('../../controler/childCategoryControler');
 const { addtoWishlist, getAllProductsWithWishlist, getUserWishlist } = require('../../controler/wishlist');
 const { addToCartControler, getCartItems, updateCartItem, removeCartItem } = require('../../controler/cart');
+const { placeOrder } = require('../../controler/order');
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
@@ -68,6 +69,12 @@ router.post('/addToCart',auth ,addToCartControler)
 router.get('/getallcart',auth,getCartItems)
 router.post('/updateCartItem', auth,updateCartItem)
 router.post('/removeCartItem',auth , removeCartItem)
+
+
+
+/////////////////order routes //////////////////
+router.post('/place', auth, placeOrder);
+
 
 
 //////////////fitlers////////////////
