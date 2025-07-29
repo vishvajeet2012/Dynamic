@@ -11,6 +11,8 @@ import { BiCategoryAlt } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { useWishlist } from "../../../context/wishListhContext";
 import { FaGrinTongueWink } from "react-icons/fa";
+import { useCart } from "../../../context/cartContext";
+
 
 export default function Header() {
   const { getLogo, success } = getLogoheader();
@@ -38,6 +40,20 @@ const [token, setToken] = useState(() => localStorage.getItem("token"));
     window.removeEventListener("storage", checkToken);
   };
 }, [token]);
+
+  const {  ///// cart
+    loading,
+    cartItems,
+    error,
+    getCartItems,
+    updateCartItem,
+  } = useCart();
+
+  useEffect(() => {
+    getCartItems();
+  }, []);
+
+  const totalItems = cartItems?.cart?.length;
 
   const wishlistCount = productsWithWishlistStatus?.totalItems || 0;
 
@@ -90,17 +106,24 @@ useEffect(() => {
 
               <Link to="/wishlist" className="relative flex items-center space-x-2 text-lg hover:text-gray-200">
                 <CiHeart className="text-2xl" />
-                <span>Wishlist</span>
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-2 -right-3 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
+                 {wishlistCount > 0 && (
+                  <span className="absolute -top-2 left-2 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
                     {wishlistCount}
                   </span>
                 )}
+                <span>Wishlist</span>
+               
               </Link>
 
-              <Link to="/cart" className="flex items-center space-x-2 text-lg hover:text-gray-200">
+              <Link to="/cart" className="relative flex items-center space-x-2 text-lg hover:text-gray-200">
                 <CiShoppingCart className="text-2xl" />
-                <span>Cart</span>
+                 {totalItems > 0 && (
+                  <span className="absolute -top-2 left-2 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
+                    {totalItems}
+                  </span>
+                )}
+                <span >Cart</span>
+                
               </Link>
             </div>
           </div>
@@ -137,7 +160,6 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Bottom Nav (Fixed + Always Visible) */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-14 text-gray-700 z-40">
           {mobileNavLinks.map((link) => (
             <Link
@@ -146,6 +168,11 @@ useEffect(() => {
               className="flex flex-col items-center text-xs flex-1"
             >
               <span className="text-xl">{link.icon}</span>
+              { link.label==="Cart" && totalItems > 0 && (
+                  <span className="absolute -top-0 right-6 text-white bg-primaryReds prim text-xs font-bold px-1.5 py-0.5 rounded-full">
+                    {totalItems}
+                  </span>
+                )}
               {link.label}
             </Link>
           ))}

@@ -50,7 +50,7 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Get all cart items
+  
     const getCartItems = async () => {
         setLoading(true);
         setError(null);
@@ -73,7 +73,6 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Update cart item
     const updateCartItem = async ( productId) => {
             const { color, productId:NewID, quantity, size } = productId;
 
