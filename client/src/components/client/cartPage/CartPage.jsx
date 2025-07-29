@@ -3,6 +3,9 @@ import { useCart } from "../../../../context/cartContext";
 import RemoveCartProduct from "./RemoveCartProduct";
 
 export default function CartPageProduct() {
+
+
+
   const {
     loading,
     cartItems,
