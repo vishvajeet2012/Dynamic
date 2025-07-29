@@ -1,5 +1,4 @@
 const Product = require('../models/ProductModel');
-const cache = require("../utils/cache"); // path to the cache.js file
 
 // Create a new product
 const Products = require('../models/ProductModel');
@@ -440,50 +439,10 @@ exports.getProduct = async (req, res) => {
 //   }
 // };
 
-
-
-// exports.getProducts = async (req, res) => {
-//   try {
-//     const filter = {};
-//     const userId = req?.user;
-
-//     // Add filters from request body
-//     if (req.body.gender) filter.gender = req.body.gender;
-//     if (req.body.category) filter.category = req.body.category;
-//     if (req.body.subCategory) filter.subCategory = req.body.subCategory;
-//     if (req.body.color) filter.color = req.body.color;
-//     if (req.body.size) filter.size = { $in: [req.body.size] };
-//     if (req.body.isNewArrival !== undefined) filter.isNewArrival = req.body.isNewArrival;
-//     if (req.body.isFeatured !== undefined) filter.isFeatured = req.body.isFeatured;
-
-//     const products = await Product.find(filter)
-//       .populate({
-//         path: 'category',
-//         select: 'categoryName categoryImage categoryDescription isActive'
-//       })
-//       .populate({
-//         path: 'subcategories',
-//         select: 'subCategoryName subCategoryImage subCategoryDescription isActive',
-//         match: { isActive: true }
-//       })
-//       .populate({
-//         path: 'childCategory',
-//         select: 'childCategoryName childCategoryImage childCategoryDescription isActive bannerImage',
-//         match: { isActive: true }
-//       });
-
-//     res.status(200).json(products);
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// };
-
-
-
 exports.getProducts = async (req, res) => {
   try {
     const filter = {};
-    
+    const userId = req?.user;
 
     // Add filters from request body
     if (req.body.gender) filter.gender = req.body.gender;
@@ -493,13 +452,6 @@ exports.getProducts = async (req, res) => {
     if (req.body.size) filter.size = { $in: [req.body.size] };
     if (req.body.isNewArrival !== undefined) filter.isNewArrival = req.body.isNewArrival;
     if (req.body.isFeatured !== undefined) filter.isFeatured = req.body.isFeatured;
-
-    const cacheKey = `products:${JSON.stringify(filter)}`;
-    const cachedData = cache.get(cacheKey);
-
-    if (cachedData) {
-      return res.status(200).json(cachedData); // plain JS object, no populate here
-    }
 
     const products = await Product.find(filter)
       .populate({
@@ -517,16 +469,11 @@ exports.getProducts = async (req, res) => {
         match: { isActive: true }
       });
 
-    cache.set(cacheKey, products); // store plain result
-
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
-
-
 
 
 /////////////////////// get product by cateogry /////////////////////
