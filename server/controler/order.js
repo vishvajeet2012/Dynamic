@@ -1,5 +1,5 @@
-const order = require("../models/order");
-const User =requrie("../models/authModel.js")
+const Order = require("../models/order");
+const  User = require('../models/authModel')
 
 
 exports.placeOrder = async (req, res) => {
@@ -24,7 +24,7 @@ exports.placeOrder = async (req, res) => {
 
                         }))         
                             const totalPrice =orderItems.reduce ((acc,item)=>acc+item.price *item.quantity,0)
-                                    const order = await order.create({
+                                    const order = await Order.create({
                                         user:userId,
                                         orderItems,
                                    shippingInfo,
