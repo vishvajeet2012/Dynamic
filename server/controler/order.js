@@ -77,15 +77,14 @@ exports.placeOrder = async (req, res) => {
 
 
     }
-      try{
+      
                         await transporter.sendMail(mailSent);
-        return true;
+        
 
 
-            }catch(error){
+          
                  console.error('Error sending OTP email:', error);
-        return false;
-            }
+     
                         
                  // Clear user cart
     user.cart = [];
