@@ -83,7 +83,6 @@ exports.placeOrder = async (req, res) => {
 
 
           
-                 console.error('Error sending OTP email:', error);
      
                         
                  // Clear user cart
