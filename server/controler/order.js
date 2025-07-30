@@ -1,5 +1,6 @@
 const Order = require("../models/order");
 const  User = require('../models/authModel')
+const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE || 'gmail',
