@@ -16,12 +16,10 @@ const userSchema = new Schema({
     email: {
         type: String,
         default: "",
-
         lowercase: true
     },
     password: {
         type: String,
-
         minlength: [6, 'Password must be at least 6 characters']
     },
     isAdmin: {
@@ -70,14 +68,12 @@ const userSchema = new Schema({
             ref: 'Product'
         }
     ],
-
     isVerified: {
         type: Boolean,
         default: false
     },
     otp: {
         type: String,
-
     },
     isGuest: {
         type: Boolean,
@@ -91,7 +87,6 @@ const userSchema = new Schema({
     },
     otpExpiry: {
         type: Date,
-
     },
     lastLogin: {
         type: Date
@@ -99,28 +94,27 @@ const userSchema = new Schema({
     mobileNumber: {
         type: String,
         unique: true,
+        default: ""
+    },
 
-        default: ""
-    },
-    address: {
-        type: String,
-        default: ""
-    },
-    state: {
-        type: String,
-        default: ""
-    },
-    city: {
-        type: String,
-        default: ""
-    },
+    // ✅ Updated Address Schema (Multiple addresses)
+    addresses: [
+        {
+            fullAddress: { type: String, required: true },
+            city: { type: String, required: true },
+            state: { type: String, required: true },
+            pincode: { type: String, required: true },
+            label: { type: String, enum: ['home', 'work', 'other'], default: 'home' },
+            isDefault: { type: Boolean, default: false }
+        }
+    ],
+
     cart: [
         {
             product: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Product",
                 required: true,
-                
             },
             quantity: {
                 type: Number,
@@ -129,24 +123,14 @@ const userSchema = new Schema({
             color: {
                 type: String,
                 required: true
-
-            }, 
+            },
             size: {
-      type: String,
-      enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'OS'],
-      required: true
-    },
-
+                type: String,
+                enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'OS'],
+                required: true
+            },
         }
-
     ],
-
-
-
-    pincode: {
-        type: String,
-        default: ""
-    },
     preferences: {
         newsletter: {
             type: Boolean,
@@ -180,10 +164,8 @@ userSchema.methods.generateAuthToken = function () {
 
 // Generate OTP
 userSchema.methods.generateOTP = function () {
-    // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     this.otp = otp;
-    // Set OTP expiry to 10 minutes from now
     this.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
     return otp;
 };

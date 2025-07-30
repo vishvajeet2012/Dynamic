@@ -73,7 +73,7 @@ router.post('/removeCartItem',auth , removeCartItem)
 
 
 /////////////////order routes //////////////////
-router.post('/place', auth, placeOrder);
+router.post('/placeorder', auth, placeOrder);
 
 
 

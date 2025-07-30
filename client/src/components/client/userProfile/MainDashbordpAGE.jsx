@@ -270,13 +270,13 @@ const [imagesUrls, setImageUrls] = useState(null);
       email: user.email,
       mobileNumber: user.mobileNumber || '',
       profilePicture: user.profilePicture || '',
-      city: user.city || '',
-      pincode: user.pincode || '',
-      address: user.address || '',
-      state: user.state || ''
+      city: user.addresses?.filter(e=>e.isDefault===true)[0].city || '',
+      pincode: user.addresses?.filter(e=>e.isDefault===true)[0].pincode || '',
+      address: user.addresses?.filter(e=>e.isDefault===true)[0].fullAddress || '',
+      state: user.addresses?.filter(e=>e.isDefault===true)[0].state || '',
+      isDefault:user?.addresses?.filter(e=>e.isDefault===true)[0].isDefault,
     }
   });
-
   const handleImageChange = async (e) => {
     const file = e.target?.files?.[0];
    const formData = new FormData();
