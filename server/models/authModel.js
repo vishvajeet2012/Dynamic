@@ -105,7 +105,9 @@ const userSchema = new Schema({
             state: { type: String, required: true },
             pincode: { type: String, required: true },
             label: { type: String, enum: ['home', 'work', 'other'], default: 'home' },
-            isDefault: { type: Boolean, default: false }
+            isDefault: { type: Boolean, default: false },
+            phoneNo:{type:String ,default:function (){
+                return this.parent().mobileNumber}}
         }
     ],
 
