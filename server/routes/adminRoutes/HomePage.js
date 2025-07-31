@@ -12,7 +12,7 @@ const { createProduct, getProducts, productDelete, updateProduct, getProductbyke
 const { createChildCategory } = require('../../controler/childCategoryControler');
 const { addtoWishlist, getAllProductsWithWishlist, getUserWishlist } = require('../../controler/wishlist');
 const { addToCartControler, getCartItems, updateCartItem, removeCartItem } = require('../../controler/cart');
-const { placeOrder } = require('../../controler/order');
+const { placeOrder, updateOrderStatus } = require('../../controler/order');
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
@@ -74,8 +74,7 @@ router.post('/removeCartItem',auth , removeCartItem)
 
 /////////////////order routes //////////////////
 router.post('/placeorder', auth, placeOrder);
-
-
+route.post('/updateOrderStatus',auth, updateOrderStatus)
 
 //////////////fitlers////////////////
 router.post('/getFiltersForSubcategory',getFiltersForSubcategory)
