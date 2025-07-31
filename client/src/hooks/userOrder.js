@@ -42,7 +42,7 @@ const token =localStorage.getItem('token')
   export const useGetAllOrder = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);  
+  const [data, setSuccess] = useState(false);  
 // subcategorycreate
   const  getallorder = async (formData) => {
     setLoading(true);
@@ -60,7 +60,7 @@ const token =localStorage.getItem('token')
                 }
             
       )
-      setSuccess(true);
+      setSuccess(response.data);
       return response.data;  
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create category');
@@ -69,5 +69,5 @@ const token =localStorage.getItem('token')
       setLoading(false);  
     }
   }
-  return {getallorder,loading , error,success}
+  return {getallorder,loading , error,data}
   }

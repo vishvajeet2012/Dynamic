@@ -21,6 +21,7 @@ import ProductPage from './components/client/pdppage/productpage';
 import Wishlistpage from './components/client/wishlist/wishlistPage';
 import CartPage from './components/client/cartPage';
 import OrderPlacementUI from './components/client/order';
+import AdminOrder from './components/admin/Adminorders';
 function App() {
   return (
     <>
@@ -47,6 +48,7 @@ function App() {
         <Route path='/productupdatedelete' element={<AdminProductManagement/>} />
         <Route path="/category/:id" element={<CategroyPage />} />
         <Route path ="/checkout"  element={<OrderPlacementUI/>}/>
+        <Route path="/adminorder" element={<AdminOrder/>}/>
         {/* Add other protected routes here */}
       </Route>
     </Routes>

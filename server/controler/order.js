@@ -170,7 +170,7 @@ res.status(200).json({
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-      .populate('user', 'name email') // Optional: show user info
+      .populate('firstName','lastName', ' email') // Optional: show user info
       .sort({ placedAt: -1 });
 
     res.status(200).json({
