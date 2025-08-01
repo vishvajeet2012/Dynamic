@@ -1,6 +1,21 @@
 import { ShoppingCart } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function OrderSumary({totalPrice}){
+
+ const  navi= useNavigate()
+     const location = useLocation()  /// use hota hai pathname ko check kane ke liye
+ 
+
+const handleCLickOrder = ()=>{
+if(location.pathname ==="/cart"){
+    navi("/checkout")
+}
+
+
+}
+
+
 
     return (
         <>
@@ -27,7 +42,7 @@ export default function OrderSumary({totalPrice}){
                             </div>
                           </div>
             
-                    <button type="button" className="w-full  bg-primaryReds text-white font-bold py-3 px-4 rounded-lg mt-8 hover:bg-primaryReds focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-transform transform hover:scale-102 flex items-center justify-center">
+                    <button type="button" onClick={handleCLickOrder} className="w-full  bg-primaryReds text-white font-bold py-3 px-4 rounded-lg mt-8 hover:bg-primaryReds focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-transform transform hover:scale-102 flex items-center justify-center">
                             {/* <Package2 className="w-5 h-5 mr-2" /> */}
                             Place Order
                           </button>

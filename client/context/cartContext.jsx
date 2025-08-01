@@ -10,7 +10,7 @@ export const CartProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const [error, setError] = useState(null);
-
+const [placeOrderData,setPlaceOrderData]= useState()
     // Get token from localStorage
     const getToken = () => localStorage.getItem('token');
 
@@ -130,6 +130,44 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+/////placeed order///////////////////
+
+
+
+ const placeOrder = async (formData, ) => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const token = getToken();
+            const response = await axios.post(`${homeUrl}/placeorder`, {shippingInfo:formData}, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${token}`
+                }
+            });
+            
+            toast(response?.data?.message)
+            await getCartItems();
+            setPlaceOrderData(resposne?.data)
+            toast(response?.message)
+            return response.data;
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to remove cart item');
+            console.error('Remove cart item error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+
+
+
+
+
+
+
     // Calculate total items in cart
     const getTotalItems = () => {
         return cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -145,8 +183,8 @@ export const CartProvider = ({ children }) => {
         loading,
         cartItems,
         error,
-        
-      
+        placeOrderData,
+      placeOrder,
         addToCart,
         getCartItems,
         updateCartItem,

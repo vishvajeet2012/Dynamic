@@ -13,7 +13,9 @@ exports.placeOrder = async (req, res) => {
 
   try {
     const userId = req.user._id;
-    const { shippingInfo, paymentMethod } = req.body;
+    const {shippingInfo:datas
+ } = req.body;
+ const {shippingInfo   ,paymentMethod}=datas
 
     const user = await User.findById(userId)?.populate('cart.product')
     if (!user || user.cart.length === 0) {
@@ -169,8 +171,10 @@ res.status(200).json({
 
 exports.getAllOrders = async (req, res) => {
   try {
+
+
     const orders = await Order.find()
-      .populate('firstName','lastName', ' email') // Optional: show user info
+      .populate('user', 'firstName lastName email') // Optional: show user info
       .sort({ placedAt: -1 });
 
     res.status(200).json({
@@ -185,28 +189,365 @@ exports.getAllOrders = async (req, res) => {
 
 
 /////////////////exprots update order status ///////////////////
-exports.updateOrderStatus = async (req,res)=>{
 
-try{
-      const {orderId} = req.body
-      const {status}= req.body
-const allowedStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered']
-if(!allowedStatuses.includes(status)){
-  return res.status(400).json({message:"Invalied status value"})
 
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, status } = req.body;
+    
+    // Log for debugging
+    console.log('Received orderId:', orderId);
+    console.log('Received status:', status);
+    
+    // Validate required fields
+    if (!orderId || !status) {
+      return res.status(400).json({ 
+        message: "OrderId and status are required" 
+      });
+    }
+    
+    const allowedStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+    
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ 
+        message: "Invalid status value. Allowed values: " + allowedStatuses.join(', ') 
+      });
+    }
+
+    // Find the order
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ 
+        message: "Order not found" 
+      });
+    }
+    const userNumber = order?.shippingInfo?.phoneNo
+const user = await User.findOne({ mobileNumber: userNumber });
+    console.log(user)
+
+
+
+    // Update the status
+    order.status = status;
+    
+    await order.save();
+if (order.status === "Shipped") {
+  const mailSent = {
+    from: process.env.EMAIL_USER,
+    to: user?.email,
+    subject: "🚚 Your Order Has Been Shipped - The V Store!",
+    html: `
+      <div style="max-width:600px;margin:auto;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        
+        <!-- Header with Logo -->
+        <div style="background:linear-gradient(135deg, #dc2626, #b91c1c);color:white;text-align:center;padding:30px 20px;position:relative;">
+          <img src="https://res.cloudinary.com/dkcc4frdi/image/upload/v1751125393/progoruoiovchkxdnpip.png" alt="The V Store Logo" style="max-width:120px;height:auto;filter:brightness(0) invert(1);margin-bottom:15px;" />
+          <h1 style="font-size:28px;font-weight:bold;margin:10px 0;text-shadow:2px 2px 4px rgba(0,0,0,0.3);">The V Store</h1>
+          <h2 style="font-size:24px;margin:0;display:flex;align-items:center;justify-content:center;gap:10px;">
+            <span style="font-size:30px;">🚚</span> Your Order Has Been Shipped!
+          </h2>
+        </div>
+
+        <!-- Main Content -->
+        <div style="padding:30px 20px;">
+          <p style="font-size:18px;margin-bottom:20px;color:#374151;">Hello ${order?.shippingInfo?.email || 'Valued Customer'},</p>
+          <p style="font-size:16px;margin-bottom:30px;color:#6b7280;line-height:1.7;">We're excited to let you know that your order has been shipped and is on its way to you! Thank you for choosing The V Store.</p>
+          
+          <!-- Order Details Section -->
+          <h3 style="color:#dc2626;font-size:20px;font-weight:bold;margin:30px 0 15px 0;padding-bottom:8px;border-bottom:2px solid #dc2626;display:flex;align-items:center;gap:10px;">
+            <span>📦</span> Order Details
+          </h3>
+          
+          <div style="background:linear-gradient(135deg, #fef2f2, #ffffff);border:1px solid #fecaca;border-radius:8px;padding:20px;margin:20px 0;">
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #fee2e2;">
+              <span style="font-weight:600;color:#dc2626;">Shipping Address:</span>
+              <span style="color:#374151;text-align:right;max-width:60%;">${order.shippingInfo.fullAddress}, ${order.shippingInfo.city}, ${order.shippingInfo.state} - ${order.shippingInfo.pincode}, ${order.shippingInfo.country}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #fee2e2;">
+              <span style="font-weight:600;color:#dc2626;">Phone:</span>
+              <span style="color:#374151;">${order.shippingInfo.phoneNo || 'N/A'}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #fee2e2;">
+              <span style="font-weight:600;color:#dc2626;">Payment Method:</span>
+              <span style="color:#374151;">${order.paymentMethod}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0;">
+              <span style="font-weight:600;color:#dc2626;">Status:</span>
+              <span style="color:#10b981;font-weight:bold;">${order.status}</span>
+            </div>
+          </div>
+
+          <!-- Order Summary Section -->
+          <h3 style="color:#dc2626;font-size:20px;font-weight:bold;margin:30px 0 15px 0;padding-bottom:8px;border-bottom:2px solid #dc2626;display:flex;align-items:center;gap:10px;">
+            <span>🛍️</span> Order Summary
+          </h3>
+          
+          <div style="background:#ffffff;border:1px solid #fecaca;border-radius:8px;overflow:hidden;margin:20px 0;">
+            <table width="100%" style="border-collapse:collapse;">
+              <thead>
+                <tr style="background:linear-gradient(135deg, #dc2626, #b91c1c);color:#ffffff;">
+                  <th align="left" style="padding:15px 12px;font-weight:600;">Product</th>
+                  <th align="center" style="padding:15px 8px;font-weight:600;">Size</th>
+                  <th align="center" style="padding:15px 8px;font-weight:600;">Color</th>
+                  <th align="center" style="padding:15px 8px;font-weight:600;">Qty</th>
+                  <th align="right" style="padding:15px 12px;font-weight:600;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${order.orderItems.map((item, index) => `
+                  <tr style="border-bottom:1px solid #fee2e2;${index % 2 === 0 ? 'background:#fef2f2;' : 'background:#ffffff;'}">
+                    <td style="padding:12px;color:#374151;font-weight:500;">${item.name}</td>
+                    <td align="center" style="padding:12px;color:#6b7280;">${item.size}</td>
+                    <td align="center" style="padding:12px;color:#6b7280;">${item.color}</td>
+                    <td align="center" style="padding:12px;color:#6b7280;font-weight:600;">${item.quantity}</td>
+                    <td align="right" style="padding:12px;color:#dc2626;font-weight:600;">₹${item.quantity * item.price}</td>
+                  </tr>
+                `).join('')}
+                <tr style="background:linear-gradient(135deg, #fef2f2, #ffffff);border-top:2px solid #dc2626;">
+                  <td colspan="4" align="right" style="padding:15px 12px;font-weight:bold;color:#374151;font-size:16px;">Total Amount:</td>
+                  <td align="right" style="padding:15px 12px;font-weight:bold;color:#dc2626;font-size:18px;">₹${order.totalPrice}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- CTA Button -->
+          <div style="text-align:center;margin:40px 0;">
+            <a href="https://thevstore.com/orders" style="display:inline-block;background:linear-gradient(135deg, #dc2626, #b91c1c);color:#ffffff;padding:15px 30px;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;box-shadow:0 4px 12px rgba(220,38,38,0.3);transition:all 0.3s ease;">
+              🔍 Track Your Order
+            </a>
+          </div>
+
+          <!-- Footer Message -->
+          <div style="text-align:center;margin-top:40px;padding-top:30px;border-top:1px solid #fee2e2;">
+            <p style="font-size:16px;color:#374151;margin-bottom:10px;">Thank you for shopping with <strong style="color:#dc2626;">The V Store</strong>!</p>
+            <p style="font-size:14px;color:#9ca3af;">We appreciate your business and hope you love your purchase.</p>
+          </div>
+
+          <!-- Copyright -->
+          <div style="text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid #fee2e2;">
+            <p style="font-size:12px;color:#9ca3af;">&copy; ${new Date().getFullYear()} The V Store. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Responsive Styles -->
+      <style>
+        @media only screen and (max-width: 600px) {
+          .email-container { width: 100% !important; margin: 0 !important; }
+          .content { padding: 20px 15px !important; }
+          .header { padding: 20px 15px !important; }
+          .company-name { font-size: 24px !important; }
+          .shipping-title { font-size: 20px !important; }
+          .section-header { font-size: 18px !important; }
+          .order-details { padding: 15px !important; }
+          .detail-item { flex-direction: column; align-items: flex-start !important; }
+          .detail-value { text-align: left !important; margin-top: 5px; }
+          table th, table td { padding: 8px 4px !important; font-size: 12px !important; }
+          .cta-button { padding: 12px 24px !important; font-size: 14px !important; }
+        }
+      </style>
+    `
+  };
+
+  await transporter.sendMail(mailSent);
 }
-const order = await Order.findById(orderId)
-if(!order) return res.status(404).json({message:"order not found "})
-  order.status=status
-await Order.Save()
-    res.status(200).json({ message: 'Order status updated', status: order.status });
+if (order.status === "Delivered") {
+  const mailSent = {
+    from: process.env.EMAIL_USER,
+    to: user?.email,
+    subject: "🎉 Your Order Has Been Delivered - The V Store!",
+    html: `
+      <div style="max-width:600px;margin:auto;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        
+        <!-- Header with Logo -->
+        <div style="background:linear-gradient(135deg, #dc2626, #b91c1c);color:white;text-align:center;padding:30px 20px;position:relative;">
+          <img src="https://res.cloudinary.com/dkcc4frdi/image/upload/v1751125393/progoruoiovchkxdnpip.png" alt="The V Store Logo" style="max-width:120px;height:auto;filter:brightness(0) invert(1);margin-bottom:15px;" />
+          <h1 style="font-size:28px;font-weight:bold;margin:10px 0;text-shadow:2px 2px 4px rgba(0,0,0,0.3);">The V Store</h1>
+          <h2 style="font-size:24px;margin:0;display:flex;align-items:center;justify-content:center;gap:10px;">
+            <span style="font-size:30px;">🎉</span> Order Delivered Successfully!
+          </h2>
+        </div>
 
+        <!-- Main Content -->
+        <div style="padding:30px 20px;">
+          
+          <!-- Celebration Message -->
+          <div style="text-align:center;background:linear-gradient(135deg, #fef2f2, #ffffff);border:1px solid #fecaca;border-radius:12px;padding:25px;margin-bottom:30px;">
+            <div style="font-size:48px;margin-bottom:15px;">📦✨</div>
+            <p style="font-size:20px;color:#dc2626;font-weight:bold;margin-bottom:10px;">Great News, ${order?.shippingInfo?.fullName || 'Valued Customer'}!</p>
+            <p style="font-size:16px;color:#374151;line-height:1.6;">Your package has been successfully delivered on <strong style="color:#dc2626;">${new Date().toLocaleDateString('en-IN')}</strong></p>
+          </div>
 
+          <!-- Delivery Details Section -->
+          <h3 style="color:#dc2626;font-size:20px;font-weight:bold;margin:30px 0 15px 0;padding-bottom:8px;border-bottom:2px solid #dc2626;display:flex;align-items:center;gap:10px;">
+            <span>📋</span> Delivery Details
+          </h3>
+          
+          <div style="background:linear-gradient(135deg, #fef2f2, #ffffff);border:1px solid #fecaca;border-radius:8px;padding:20px;margin:20px 0;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #fee2e2;">
+              <span style="font-weight:600;color:#dc2626;min-width:120px;">Delivered To:</span>
+              <span style="color:#374151;text-align:right;flex:1;margin-left:15px;">${order.shippingInfo.fullAddress}, ${order.shippingInfo.city}, ${order.shippingInfo.state} - ${order.shippingInfo.pincode}, ${order.shippingInfo.country}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #fee2e2;">
+              <span style="font-weight:600;color:#dc2626;">Contact Phone:</span>
+              <span style="color:#374151;">${order.shippingInfo.phoneNo || 'N/A'}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;">
+              <span style="font-weight:600;color:#dc2626;">Delivery Date:</span>
+              <span style="color:#10b981;font-weight:bold;">${new Date().toLocaleDateString('en-IN')}</span>
+            </div>
+          </div>
 
-}catch(error){
-  res.ststus(500).json({message:"invald status value"})
+          <!-- Items Received Section -->
+          <h3 style="color:#dc2626;font-size:20px;font-weight:bold;margin:30px 0 15px 0;padding-bottom:8px;border-bottom:2px solid #dc2626;display:flex;align-items:center;gap:10px;">
+            <span>🛍️</span> Items You Received
+          </h3>
+          
+          <div style="background:#ffffff;border:1px solid #fecaca;border-radius:8px;overflow:hidden;margin:20px 0;">
+            <div style="overflow-x:auto;">
+              <table style="width:100%;border-collapse:collapse;min-width:500px;">
+                <thead>
+                  <tr style="background:linear-gradient(135deg, #dc2626, #b91c1c);color:#ffffff;">
+                    <th align="left" style="padding:15px 12px;font-weight:600;font-size:14px;">Product</th>
+                    <th align="center" style="padding:15px 8px;font-weight:600;font-size:14px;">Size</th>
+                    <th align="center" style="padding:15px 8px;font-weight:600;font-size:14px;">Color</th>
+                    <th align="center" style="padding:15px 8px;font-weight:600;font-size:14px;">Qty</th>
+                    <th align="right" style="padding:15px 12px;font-weight:600;font-size:14px;">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${order.orderItems.map((item, index) => `
+                    <tr style="border-bottom:1px solid #fee2e2;${index % 2 === 0 ? 'background:#fef2f2;' : 'background:#ffffff;'}">
+                      <td style="padding:12px;color:#374151;font-weight:500;">${item.name}</td>
+                      <td align="center" style="padding:12px;color:#6b7280;">${item.size}</td>
+                      <td align="center" style="padding:12px;color:#6b7280;">${item.color}</td>
+                      <td align="center" style="padding:12px;color:#6b7280;font-weight:600;">${item.quantity}</td>
+                      <td align="right" style="padding:12px;color:#dc2626;font-weight:600;">₹${item.price * item.quantity}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+                <tfoot>
+                  <tr style="background:linear-gradient(135deg, #fef2f2, #ffffff);border-top:2px solid #dc2626;">
+                    <td colspan="4" align="right" style="padding:15px 12px;font-weight:bold;color:#374151;font-size:16px;">Total Amount:</td>
+                    <td align="right" style="padding:15px 12px;font-weight:bold;color:#dc2626;font-size:18px;">₹${order.totalPrice}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div style="text-align:center;margin:40px 0;">
+            <a href="https://thevstore.com/review" style="display:inline-block;background:linear-gradient(135deg, #f59e0b, #d97706);color:#ffffff;padding:15px 25px;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;margin:10px;box-shadow:0 4px 12px rgba(245,158,11,0.3);transition:all 0.3s ease;">
+              ⭐ Leave a Review
+            </a>
+            <a href="https://thevstore.com/orders" style="display:inline-block;background:linear-gradient(135deg, #dc2626, #b91c1c);color:#ffffff;padding:15px 25px;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;margin:10px;box-shadow:0 4px 12px rgba(220,38,38,0.3);transition:all 0.3s ease;">
+              📦 View All Orders
+            </a>
+          </div>
+
+          <!-- Thank You Message -->
+          <div style="text-align:center;background:linear-gradient(135deg, #fef2f2, #ffffff);border:1px solid #fecaca;border-radius:8px;padding:25px;margin:30px 0;">
+            <p style="font-size:18px;color:#dc2626;font-weight:600;margin-bottom:10px;">Thank you for choosing The V Store!</p>
+            <p style="font-size:16px;color:#374151;line-height:1.6;">We hope you love your purchase. Your satisfaction is our priority, and we look forward to serving you again soon!</p>
+          </div>
+
+          <!-- Footer -->
+          <div style="text-align:center;margin-top:40px;padding-top:30px;border-top:1px solid #fee2e2;">
+            <p style="font-size:12px;color:#9ca3af;margin-bottom:15px;">
+              &copy; ${new Date().getFullYear()} The V Store. All rights reserved.
+            </p>
+            <div style="font-size:11px;color:#9ca3af;">
+              <a href="https://thevstore.com/privacy" style="color:#9ca3af;text-decoration:none;margin:0 8px;">Privacy Policy</a> |
+              <a href="https://thevstore.com/terms" style="color:#9ca3af;text-decoration:none;margin:0 8px;">Terms of Service</a> |
+              <a href="https://thevstore.com/contact" style="color:#9ca3af;text-decoration:none;margin:0 8px;">Contact Us</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Responsive Styles -->
+      <style>
+        @media only screen and (max-width: 600px) {
+          .email-container { width: 100% !important; margin: 0 !important; }
+          .content { padding: 20px 15px !important; }
+          .header { padding: 20px 15px !important; }
+          .company-name { font-size: 24px !important; }
+          .celebration-message { font-size: 18px !important; }
+          .section-header { font-size: 18px !important; }
+          .delivery-details { padding: 15px !important; }
+          .detail-item { flex-direction: column !important; align-items: flex-start !important; text-align: left !important; }
+          .detail-value { margin-top: 5px !important; margin-left: 0 !important; }
+          .table-container { overflow-x: auto !important; }
+          table { font-size: 12px !important; }
+          table th, table td { padding: 8px 4px !important; }
+          .cta-buttons a { display: block !important; margin: 10px auto !important; width: 80% !important; }
+          .footer-links { display: block !important; }
+          .footer-links a { display: block !important; margin: 5px 0 !important; }
+        }
+        
+        @media only screen and (max-width: 480px) {
+          .celebration-icon { font-size: 36px !important; }
+          .celebration-title { font-size: 18px !important; }
+          .celebration-text { font-size: 14px !important; }
+          table th, table td { padding: 6px 2px !important; font-size: 11px !important; }
+          .cta-buttons a { padding: 12px 20px !important; font-size: 14px !important; }
+        }
+      </style>
+    `
+  };
+
+  await transporter.sendMail(mailSent);
 }
+    res.status(200).json({ 
+      message: 'Order status updated successfully', 
+      order: {
+        _id: order._id,
+        status: order.status,
+        updatedAt: order.updatedAt
+      }
+    });
 
-}
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    
+    // More specific error handling
+    if (error.name === 'CastError') {
+      return res.status(400).json({ 
+        message: "Invalid order ID format" 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: "Internal server error", 
+      error: error.message 
+    });
+  }
+};
 
 
+// exports.updateOrderStatus = async (req,res)=>{
+
+// try{
+//       const {orderId,status} = req.body
+//    console.log(status)
+// const allowedStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered']
+// if(!allowedStatuses.includes(status)){
+//   return res.status(400).json({message:"Invalied status value"})
+
+// }
+// const order = await Order.findById(orderId)
+// if(!order) return res.status(404).json({message:"order not found "})
+//   order.status=status
+// await Order.Save()
+//     res.status(200).json({ message: 'Order status updated', status: order.status });
+
+
+
+// }catch(error){
+//   res.status(500).json({message:"invald status value"})
+// }
+
+// }

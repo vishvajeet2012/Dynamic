@@ -71,3 +71,39 @@ const token =localStorage.getItem('token')
   }
   return {getallorder,loading , error,data}
   }
+
+
+
+   export const useupdateOrderStatus = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [data, setSuccess] = useState(false);  
+// subcategorycreate
+  const  updateOrderStatus = async (orderId,status) => {
+    setLoading(true);  
+    setError(null);
+    setSuccess(false);
+    console.log(orderId)
+const token =localStorage.getItem('token')
+    try {
+      const response =await axios.post(`${homeUrl}/updateOrderStatus`,{orderId,status},
+         {
+                   headers:{
+                
+                authorization:`Bearer ${token}`
+                
+            }
+                }
+            
+      )
+      setSuccess(response.data);
+      return response.data;  
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create category');
+      throw err;
+    } finally {
+      setLoading(false);  
+    }
+  }
+  return {updateOrderStatus,loading , error,data}
+  }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useGetAllOrder } from "../../../hooks/userOrder"
+import { useGetAllOrder, useupdateOrderStatus } from "../../../hooks/userOrder"
 import { 
   Package, 
   User, 
@@ -15,7 +15,10 @@ import {
   Truck,
   Eye,
   Filter,
-  Search
+  Search,
+  Edit,
+  Save,
+  X
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -23,15 +26,30 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
+const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered']
+
 export default function AdminOrder() {
   const { getallorder, loading, error, data } = useGetAllOrder()
+  const { updateOrderStatus, loading: statusLoading, error: statusError, data: statusData } = useupdateOrderStatus()
+  
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [editingOrder, setEditingOrder] = useState(null)
+  const [newStatus, setNewStatus] = useState("")
 
   useEffect(() => {
     getallorder()
   }, [])
+
+  // Refetch orders when status is updated successfully
+  useEffect(() => {
+    if (statusData && !statusError) {
+      getallorder()
+      setEditingOrder(null)
+      setNewStatus("")
+    }
+  }, [statusData, statusError])
 
   const orders = data?.orders || []
 
@@ -88,15 +106,44 @@ export default function AdminOrder() {
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch = 
-      order.user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order._id.toLowerCase().includes(searchTerm.toLowerCase())
+      order?.user?.firstName?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      order?.user?.lastName?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      order?.user?.email?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      order?._id?.toLowerCase()?.includes(searchTerm.toLowerCase())
     
     const matchesStatus = statusFilter === 'all' || order.status.toLowerCase() === statusFilter.toLowerCase()
     
     return matchesSearch && matchesStatus
   })
+
+  const handleEditStatus = (orderId, currentStatus) => {
+    setEditingOrder(orderId)
+    setNewStatus(currentStatus)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingOrder(null)
+    setNewStatus("")
+  }
+
+  const handleUpdateStatus = async (orderId) => {
+    if (!newStatus || newStatus === orders.find(o => o._id === orderId)?.status) {
+      handleCancelEdit()
+      return
+    }
+    
+    try {
+      await updateOrderStatus(orderId, newStatus)
+    } catch (error) {
+      console.error('Error updating order status:', error)
+    }
+  }
+
+  const handleViewDetails = (order) => {
+    setSelectedOrder(order)
+    // You can implement a modal or navigate to detailed view here
+    console.log('View order details:', order)
+  }
 
   if (loading) {
     return (
@@ -133,6 +180,18 @@ export default function AdminOrder() {
           {orders.length} Total Orders
         </Badge>
       </div>
+
+      {/* Status Error Display */}
+      {statusError && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-4">
+            <div className="flex items-center space-x-2 text-red-700">
+              <XCircle className="w-5 h-5" />
+              <span>Error updating status: {statusError}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filters */}
       <Card>
@@ -192,9 +251,57 @@ export default function AdminOrder() {
                       <CardTitle className="text-lg">Order #{order._id.slice(-8)}</CardTitle>
                       <div className="flex items-center space-x-2 mt-1">
                         {getStatusIcon(order.status)}
-                        <Badge className={getStatusColor(order.status)}>
-                          {order.status}
-                        </Badge>
+                        {editingOrder === order._id ? (
+                          <div className="flex items-center space-x-2">
+                            <Select value={newStatus} onValueChange={setNewStatus}>
+                              <SelectTrigger className="w-32 h-8">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ORDER_STATUSES.map((status) => (
+                                  <SelectItem key={status} value={status}>
+                                    {status}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleUpdateStatus(order._id)}
+                              disabled={statusLoading}
+                              className="h-8 px-2"
+                            >
+                              {statusLoading ? (
+                                <div className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                              ) : (
+                                <Save className="w-4 h-4" />
+                              )}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={handleCancelEdit}
+                              className="h-8 px-2"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <Badge className={getStatusColor(order.status)}>
+                              {order.status}
+                            </Badge>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEditStatus(order._id, order.status)}
+                              className="h-6 w-6 p-0"
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -258,7 +365,15 @@ export default function AdminOrder() {
                       <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center space-x-3">
                           <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                            <Package className="w-6 h-6 text-gray-400" />
+                            {item?.image ? (
+                              <img 
+                                className="w-full h-full object-cover rounded-lg" 
+                                src={item.image} 
+                                alt={item.name || 'Product'} 
+                              />
+                            ) : (
+                              <Package className="w-6 h-6 text-gray-400" />
+                            )}
                           </div>
                           <div>
                             <p className="font-medium">{item.name || 'Product Name'}</p>
@@ -291,13 +406,23 @@ export default function AdminOrder() {
                   </div>
                   
                   <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewDetails(order)}
+                    >
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
                     </Button>
-                    <Button size="sm">
-                      Update Status
-                    </Button>
+                    {editingOrder !== order._id && (
+                      <Button 
+                        size="sm"
+                        onClick={() => handleEditStatus(order._id, order.status)}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Update Status
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>

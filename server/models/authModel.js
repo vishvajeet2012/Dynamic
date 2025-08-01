@@ -99,7 +99,9 @@ const userSchema = new Schema({
 
     // ✅ Updated Address Schema (Multiple addresses)
     addresses: [
-        {
+        {       email:{type:String,default:function (){
+        return this.parent().email 
+        }},
             fullAddress: { type: String, required: true },
             city: { type: String, required: true },
             state: { type: String, required: true },

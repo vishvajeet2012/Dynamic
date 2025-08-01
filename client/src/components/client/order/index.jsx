@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { CreditCard, Truck, ShoppingCart, Package, ShoppingBag, Plus, MapPin } from 'lucide-react';
+import { CreditCard, Truck, ShoppingCart, Package, ShoppingBag, Plus, MapPin, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useGetSingleUser } from '../../../hooks/auth/use-Auth';
 import { usePlaceOrder } from '../../../hooks/userOrder';
-
-
-
+import { useCart } from '../../../../context/cartContext';
 
 const mockOrderItems = [
   {
@@ -29,7 +27,7 @@ const mockOrderItems = [
     color: 'Blue',
     quantity: 1,
   },
-   {
+  {
     product: '60d5f2f9a3b4c9001f7e8a3c',
     name: 'Leather Ankle Boots',
     image: 'https://placehold.co/100x100/d0d0d0/333?text=Boots',
@@ -41,74 +39,146 @@ const mockOrderItems = [
 ];
 
 const OrderPlacementUI = () => {
+  const { placeOrder, loading, placeOrderData,getCartItems, error, success, cartItems } = useCart();
+  const { getSingleUser, loading: userLoading, error: userError, user } = useGetSingleUser();
 
-const { placeOrder,loading , error,success}=usePlaceOrder()
 
 
-         const  {getSingleUser,laoding:userLoading ,error:userError,user}  =  useGetSingleUser()
-      useEffect(()=>{
-        getSingleUser()
-      },[])
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      name: 'Home',
-      address: '123 Main Street',
-      city: 'Jaipur',
-      state: 'Rajasthan',
-      postalCode: '302001',
-      country: 'India',
-      phone: '+91 9876543210'
-    },
-    {
-      id: 2,
-      name: 'Office',
-      address: '456 Business Park',
-      city: 'Jaipur',
-      state: 'Rajasthan',
-      postalCode: '302017',
-      country: 'India',
-      phone: '+91 9876543211'
-    }
-  ]);
-  
-  const [selectedAddress, setSelectedAddress] = useState(addresses[0]);
+
+  useEffect(() => {
+    getSingleUser();
+    getCartItems()
+  }, []);
+
+
+
+
+
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [newAddress, setNewAddress] = useState({
-    
+    label: '',
+    fullAddress: '',
+    city: '',
+    state: '',
+    pincode: '',
+    country: 'India',
+    phoneNo: '',
+    default: false
   });
 
-  const subtotal = mockOrderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  // Set default address when user data loads
+  useEffect(() => {
+    if (user?.addresses && user.addresses.length > 0 && !selectedAddress) {
+      const defaultAddr = user.addresses.find(addr => addr.default) || user.addresses[0];
+      setSelectedAddress(defaultAddr);
+    }
+  }, [user, selectedAddress]);
+
+  // Use cart items if available, otherwise fallback to mock data
+  const orderItems = cartItems && cartItems?.cart?.length > 0 ? cartItems?.cart : mockOrderItems;
+
+  const subtotal = orderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const shippingFee = 5.00;
   const grandTotal = subtotal + shippingFee;
 
   const handleAddAddress = () => {
-    if (newAddress.name && newAddress.address && newAddress.city) {
-      const address = {
-        id: addresses.length + 1,
-        ...newAddress
-      };
+    if (newAddress.label && newAddress.fullAddress && newAddress.city && newAddress.pincode && newAddress.phoneNo) {
+      // In real implementation, you would call an API to add the address
+      // For now, we'll just close the dialog and reset the form
       setNewAddress({
-        name: '',
-        address: '',
+        label: '',
+        fullAddress: '',
         city: '',
         state: '',
-        postalCode: '',
+        pincode: '',
         country: 'India',
-        phone: ''
+        phoneNo: '',
+        default: false
       });
       setIsDialogOpen(false);
+      
+      // Refresh user data to get updated addresses
+      getSingleUser();
+    } else {
+      alert('Please fill in all required fields');
+    }
+  };
 
-
+  const handlePlaceOrder = async () => {
+    if (!selectedAddress) {
+      alert('Please select a delivery address');
+      return;
     }
 
+    try {
+      const orderData = {
+        paymentMethod: selectedPaymentMethod,
+        shippingInfo: {
+          _id: selectedAddress._id,
+          label: selectedAddress.label,
+          fullAddress: selectedAddress.fullAddress,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          pincode: selectedAddress.pincode,
+          country: selectedAddress.country || 'India',
+          phoneNo: selectedAddress.phoneNo,
+          isDefault: selectedAddress.default || false
+        },
+        orderItems: orderItems.map(item => ({
+          product: item.product || item._id,
+          name: item.name,
+          image: item.image,
+          price: item.price,
+          size: item.size,
+          color: item.color,
+          quantity: item.quantity
+        })),
+        itemsPrice: subtotal,
+        shippingPrice: shippingFee,
+        totalPrice: grandTotal
+      };
 
-    };
+      await placeOrder(orderData);
+      
+      if (success) {
+        setShowSuccessModal(true);
+      }
+    } catch (err) {
+      console.error('Order placement failed:', err);
+    }
+  };
 
-  async function handlePlaceOrder (){
-    await  placeOrder(selectedAddress)
-  }
-      console.log(selectedAddress)
+  const paymentMethods = [
+    {
+      id: 'stripe',
+      name: 'Credit/Debit Card (Stripe)',
+      description: 'Pay securely with your credit or debit card',
+      icons: [
+        'https://img.icons8.com/color/48/000000/visa.png',
+        'https://img.icons8.com/color/48/000000/mastercard.png',
+        'https://img.icons8.com/color/48/000000/amex.png'
+      ]
+    },
+    {
+      id: 'razorpay',
+      name: 'UPI/Net Banking (Razorpay)',
+      description: 'Pay via UPI, Net Banking, or Wallet',
+      icons: [
+        'https://img.icons8.com/color/48/000000/google-pay.png',
+        'https://img.icons8.com/color/48/000000/paytm.png'
+      ]
+    },
+    {
+      id: 'cod',
+      name: 'Cash on Delivery',
+      description: 'Pay with cash when your order is delivered',
+      icons: []
+    }
+  ];
+
   return (
     <div className="bg-gray-50 min-h-screen font-sans">
       <div className="container mx-auto px-4 py-8 lg:py-12">
@@ -119,7 +189,7 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           <div className="lg:col-span-7">
             <div className="bg-white p-6 lg:p-8 rounded-xl shadow-md">
-              {/* Address List */}
+              {/* Address Section */}
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-gray-700 flex items-center">
@@ -138,26 +208,26 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="addressName">Address Name</Label>
+                          <Label htmlFor="addressLabel">Address Label *</Label>
                           <Input
-                            id="addressName"
+                            id="addressLabel"
                             placeholder="e.g., Home, Office"
-                            value={newAddress.name}
-                            onChange={(e) => setNewAddress({...newAddress, name: e.target.value})}
+                            value={newAddress.label}
+                            onChange={(e) => setNewAddress({...newAddress, label: e.target.value})}
                           />
                         </div>
                         <div>
-                          <Label htmlFor="fullAddress">Address</Label>
+                          <Label htmlFor="fullAddress">Full Address *</Label>
                           <Input
                             id="fullAddress"
-                            placeholder="Street address"
-                            value={newAddress.address}
-                            onChange={(e) => setNewAddress({...newAddress, address: e.target.value})}
+                            placeholder="House/Flat No, Street, Area"
+                            value={newAddress.fullAddress}
+                            onChange={(e) => setNewAddress({...newAddress, fullAddress: e.target.value})}
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <Label htmlFor="newCity">City</Label>
+                            <Label htmlFor="newCity">City *</Label>
                             <Input
                               id="newCity"
                               placeholder="City"
@@ -166,7 +236,7 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
                             />
                           </div>
                           <div>
-                            <Label htmlFor="newState">State</Label>
+                            <Label htmlFor="newState">State *</Label>
                             <Input
                               id="newState"
                               placeholder="State"
@@ -177,12 +247,12 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <Label htmlFor="newPostal">Postal Code</Label>
+                            <Label htmlFor="newPincode">Pincode *</Label>
                             <Input
-                              id="newPostal"
-                              placeholder="Postal Code"
-                              value={newAddress.postalCode}
-                              onChange={(e) => setNewAddress({...newAddress, postalCode: e.target.value})}
+                              id="newPincode"
+                              placeholder="Pincode"
+                              value={newAddress.pincode}
+                              onChange={(e) => setNewAddress({...newAddress, pincode: e.target.value})}
                             />
                           </div>
                           <div>
@@ -195,23 +265,23 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
                           </div>
                         </div>
                         <div>
-                          <Label htmlFor="newPhone">Phone Number</Label>
+                          <Label htmlFor="newPhone">Phone Number *</Label>
                           <Input
                             id="newPhone"
                             placeholder="Phone number"
-                            value={newAddress.phone}
-                            onChange={(e) => setNewAddress({...newAddress, phone: e.target.value})}
+                            value={newAddress.phoneNo}
+                            onChange={(e) => setNewAddress({...newAddress, phoneNo: e.target.value})}
                           />
-                            <Label htmlFor="Default">Default Address</Label>
-                        <Input 
-                        type="checkbox"
-  id="Default"
-  checked={newAddress.isDefault}
-  onChange={(e) =>
-    setNewAddress({ ...newAddress, isDefault: e.target.checked })
-  }
-/>
-
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="defaultAddress"
+                            checked={newAddress.default}
+                            onChange={(e) => setNewAddress({ ...newAddress, default: e.target.checked })}
+                            className="rounded border-gray-300"
+                          />
+                          <Label htmlFor="defaultAddress">Set as default address</Label>
                         </div>
                         <Button onClick={handleAddAddress} className="w-full">
                           Add Address
@@ -222,32 +292,46 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
                 </div>
                 
                 <div className="space-y-3">
-                  {user?.addresses?.map((addr) => (
-                    <div
-                      key={addr.id}
-                      className={`p-4 border rounded-lg cursor-pointer transition ${
-                        selectedAddress?._id === addr._id
-                          ? 'border-indigo-600 ring-2 ring-indigo-500 bg-indigo-50'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                      onClick={() => setSelectedAddress(addr)}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold text-gray-800">{addr.label}</p>
-                          <p className="text-sm  text-gray-600 mt-1">
-                      {addr?.fullAddress}, {addr.city}, {addr.state} {addr.pincode}
-                          </p>
-                          <p className="text-sm text-gray-500">{addr.phone}</p>
-                        </div>
-                        {selectedAddress?.id === addr._id && (
-                          <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
-                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                  {userLoading ? (
+                    <div className="text-center py-4">Loading addresses...</div>
+                  ) : user?.addresses && user.addresses.length > 0 ? (
+                    user.addresses.map((addr) => (
+                      <div
+                        key={addr._id}
+                        className={`p-4 border rounded-lg cursor-pointer transition ${
+                          selectedAddress?._id === addr._id
+                            ? 'border-indigo-600 ring-2 ring-indigo-500 bg-indigo-50'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                        onClick={() => setSelectedAddress(addr)}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold text-gray-800">{addr.label}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {addr.fullAddress}, {addr.city}, {addr.state} {addr.pincode}
+                            </p>
+                            <p className="text-sm text-gray-500">{addr.phoneNo}</p>
+                            {addr.default && (
+                              <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mt-1">
+                                Default
+                              </span>
+                            )}
                           </div>
-                        )}
+                          {selectedAddress?._id === addr._id && (
+                            <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                          )}
+                        </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No addresses found. Please add a delivery address.</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 
@@ -259,21 +343,34 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
                   <CreditCard className="w-6 h-6 mr-3 text-indigo-600" /> Payment Method
                 </h2>
                 <div className="space-y-4">
-                  <div className={`p-4 border rounded-lg cursor-pointer transition border-gray-300`}>
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-gray-800">Pay Online</span>
-                      <div className="flex items-center space-x-2">
-                          <img src="https://img.icons8.com/color/48/000000/visa.png" alt="Visa" className="h-6"/>
-                          <img src="https://img.icons8.com/color/48/000000/mastercard.png" alt="Mastercard" className="h-6"/>
-                          <img src="https://img.icons8.com/color/48/000000/paypal.png" alt="Paypal" className="h-6"/>
+                  {paymentMethods.map((method) => (
+                    <div
+                      key={method.id}
+                      className={`p-4 border rounded-lg cursor-pointer transition ${
+                        selectedPaymentMethod === method.id
+                          ? 'border-indigo-600 ring-2 ring-indigo-500 bg-indigo-50'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                      onClick={() => setSelectedPaymentMethod(method.id)}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="font-semibold text-gray-800">{method.name}</span>
+                          <p className="text-sm text-gray-500 mt-1">{method.description}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {method.icons.map((icon, index) => (
+                            <img key={index} src={icon} alt="Payment icon" className="h-6" />
+                          ))}
+                          {selectedPaymentMethod === method.id && (
+                            <div className="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center ml-2">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                     <p className="text-sm text-gray-500 mt-1">Use your credit card, debit card, or PayPal.</p>
-                  </div>
-                  <div className={`p-4 border rounded-lg cursor-pointer transition border-indigo-600 ring-2 ring-indigo-500 bg-indigo-50`}>
-                     <span className="font-semibold text-gray-800">Cash on Delivery (COD)</span>
-                     <p className="text-sm text-gray-500 mt-1">Pay with cash when your order is delivered.</p>
-                  </div>
+                  ))}
                 </div>
               </div>
               
@@ -285,16 +382,23 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
                   <ShoppingBag className="w-6 h-6 mr-3 text-indigo-600" /> Your Items
                 </h2>
                 <div className="space-y-4">
-                  {mockOrderItems.map((item) => (
-                    <div key={item.product} className="flex items-center space-x-4">
-                      <img src={item.image} alt={item.name} className="w-20 h-20 rounded-lg object-cover border" 
-                           onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/100x100/ccc/FFF?text=Error'; }}/>
+                  {orderItems.map((item, index) => (
+                    <div key={item.product || item._id || index} className="flex items-center space-x-4">
+                      <img 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-20 h-20 rounded-lg object-cover border" 
+                        onError={(e) => { 
+                          e.target.onerror = null; 
+                          e.target.src='https://placehold.co/100x100/ccc/FFF?text=Error'; 
+                        }}
+                      />
                       <div className="flex-grow">
                         <p className="font-semibold text-gray-800">{item.name}</p>
                         <p className="text-sm text-gray-500">
                           {item.color} / {item.size}
                         </p>
-                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
                       <p className="font-semibold text-gray-800">${(item.price * item.quantity).toFixed(2)}</p>
                     </div>
@@ -313,7 +417,7 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotal ({mockOrderItems.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
+                  <span>Subtotal ({orderItems.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
@@ -327,9 +431,19 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
                 </div>
               </div>
 
-              <Button onClick={handlePlaceOrder} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition text-lg">
-                Place Order
+              <Button 
+                onClick={handlePlaceOrder} 
+                disabled={loading || !selectedAddress}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition text-lg"
+              >
+                {loading ? 'Placing Order...' : 'Place Order'}
               </Button>
+
+              {error && (
+                <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                  {error}
+                </div>
+              )}
 
               <div className="mt-4 text-center">
                 <p className="text-sm text-gray-500">
@@ -341,21 +455,26 @@ const { placeOrder,loading , error,success}=usePlaceOrder()
         </div>
       </div>
 
-       {/* Success Modal - remains hidden by default */}
-      <div id="successModal" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm mx-auto">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                  <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-800">Order Placed!</h3>
-              <p className="text-gray-600 my-4">Your order has been placed successfully. We'll notify you once it's on its way.</p>
-              <button type="button" className="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition">
-                  Continue Shopping
-              </button>
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-800">Order Placed!</h3>
+            <p className="text-gray-600 my-4">
+              Your order has been placed successfully. We'll notify you once it's on its way.
+            </p>
+            <Button 
+              onClick={() => setShowSuccessModal(false)}
+              className="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700"
+            >
+              Continue Shopping
+            </Button>
           </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
