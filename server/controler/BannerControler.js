@@ -47,7 +47,7 @@ exports.getBanners = async (req, res) => {
 // @desc    Get single banner
 // @route   GET /api/banners/:id
 // @access  Public// @desc    Get banners by type (using POST)
-// @route   POST /api/banners/filter
+// @route   POST /api/banner/filter
 // @access  Public
 exports.getBannersByType = async (req, res) => {
     try {
