@@ -104,19 +104,19 @@ export const CardCarousel = ({
                     : undefined
                 }
                 modules={[EffectCoverflow, Autoplay, Pagination, Navigation]}>
-                {images?.map((image, index) => (
+                {images?.slice(0,8)?.map((image, index) => (
                   <SwiperSlide key={index}>
                    <Link to={`/category/${image?._id}`} className="size-full rounded-3xl">
                       <LazyLoadImage
                         src={image.subCategoryImage}
                         width={500}
                         height={500}
-                        className="size-full rounded-xl"
+                        className="h-full rounded-xl"
                         alt={image.alt} />
                     </Link>
                   </SwiperSlide>
                 ))}
-                {images?.map((image, index) => (
+                {images?.slice(0,8)?.map((image, index) => (
                   <SwiperSlide key={index}>
                     <div className="size-full rounded-3xl">
                       <LazyLoadImage
