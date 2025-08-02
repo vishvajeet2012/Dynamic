@@ -38,9 +38,10 @@ setSubCategoryData(categories?.flatMap(e=>e.subcategories))
                 </div>
 
 
-      </div> */}
+      </div> */}.
+      
          <div className="md:hidden block w-full">
-      <CardCarousel
+      <CardSwipe
         images={subCategoryData}
         autoplayDelay={2000}
         showPagination={true}
