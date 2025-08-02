@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import { CardCarousel } from "../../components/ui/card-carousel"
+import { CardSwipe } from "@/components/ui/card-swipe"
 
 export default function CategorySection({categories}){
 const [subCategoryData,setSubCategoryData]= useState()
@@ -13,7 +15,7 @@ setSubCategoryData(categories?.flatMap(e=>e.subcategories))
         <>
 
          <section className="w-full py-6 px-6">
-      <div className="text-center mb-4">
+      {/* <div className=" md:block hidden text-center mb-4">
         <h1 className="text-4xl capitalize font-semibold text-black tracking-tight">
           Categories
         </h1>
@@ -36,7 +38,15 @@ setSubCategoryData(categories?.flatMap(e=>e.subcategories))
                 </div>
 
 
-      </div>
+      </div> */}
+         <div className="md:hidden block w-full">
+      <CardCarousel
+        images={subCategoryData}
+        autoplayDelay={2000}
+        showPagination={true}
+        showNavigation={true}
+      />
+    </div>
 </section>
 
 

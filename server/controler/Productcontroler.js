@@ -772,7 +772,7 @@ exports.getFiltersForSubcategory = async (req, res) => {
 
     // Step 2: Convert basePrice strings to numbers
     const priceNumbers = products
-      .map(p => parseFloat(p.basePrice?.replace(/[^\d.]/g, ''))) // Clean string like "Rs. 500"
+      .map(p => parseFloat(p.basePrice)) // Clean string like "Rs. 500"
       .filter(price => !isNaN(price));
 
     // Step 3: Count how many prices fall in each range
