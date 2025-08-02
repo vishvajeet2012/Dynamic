@@ -66,7 +66,7 @@ export const CardCarousel = ({
           </Badge>
           <div className="flex flex-col justify-center pb-2 pl-4 pt-14 md:items-center">
             <div className="flex gap-4">
-              <div]\]
+              <div>
                 {/* <h3 className="text-4xl opacity-85 font-bold tracking-tight">
 
                 </h3> */}

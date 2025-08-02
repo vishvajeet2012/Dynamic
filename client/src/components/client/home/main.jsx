@@ -18,7 +18,7 @@ export default function Home() {
     
       <Banner bannerType="homepage" />
       <NewArrivals titile={"New Arrival"} query={{ isNewArrival: true }} />
-      <CategorySection categories={categories} />
+      <CategorySection categoriesLoading={loading} categories={categories} />
          <NewArrivals titile={"Featured"} query={{ isFeatured: true }} />
       <AboutUs />
     </>
