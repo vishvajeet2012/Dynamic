@@ -20,14 +20,15 @@ exports.updateUserData = async (req, res) => {
         firstName,
         lastName,
         email,
+        gender,
         city,
         state,
         address,
-   
-        pincode,
+        bio,
+        
         profilePicture,
+        pincode,
         mobileNumber,
-        gender,
         fullAddress,
     } = req.body;
     console.log(req.body)
@@ -58,6 +59,7 @@ exports.updateUserData = async (req, res) => {
         if (profilePicture !== undefined) updateFields.profilePicture = profilePicture;
         if (mobileNumber !== undefined) updateFields.mobileNumber = mobileNumber;
         if (gender !== undefined) updateFields.gender = gender;
+        if(bio!==undefined) updateFields.bio=bio;
 
         // Handle address update
         if (fullAddress || city || state || pincode) {

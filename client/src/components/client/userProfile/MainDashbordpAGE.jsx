@@ -1,585 +1,261 @@
 import { useEffect, useState } from 'react';
 import { 
-  FiHome, // Replaced FiDashboard with FiHome
   FiUser, 
   FiMail, 
-  FiBell, 
-  FiSettings, 
-  FiLogOut,
-  FiChevronDown,
-  FiSearch,
   FiCalendar,
-  FiClock,
   FiLock,
   FiEye,
   FiEyeOff,
   FiCheckCircle,
-  FiAlertCircle
+  FiAlertCircle,
+  FiEdit,
+  FiTrash2,
+  FiPlus,
+  FiHome,
+  FiShoppingBag,
+  FiCreditCard,
+  FiHeart,
+  FiSettings,
+  FiBell
 } from 'react-icons/fi';
-import { BsGraphUp, BsCheck2All } from 'react-icons/bs';
 import { useGetSingleUser } from "../../../hooks/auth/use-Auth.js";
 import { useUserProfileUpdate } from '../../../hooks/client/homePageHooks/use-user.js';
-import { set, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useUplaodImage } from '../../../hooks/client/homePageHooks/use-banner.js';
 
-export default function MainDashboardPage() {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const {userProfileUpdate,loading,error,success}=useUserProfileUpdate()
-   const  {getSingleUser,laoding:userLoading ,error:userError,user}  =  useGetSingleUser()
+export default function ProfilePage() {
+  const [activeTab, setActiveTab] = useState('profile');
   
-    const { uploadImage, loading: uploadLoading, error: uploadError ,banners } = useUplaodImage()
-
-
-
-    useEffect(() => {
-        getSingleUser()
-      },[])
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <DashboardContent />;
-      case 'profile':
-        return <ProfileContent userLoading={userLoading} user={user} />;
-      case 'settings':
-        return <SettingsContent />;
-      case 'messages':
-        return <MessagesContent />;
-      case 'notifications':
-        return <NotificationsContent />;
-      default:
-        return <DashboardContent />;
-    }
-  };
+  const tabs = [
+    { id: 'profile', label: 'Profile', icon: <FiUser /> },
+    { id: 'orders', label: 'Orders', icon: <FiShoppingBag /> },
+    { id: 'addresses', label: 'Addresses', icon: <FiHome /> },
+    { id: 'payment', label: 'Payment Methods', icon: <FiCreditCard /> },
+    { id: 'wishlist', label: 'Wishlist', icon: <FiHeart /> },
+    { id: 'notifications', label: 'Notifications', icon: <FiBell /> },
+    { id: 'settings', label: 'Settings', icon: <FiSettings /> },
+  ];
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Left Sidebar - Hidden on mobile */}
-      <div className="hidden md:flex md:flex-shrink-0">
-        <div className="w-64 bg-white shadow-lg flex flex-col">
-          {/* User Profile Section */}
-          <div className="p-6 flex flex-col items-center border-b border-gray-200">
-            <img 
-              src={user.profilePicture} 
-              alt="User Profile" 
-              className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-primary-100"
-            />
-            <h3 className="font-semibold text-lg text-gray-800">{user.firstName}</h3>
-            <p className="text-gray-500 text-sm">{user.email}</p>
-         
-          </div>
-
-          {/* Navigation Tabs */}
-          <nav className="flex-1 mt-2 px-2 space-y-1">
-            <TabItem
-              icon={<FiHome className="w-5 h-5" />} // Changed to FiHome
-              label="Dashboard" 
-              active={activeTab === 'dashboard'} 
-              onClick={() => setActiveTab('dashboard')}
-            />
-            <TabItem 
-              icon={<FiUser className="w-5 h-5" />} 
-              label="Profile" 
-              active={activeTab === 'profile'} 
-              onClick={() => setActiveTab('profile')}
-            />
-            <TabItem 
-              icon={<FiMail className="w-5 h-5" />} 
-              label="Messages" 
-              active={activeTab === 'messages'} 
-              onClick={() => setActiveTab('messages')}
-              badge={3}
-            />
-            <TabItem 
-              icon={<FiBell className="w-5 h-5" />} 
-              label="Notifications" 
-              active={activeTab === 'notifications'} 
-              onClick={() => setActiveTab('notifications')}
-              badge={5}
-            />
-            <TabItem 
-              icon={<FiSettings className="w-5 h-5" />} 
-              label="Settings" 
-              active={activeTab === 'settings'} 
-              onClick={() => setActiveTab('settings')}
-            />
-          </nav>
-
-          {/* Logout Button */}
-          <div className="p-4 border-t border-gray-200">
-            <button className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-              <FiLogOut className="w-5 h-5 mr-2" />
-              Logout
-            </button>
-          </div>
-        </div>
+    <div className="flex flex-col md:flex-row gap-6 p-4 md:p-6">
+      {/* Side Navigation */}
+      <div className="w-full md:w-64 bg-white rounded-lg shadow p-4">
+        <h2 className="text-xl font-bold text-gray-800 mb-6">My Account</h2>
+        <nav>
+          <ul className="space-y-2">
+            {tabs.map((tab) => (
+              <li key={tab.id}>
+                <button
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center w-full px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeTab === tab.id 
+                      ? 'bg-blue-100 text-blue-700 font-medium' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="mr-3">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile Header */}
-        <header className="md:hidden bg-white shadow-sm p-4 flex justify-between items-center">
-          <button 
-            onClick={() => setActiveTab('dashboard')}
-            className="text-xl font-semibold text-gray-800 capitalize"
-          >
-            {activeTab}
-          </button>
-          <div className="flex items-center space-x-4">
-            <button className="p-2 rounded-full bg-gray-100 text-gray-600">
-              <FiBell className="w-5 h-5" />
-            </button>
-            <img 
-              src={user.avatar} 
-              alt="User Profile" 
-              className="w-8 h-8 rounded-full object-cover"
-            />
-          </div>
-        </header>
-
-        {/* Desktop Header */}
-        <header className="hidden md:flex bg-white shadow-sm p-4 justify-between items-center">
-          <div className="flex items-center">
-            <h1 className="text-xl font-semibold text-gray-800 capitalize mr-4">
-              {activeTab}
-            </h1>
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-          <div className="flex items-center space-x-6">
-            <button className="relative p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">
-              <FiBell className="w-5 h-5" />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <div className="flex items-center">
-              <img 
-                src={user.profilePicture} 
-                alt="User Profile" 
-                className="w-8 h-8 rounded-full object-cover mr-2"
-              />
-              <span className="font-medium text-gray-700">{user.name}</span>
-              <FiChevronDown className="ml-1 text-gray-500" />
-            </div>
-          </div>
-        </header>
-
-        {/* Dynamic Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
-          {renderContent()}
-        </main>
+      
+      {/* Main Content */}
+      <div className="flex-1">
+        {activeTab === 'profile' && <ProfileSection />}
+        {activeTab === 'addresses' && <AddressSection />}
+        {activeTab === 'orders' && <OrdersSection />}
+        {activeTab === 'payment' && <PaymentSection />}
+        {activeTab === 'wishlist' && <WishlistSection />}
+        {activeTab === 'notifications' && <NotificationsSection />}
+        {activeTab === 'settings' && <SettingsSection />}
       </div>
     </div>
   );
 }
 
-// Tab Item Component
-function TabItem({ icon, label, active, onClick, badge }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-        active 
-          ? 'bg-primary-100 text-primary-600' 
-          : 'text-gray-600 hover:bg-gray-100'
-      }`}
-    >
-      <span className="mr-3">{icon}</span>
-      {label}
-      {badge && (
-        <span className="ml-auto bg-primary-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-          {badge}
-        </span>
-      )}
-    </button>
-  );
-}
-
-// Content Components
-function DashboardContent() {
-  const stats = [
-    { title: "Total Projects", value: "24", change: "+12%", icon: <BsGraphUp className="w-6 h-6 text-primary-500" /> },
-    { title: "Completed Tasks", value: "56", change: "+5%", icon: <BsCheck2All className="w-6 h-6 text-green-500" /> },
-    { title: "Pending Requests", value: "3", change: "-2%", icon: <FiAlertCircle className="w-6 h-6 text-yellow-500" /> }
-  ];
-
-  const activities = [
-    { id: 1, title: "Project Alpha Update", description: "New tasks assigned to you", time: "10 min ago", icon: <FiMail className="w-5 h-5 text-blue-500" /> },
-    { id: 2, title: "Team Meeting", description: "Scheduled for tomorrow at 10 AM", time: "1 hour ago", icon: <FiCalendar className="w-5 h-5 text-purple-500" /> },
-    { id: 3, title: "System Update", description: "New version available for download", time: "3 hours ago", icon: <FiSettings className="w-5 h-5 text-green-500" /> }
-  ];
-
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
-      
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stats.map((stat, index) => (
-          <StatCard 
-            key={index}
-            title={stat.title}
-            value={stat.value}
-            change={stat.change}
-            icon={stat.icon}
-          />
-        ))}
-      </div>
-      
-      {/* Recent Activity */}
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-800">Recent Activity</h3>
-          <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-            View All
-          </button>
-        </div>
-        <div className="space-y-4">
-          {activities.map(activity => (
-            <ActivityItem key={activity.id} {...activity} />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-function ProfileContent({ user ,userLoading }) {
-  const [showPassword, setShowPassword] = useState(false);
-  const { userProfileUpdate, loading, error, success } = useUserProfileUpdate();
+function ProfileSection() {
+  const { getSingleUser, loading: userLoading, error: userError, user } = useGetSingleUser();
+  const { userProfileUpdate, loading: updateLoading, error: updateError, success: updateSuccess } = useUserProfileUpdate();
   const { uploadImage, loading: uploadLoading } = useUplaodImage();
-  const [avatarPreview, setAvatarPreview] = useState(user.avatar);
+  
+  const [avatarPreview, setAvatarPreview] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [submissionError, setSubmissionError] = useState(null);
-const [publicIds, setPublicId] = useState(null);
-const [imagesUrls, setImageUrls] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  
   const { 
     register, 
     handleSubmit, 
     formState: { errors }, 
-    setValue 
-  } = useForm({
-    defaultValues: {
-      firstName: user.firstName,
-      email: user.email,
-      mobileNumber: user.mobileNumber || '',
-      profilePicture: user.profilePicture || '',
-      city: user.addresses?.filter(e=>e.isDefault===true)[0].city || '',
-      pincode: user.addresses?.filter(e=>e.isDefault===true)[0].pincode || '',
-      address: user.addresses?.filter(e=>e.isDefault===true)[0].fullAddress || '',
-      state: user.addresses?.filter(e=>e.isDefault===true)[0].state || '',
-      isDefault:user?.addresses?.filter(e=>e.isDefault===true)[0].isDefault,
+    setValue,
+    reset
+  } = useForm();
+
+  useEffect(() => {
+    getSingleUser();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        mobileNumber: user.mobileNumber || '',
+        profilePicture: user.profilePicture || '',
+        gender: user.gender || 'prefer-not-to-say',
+        bio: user.bio || ''
+      });
+      setAvatarPreview(user.profilePicture);
     }
-  });
+  }, [user, reset]);
+
   const handleImageChange = async (e) => {
     const file = e.target?.files?.[0];
-   const formData = new FormData();
-  formData.append("image", file); // "image" is the key expected by the server
-
-  const v = await uploadImage(formData);
-
-   
-        if (v.url) {
-        var  imageUrls   = v.url;
-
-        var publicId = v.publicId;
-        setPublicId(publicId);
-        setImageUrls(imageUrls);
-          setValue('profilePicture', imageUrls);
-          setValue('publicId', publicId);
-        } else {
-          throw new Error('Image upload failed');
-        }
-    setSelectedImage(file);
     if (!file) return;
 
-    // Validate image
-    if (!file.type.match('image.*')) {
-      setSubmissionError('Please select an image file (JPEG, PNG, etc.)');
-      return;
-    }
+    const formData = new FormData();
+    formData.append("image", file);
     
-    if (file.size > 2 * 1024 * 1024) { // 2MB
-      setSubmissionError('Image size should be less than 2MB');
-      return;
+    try {
+      const response = await uploadImage(formData);
+      if (response.url) {
+        setAvatarPreview(response.url);
+        setValue('profilePicture', response.url);
+        setValue('originalId', response.publicId);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
     }
-
-    setPreviewLoading(true);
-    setSubmissionError(null);
-    
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatarPreview(reader.result);
-      setPreviewLoading(false);
-    };
-    reader.onerror = () => {
-      setPreviewLoading(false);
-      setSubmissionError('Error loading image');
-    };
-    reader.readAsDataURL(file);
   };
 
-  const onSubmit = async (data) => {
+  const onSubmitProfile = async (data) => {
     try {
-      setSubmissionError(null);
-      let imageUrl = data.avatar; // Use existing avatar by default
-          
-      // If a new image was selected, upload it first
-      // if (selectedImage) {
-      //   const uploadResponse = await uploadImage(selectedImage);
-      //   if (uploadResponse.url) {
-      //     imageUrl = uploadResponse.url;
-      //     setValue('profilePicture', imageUrl);
-      //   } else {
-      //     throw new Error('Image upload failed');
-      //   }
-      // }
-
-      // Prepare the data to send
-      const formData = {
-        ...data,
-        profilePicture: imagesUrls,
-        orignalId:publicIds
-      };
-
-      // Call update hook
-      await userProfileUpdate(formData);
-      
-      // Reset selected image after successful upload
-      setSelectedImage(null);
+      await userProfileUpdate(data);
     } catch (error) {
       console.error('Error updating profile:', error);
-      setSubmissionError(error.message || 'Failed to update profile. Please try again.');
     }
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Profile Information</h2>
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Personal Information</h2>
       
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="bg-white p-6 rounded-xl shadow-sm">
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="flex flex-col items-center">
-              {previewLoading ||userLoading ? (
-                <div className="w-32 h-32 rounded-full bg-gray-200 animate-pulse mb-4" />
-              ) : (
-                <img 
-                  src={avatarPreview || user.profilePicture} 
-                  alt="Profile" 
-                  className="w-32 h-32 rounded-full object-cover border-4 border-primary-100 mb-4"
-                />
-              )}
-              
-              
-              <label 
-                htmlFor="avatarUpload" 
-                className="cursor-pointer text-sm font-medium text-primary-600 hover:text-primary-700"
-              >
-                {uploadLoading ? 'Uploading...' : 'Upload New Avatar'}
-              </label>
-              
-              <input 
-                id="avatarUpload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                disabled={uploadLoading || previewLoading}
-                className="hidden"
+      <form onSubmit={handleSubmit(onSubmitProfile)}>
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="flex flex-col items-center w-full md:w-1/4">
+            <div className="relative mb-4">
+              <img 
+                src={avatarPreview || '/default-avatar.png'} 
+                alt="Profile" 
+                className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
               />
-              <label 
-                htmlFor="avatarUpload" 
-                className="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 text-sm"
-              >
-                Choose File
-              </label>
-              {selectedImage && (
-                <p className="text-xs text-gray-500 mt-1">{selectedImage.name}</p>
+              {uploadLoading && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                </div>
               )}
-              <input type="hidden" {...register("avatar")} />
             </div>
             
-            <div className="flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-gray-500 text-sm font-medium mb-1">Full Name</label>
-                  <div className="flex items-center">
-                    <FiUser className="w-5 h-5 text-gray-400 mr-2" />
-                    <input
-                      {...register("firstName", { required: "Full name is required" })}
-                      className={`w-full text-gray-900 bg-gray-100 px-3 py-2 rounded ${errors.firstName ? 'border border-red-500' : ''}`}
-                      type="text"
-                    />
-                  </div>
-                  {errors.firstName && (
-                    <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-gray-500 text-sm font-medium mb-1">Email</label>
-                  <div className="flex items-center">
-                    <FiMail className="w-5 h-5 text-gray-400 mr-2" />
-                    <input
-                      {...register("email", { 
-                        required: "Email is required",
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: "Invalid email address"
-                        }
-                      })}
-                      className={`w-full text-gray-900 bg-gray-100 px-3 py-2 rounded ${errors.email ? 'border border-red-500' : ''}`}
-                      type="email"
-                      disabled // Typically emails shouldn't be changed
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-gray-500 text-sm font-medium mb-1">Join Date</label>
-                  <div className="flex items-center">
-                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
-                    <input
-                      value={new Date(user.createdAt).toLocaleDateString('en-US',{day:'2-digit',month:'long',year:'numeric'})}
-                      className="w-full text-gray-900 outline-none bg-gray-100 px-3 py-2 rounded"
-                      type="text"
-                      readOnly
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-gray-500 text-sm font-medium mb-1">Mobile Number</label>
-                  <div className="flex items-center">
-                    <FiClock className="w-5 h-5 text-gray-400 mr-2" />
-                    <input
-                      {...register("mobileNumber", {
-                        pattern: {
-                          value: /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,3}[-\s.]?[0-9]{3,6}$/im,
-                          message: "Invalid phone number"
-                        }
-                      })}
-                      className={`w-full text-gray-900 bg-gray-100 px-3 py-2 rounded ${errors.mobileNumber ? 'border border-red-500' : ''}`}
-                      type="tel"
-                    />
-                  </div>
-                  {errors.mobileNumber && (
-                    <p className="text-red-500 text-xs mt-1">{errors.mobileNumber.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-gray-500 text-sm font-medium mb-1">Address</label>
-                  <div className="flex items-center">
-                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
-                    <input
-                      {...register("address")}
-                      className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
-                      type="text"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-gray-500 text-sm font-medium mb-1">City</label>
-                  <div className="flex items-center">
-                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
-                    <input
-                      {...register("city")}
-                      className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
-                      type="text"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-gray-500 text-sm font-medium mb-1">State</label>
-                  <div className="flex items-center">
-                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
-                    <input
-                      {...register("state")}
-                      className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
-                      type="text"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-gray-500 text-sm font-medium mb-1">Pincode</label>
-                  <div className="flex items-center">
-                    <FiCalendar className="w-5 h-5 text-gray-400 mr-2" />
-                    <input
-                      {...register("pincode")}
-                      className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
-                      type="text"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Security</h3>
-              <div className="relative">
-                <label className="block text-gray-500 text-sm font-medium mb-1">Password</label>
-                <div className="flex items-center">
-                  <FiLock className="w-5 h-5 text-gray-400 mr-2" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password (click Change Password to update)"
-                    className="w-full text-gray-900 bg-gray-100 px-3 py-2 rounded"
-                    readOnly
-                  />
-                  <button 
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 text-gray-500 hover:text-gray-700"
-                  >
-                    {showPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
-                  </button>
-                </div>
-                <button 
-                  type="button"
-                  className="text-sm text-primary-600 hover:text-primary-700 mt-2"
-                  onClick={() => setActiveTab('settings')}
-                >
-                  Change Password
-                </button>
-              </div>
-              
-              <div className="flex justify-end mt-6 space-x-3">
-                <button 
-                  type="button"
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit"
-                  className="px-4 py-2 bg-primaryReds text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50"
-                  disabled={loading || uploadLoading || previewLoading}
-                >
-                  {(loading || uploadLoading) ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-              
-              {error && (
-                <div className="mt-4 text-red-500 text-sm">{error}</div>
+            <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              Change Photo
+              <input 
+                type="file" 
+                className="hidden" 
+                onChange={handleImageChange}
+                accept="image/*"
+              />
+            </label>
+          </div>
+          
+          {/* Personal Info Form */}
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">First Name*</label>
+              <input
+                {...register("firstName", { required: "First name is required" })}
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.firstName ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {errors.firstName && (
+                <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>
               )}
-              {submissionError && (
-                <div className="mt-4 text-red-500 text-sm">{submissionError}</div>
+            </div>
+            
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">Last Name*</label>
+              <input
+                {...register("lastName", { required: "Last name is required" })}
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.lastName ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {errors.lastName && (
+                <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>
               )}
-              {success && (
-                <div className="mt-4 text-green-500 text-sm">Profile updated successfully!</div>
+            </div>
+            
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">Email*</label>
+              <input
+                {...register("email", { 
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Invalid email address"
+                  }
+                })}
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
+                disabled
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
               )}
+            </div>
+            
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">Mobile Number</label>
+              <input
+                {...register("mobileNumber")}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">Gender</label>
+              <select
+                {...register("gender")}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+              </select>
+            </div>
+            
+            <div className="md:col-span-2">
+              <label className="block text-gray-700 text-sm font-medium mb-1">Bio</label>
+              <textarea
+                {...register("bio")}
+                rows="3"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></textarea>
+            </div>
+            
+            <div className="md:col-span-2 flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+                disabled={updateLoading || uploadLoading}
+              >
+                {updateLoading ? 'Saving...' : 'Save Changes'}
+              </button>
             </div>
           </div>
         </div>
@@ -588,190 +264,384 @@ const [imagesUrls, setImageUrls] = useState(null);
   );
 }
 
-
-function SettingsContent() {
-  const settings = [
-    { 
-      title: "Account Information", 
-      description: "Update your account details like email and phone number",
-      icon: <FiUser className="w-5 h-5 text-primary-500" />
-    },
-    { 
-      title: "Change Password", 
-      description: "Update your account password for security",
-      icon: <FiLock className="w-5 h-5 text-primary-500" />
-    },
-    { 
-      title: "Notification Preferences", 
-      description: "Manage how you receive notifications",
-      icon: <FiBell className="w-5 h-5 text-primary-500" />
-    },
-    { 
-      title: "Privacy Settings", 
-      description: "Control your privacy options",
-      icon: <FiCheckCircle className="w-5 h-5 text-primary-500" />
-    }
-  ];
-
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Account Settings</h2>
-      
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        {settings.map((setting, index) => (
-          <div 
-            key={index} 
-            className={`p-6 ${index !== settings.length - 1 ? 'border-b border-gray-200' : ''}`}
-          >
-            <div className="flex items-start">
-              <div className="p-2 bg-primary-50 rounded-lg mr-4">
-                {setting.icon}
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-800">{setting.title}</h3>
-                <p className="text-gray-500 mt-1">{setting.description}</p>
-              </div>
-              <button className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700">
-                Configure
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MessagesContent() {
-  const messages = [
-    { id: 1, sender: "Sarah Johnson", preview: "About the project deadline...", time: "10:30 AM", unread: true },
-    { id: 2, sender: "Team Updates", preview: "Weekly team meeting notes...", time: "Yesterday", unread: false },
-    { id: 3, sender: "David Wilson", preview: "The design files you requested...", time: "Mar 15", unread: false }
-  ];
-
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Messages</h2>
-      
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        {messages.map(message => (
-          <div 
-            key={message.id} 
-            className={`p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer ${
-              message.unread ? 'bg-blue-50' : ''
-            }`}
-          >
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
-                <FiUser className="w-5 h-5 text-primary-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between">
-                  <h3 className={`text-sm font-medium truncate ${
-                    message.unread ? 'text-gray-900' : 'text-gray-700'
-                  }`}>
-                    {message.sender}
-                  </h3>
-                  <span className="text-xs text-gray-500">{message.time}</span>
-                </div>
-                <p className="text-sm text-gray-500 truncate">{message.preview}</p>
-              </div>
-              {message.unread && (
-                <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function NotificationsContent() {
-  const notifications = [
-    { id: 1, title: "New project assigned", description: "You've been assigned to Project X", time: "Just now", read: false },
-    { id: 2, title: "System update available", description: "Version 2.3 is now available", time: "30 min ago", read: true },
-    { id: 3, title: "Payment received", description: "Your invoice #1234 has been paid", time: "2 hours ago", read: true }
-  ];
-
-  return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Notifications</h2>
-      
-      <div className="space-y-3">
-        {notifications.map(notification => (
-          <div 
-            key={notification.id} 
-            className={`p-4 bg-white rounded-lg shadow-sm ${
-              !notification.read ? 'border-l-4 border-primary-500' : ''
-            }`}
-          >
-            <div className="flex justify-between">
-              <h3 className={`font-medium ${
-                !notification.read ? 'text-gray-900' : 'text-gray-700'
-              }`}>
-                {notification.title}
-              </h3>
-              <span className="text-xs text-gray-500">{notification.time}</span>
-            </div>
-            <p className="text-sm text-gray-500 mt-1">{notification.description}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// Helper Components
-function StatCard({ title, value, change, icon }) {
-  const isPositive = change.startsWith('+');
+function AddressSection() {
+  const { getSingleUser, user } = useGetSingleUser();
+  const { userProfileUpdate } = useUserProfileUpdate();
   
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-sm">
-      <div className="flex justify-between">
-        <div>
-          <h3 className="text-gray-500 text-sm font-medium">{title}</h3>
-          <p className="text-2xl font-bold my-2 text-gray-800">{value}</p>
-          <p className={`text-sm ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-            {change} from last week
-          </p>
-        </div>
-        <div className="p-3 bg-primary-50 rounded-lg h-fit">
-          {icon}
-        </div>
-      </div>
-    </div>
-  );
-}
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState(null);
+  
+  useEffect(() => {
+    getSingleUser();
+  }, []);
 
-function InfoField({ label, value, icon }) {
+  const handleAddAddress = () => {
+    setIsEditingAddress(true);
+    setCurrentAddress(null);
+  };
+
+  const handleEditAddress = (address) => {
+    setIsEditingAddress(true);
+    setCurrentAddress(address);
+  };
+
+  const handleDeleteAddress = async (addressId) => {
+    try {
+      const updatedAddresses = user.addresses.filter(addr => addr._id !== addressId);
+      await userProfileUpdate({ addresses: updatedAddresses });
+    } catch (error) {
+      console.error('Error deleting address:', error);
+    }
+  };
+
+  const onSubmitAddress = async (addressData) => {
+    try {
+      let updatedAddresses = [...user.addresses];
+      
+      if (currentAddress) {
+        const index = updatedAddresses.findIndex(addr => 
+          addr._id === currentAddress._id || 
+          addr.isDefault === currentAddress.isDefault
+        );
+        if (index !== -1) {
+          updatedAddresses[index] = { ...addressData };
+        }
+      } else {
+        // Add new address
+        updatedAddresses.push({ 
+          ...addressData,
+          isDefault: updatedAddresses.length === 0
+        });
+      }
+      
+      // Update user with new addresses
+      await userProfileUpdate({ addresses: updatedAddresses });
+      
+      // Reset form
+      setIsEditingAddress(false);
+      setCurrentAddress(null);
+    } catch (error) {
+      console.error('Error updating address:', error);
+    }
+  };
+
+  const setDefaultAddress = async (addressId) => {
+    try {
+      const updatedAddresses = user.addresses.map(addr => ({
+        ...addr,
+        isDefault: addr._id === addressId
+      }));
+      
+      await userProfileUpdate({ addresses: updatedAddresses });
+    } catch (error) {
+      console.error('Error setting default address:', error);
+    }
+  };
+
   return (
-    <div>
-      <label className="block text-gray-500 text-sm font-medium mb-1">{label}</label>
-      <div className="flex items-center">
-        {icon && <span className="mr-2">{icon}</span>}
-        <input
-          className="text-gray-900 bg-gray-100 px-2 py-1 rounded"
-          type="text"
-          value={value}
-          readOnly
+    <div className="bg-white rounded-lg shadow p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">My Addresses</h2>
+        <button
+          onClick={handleAddAddress}
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          <FiPlus className="mr-2" />
+          Add New Address
+        </button>
+      </div>
+      
+      {isEditingAddress ? (
+        <AddressForm 
+          address={currentAddress}
+          onSubmit={onSubmitAddress}
+          onCancel={() => setIsEditingAddress(false)}
         />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {user?.addresses?.map((address) => (
+            <AddressCard 
+              key={address._id || address.isDefault}
+              address={address}
+              onEdit={() => handleEditAddress(address)}
+              onDelete={() => handleDeleteAddress(address._id)}
+              onSetDefault={() => setDefaultAddress(address._id)}
+              isDefault={address.isDefault}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AddressCard({ address, onEdit, onDelete, onSetDefault, isDefault }) {
+  return (
+    <div className={`border rounded-lg p-4 relative ${isDefault ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="font-medium text-gray-800 capitalize">
+          {address.label || 'Address'}
+          {isDefault && (
+            <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+              Default
+            </span>
+          )}
+        </h3>
+        <div className="flex space-x-2">
+          <button 
+            onClick={onEdit}
+            className="text-gray-500 hover:text-blue-600"
+            title="Edit"
+          >
+            <FiEdit />
+          </button>
+          <button 
+            onClick={onDelete}
+            className="text-gray-500 hover:text-red-600"
+            title="Delete"
+          >
+            <FiTrash2 />
+          </button>
+        </div>
+      </div>
+      
+      <p className="text-gray-600 mb-1">{address.fullAddress}</p>
+      <p className="text-gray-600">{address.city}, {address.state} - {address.pincode}</p>
+      
+      {!isDefault && (
+        <button
+          onClick={onSetDefault}
+          className="mt-3 text-sm text-blue-600 hover:text-blue-800"
+        >
+          Set as Default
+        </button>
+      )}
+    </div>
+  );
+}
+
+function AddressForm({ address, onSubmit, onCancel }) {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: address || {
+      fullAddress: '',
+      city: '',
+      state: '',
+      pincode: '',
+      label: 'home',
+      isDefault: false
+    }
+  });
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="bg-gray-50 p-4 rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="md:col-span-2">
+          <label className="block text-gray-700 text-sm font-medium mb-1">Full Address*</label>
+          <textarea
+            {...register("fullAddress", { required: "Address is required" })}
+            rows="3"
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.fullAddress ? 'border-red-500' : 'border-gray-300'
+            }`}
+          ></textarea>
+          {errors.fullAddress && (
+            <p className="text-red-500 text-xs mt-1">{errors.fullAddress.message}</p>
+          )}
+        </div>
+        
+        <div>
+          <label className="block text-gray-700 text-sm font-medium mb-1">City*</label>
+          <input
+            {...register("city", { required: "City is required" })}
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.city ? 'border-red-500' : 'border-gray-300'
+            }`}
+          />
+          {errors.city && (
+            <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>
+          )}
+        </div>
+        
+        <div>
+          <label className="block text-gray-700 text-sm font-medium mb-1">State*</label>
+          <input
+            {...register("state", { required: "State is required" })}
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.state ? 'border-red-500' : 'border-gray-300'
+            }`}
+          />
+          {errors.state && (
+            <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>
+          )}
+        </div>
+        
+        <div>
+          <label className="block text-gray-700 text-sm font-medium mb-1">Pincode*</label>
+          <input
+            {...register("pincode", { 
+              required: "Pincode is required",
+              pattern: {
+                value: /^[0-9]{6}$/,
+                message: "Invalid pincode (must be 6 digits)"
+              }
+            })}
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.pincode ? 'border-red-500' : 'border-gray-300'
+            }`}
+          />
+          {errors.pincode && (
+            <p className="text-red-500 text-xs mt-1">{errors.pincode.message}</p>
+          )}
+        </div>
+        
+        <div>
+          <label className="block text-gray-700 text-sm font-medium mb-1">Label</label>
+          <select
+            {...register("label")}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="home">Home</option>
+            <option value="work">Work</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      
+      <div className="flex justify-end space-x-3 mt-6">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+        >
+          {address ? 'Update Address' : 'Add Address'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// Placeholder components for other sections
+function OrdersSection() {
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">My Orders</h2>
+      <div className="text-center py-12">
+        <p className="text-gray-500">You haven't placed any orders yet.</p>
+        <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Start Shopping
+        </button>
       </div>
     </div>
   );
 }
 
-function ActivityItem({ title, description, time, icon }) {
+function PaymentSection() {
   return (
-    <div className="flex items-start">
-      <div className="p-2 bg-gray-100 rounded-lg mr-4">
-        {icon}
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Payment Methods</h2>
+      <div className="text-center py-12">
+        <p className="text-gray-500">No payment methods saved yet.</p>
+        <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Add Payment Method
+        </button>
       </div>
-      <div className="flex-1">
-        <h3 className="text-sm font-medium text-gray-800">{title}</h3>
-        <p className="text-sm text-gray-500">{description}</p>
+    </div>
+  );
+}
+
+function WishlistSection() {
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">My Wishlist</h2>
+      <div className="text-center py-12">
+        <p className="text-gray-500">Your wishlist is empty.</p>
+        <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Browse Products
+        </button>
       </div>
-      <span className="text-xs text-gray-400">{time}</span>
+    </div>
+  );
+}
+
+function NotificationsSection() {
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Notifications</h2>
+      <div className="space-y-4">
+        <div className="p-4 border border-gray-200 rounded-lg">
+          <div className="flex justify-between">
+            <h3 className="font-medium">Order Confirmation</h3>
+            <span className="text-sm text-gray-500">2 days ago</span>
+          </div>
+          <p className="text-gray-600 mt-1">Your order #12345 has been confirmed and is being processed.</p>
+        </div>
+        <div className="p-4 border border-gray-200 rounded-lg">
+          <div className="flex justify-between">
+            <h3 className="font-medium">Special Offer</h3>
+            <span className="text-sm text-gray-500">1 week ago</span>
+          </div>
+          <p className="text-gray-600 mt-1">Get 20% off on your next purchase with code SUMMER20.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsSection() {
+  return (
+    <div className="bg-white rounded-lg shadow p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Account Settings</h2>
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-medium text-gray-800 mb-3">Change Password</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">Current Password</label>
+              <input
+                type="password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-1">New Password</label>
+              <input
+                type="password"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Update Password
+          </button>
+        </div>
+        
+        <div className="pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-medium text-gray-800 mb-3">Notification Preferences</h3>
+          <div className="space-y-3">
+            <label className="flex items-center">
+              <input type="checkbox" className="rounded text-blue-600" defaultChecked />
+              <span className="ml-2 text-gray-700">Email notifications</span>
+            </label>
+            <label className="flex items-center">
+              <input type="checkbox" className="rounded text-blue-600" defaultChecked />
+              <span className="ml-2 text-gray-700">SMS notifications</span>
+            </label>
+            <label className="flex items-center">
+              <input type="checkbox" className="rounded text-blue-600" />
+              <span className="ml-2 text-gray-700">Push notifications</span>
+            </label>
+          </div>
+          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Save Preferences
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
