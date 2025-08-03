@@ -144,57 +144,111 @@ const sendOTPEmail = async (email, otp) => {
 
 
 
+// exports.userRegister = async (req, res) => {
+//     try {
+//         const { firstName, lastName, email, password, guestToken } = req.body;
+        
+//         // Check required fields
+//         if (!firstName || !lastName || !email || !password) {
+//             return res.status(400).json({ message: "All fields are required" });
+//         }
+        
+//         // Check for existing user
+//         const existingUser = await userAuthCollection.findOne({ email });
+        
+//         // Handle guest conversion if guestToken provided
+//         if (guestToken) {
+//             const guestUser = await userAuthCollection.findOne({ 
+//                 guestToken,
+//                 isGuest: true 
+//             });
+            
+//             if (!guestUser) {
+//                 return res.status(400).json({ message: "Invalid guest session" });
+//             }
+            
+//             // Convert guest to regular user
+//             guestUser.firstName = firstName;
+//             guestUser.lastName = lastName;
+//             guestUser.email = email;
+//             guestUser.password = await bcrypt.hash(password, 10);
+//             guestUser.isGuest = false;
+//             guestUser.guestToken = undefined;
+            
+//             // Generate OTP
+//             const otp = guestUser.generateOTP();
+//             await guestUser.save();
+            
+//             // Send OTP email
+//             await sendOTPEmail(email, otp);
+            
+//             return res.status(200).json({ 
+//                 message: "Account created successfully. Please verify your email.",
+//                 isGuestConversion: true
+//             });
+//         }
+        
+//         // Rest of your existing registration logic...
+//     } catch (err) {
+//         // Error handling
+//     }
+// };
+
 exports.userRegister = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, guestToken } = req.body;
+        const { firstName, lastName, email, password } = req.body;
         
         // Check required fields
         if (!firstName || !lastName || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
         
-        // Check for existing user
+        // Check if email is already registered
         const existingUser = await userAuthCollection.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "Email already registered" });
+        }
         
-        // Handle guest conversion if guestToken provided
-        if (guestToken) {
-            const guestUser = await userAuthCollection.findOne({ 
-                guestToken,
-                isGuest: true 
-            });
-            
-            if (!guestUser) {
-                return res.status(400).json({ message: "Invalid guest session" });
-            }
-            
-            // Convert guest to regular user
-            guestUser.firstName = firstName;
-            guestUser.lastName = lastName;
-            guestUser.email = email;
-            guestUser.password = await bcrypt.hash(password, 10);
-            guestUser.isGuest = false;
-            guestUser.guestToken = undefined;
-            
-            // Generate OTP
-            const otp = guestUser.generateOTP();
-            await guestUser.save();
-            
-            // Send OTP email
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Create new user
+        const newUser = new userAuthCollection({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+            isGuest: false
+        });
+        
+        // Generate OTP
+        const otp = newUser.generateOTP();
+        
+        // Save user
+        await newUser.save();
+        
+        // Send OTP email
+        try {
             await sendOTPEmail(email, otp);
-            
-            return res.status(200).json({ 
-                message: "Account created successfully. Please verify your email.",
-                isGuestConversion: true
+        } catch (emailError) {
+            console.error('Failed to send OTP email:', emailError);
+            return res.status(500).json({ 
+                message: "Account created but failed to send verification email. Please try again." 
             });
         }
         
-        // Rest of your existing registration logic...
+        return res.status(201).json({ 
+            message: "Account created successfully. Please verify your email."
+        });
+        
     } catch (err) {
-        // Error handling
+        console.error('Registration error:', err);
+        return res.status(500).json({ 
+            message: "Internal server error try again",
+            ...(process.env.NODE_ENV === 'development' && { error: err.message })
+        });
     }
 };
-
-
 
 
 
