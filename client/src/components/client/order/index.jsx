@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useGetSingleUser } from '../../../hooks/auth/use-Auth';
 import { usePlaceOrder } from '../../../hooks/userOrder';
 import { useCart } from '../../../../context/cartContext';
+import { useUserProfileUpdate } from '../../../hooks/client/homePageHooks/use-user';
 
 const mockOrderItems = [
   {
@@ -41,6 +42,7 @@ const mockOrderItems = [
 const OrderPlacementUI = () => {
   const { placeOrder, loading, placeOrderData,getCartItems, error, success, cartItems } = useCart();
   const { getSingleUser, loading: userLoading, error: userError, user } = useGetSingleUser();
+  const {userProfileUpdate,loading:addressUpdate,error:addressupdateError,success:adrreessUpdateSuceess}=useUserProfileUpdate()
 
 
 
@@ -49,7 +51,6 @@ const OrderPlacementUI = () => {
     getSingleUser();
     getCartItems()
   }, []);
-
 
 
 
@@ -69,7 +70,6 @@ const OrderPlacementUI = () => {
     default: false
   });
 
-  // Set default address when user data loads
   useEffect(() => {
     if (user?.addresses && user.addresses.length > 0 && !selectedAddress) {
       const defaultAddr = user.addresses.find(addr => addr.default) || user.addresses[0];
@@ -77,17 +77,14 @@ const OrderPlacementUI = () => {
     }
   }, [user, selectedAddress]);
 
-  // Use cart items if available, otherwise fallback to mock data
-  const orderItems = cartItems && cartItems?.cart?.length > 0 ? cartItems?.cart : mockOrderItems;
-
-  const subtotal = orderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const orderItems = cartItems?.cart
+ 
+  const subtotal = 21;
   const shippingFee = 5.00;
   const grandTotal = subtotal + shippingFee;
 
-  const handleAddAddress = () => {
+  const handleAddAddress = async() => {
     if (newAddress.label && newAddress.fullAddress && newAddress.city && newAddress.pincode && newAddress.phoneNo) {
-      // In real implementation, you would call an API to add the address
-      // For now, we'll just close the dialog and reset the form
       setNewAddress({
         label: '',
         fullAddress: '',
@@ -99,7 +96,7 @@ const OrderPlacementUI = () => {
         default: false
       });
       setIsDialogOpen(false);
-      
+     await userProfileUpdate(newAddress)
       // Refresh user data to get updated addresses
       getSingleUser();
     } else {
@@ -382,12 +379,12 @@ const OrderPlacementUI = () => {
                   <ShoppingBag className="w-6 h-6 mr-3 text-indigo-600" /> Your Items
                 </h2>
                 <div className="space-y-4">
-                  {orderItems.map((item, index) => (
+                  {orderItems?.map((item, index) => (
                     <div key={item.product || item._id || index} className="flex items-center space-x-4">
                       <img 
-                        src={item.image} 
+                        src={item.images[0]?.imagesUrls} 
                         alt={item.name} 
-                        className="w-20 h-20 rounded-lg object-cover border" 
+                        className="w-20 h-20 rounded-lg aspect-[8/9] object-contain border" 
                         onError={(e) => { 
                           e.target.onerror = null; 
                           e.target.src='https://placehold.co/100x100/ccc/FFF?text=Error'; 
@@ -400,7 +397,7 @@ const OrderPlacementUI = () => {
                         </p>
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
-                      <p className="font-semibold text-gray-800">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-semibold text-gray-800">{(item.sellingPrice * item.quantity).toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
@@ -417,7 +414,7 @@ const OrderPlacementUI = () => {
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotal ({orderItems.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
+                  <span>Subtotal</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
@@ -427,8 +424,8 @@ const OrderPlacementUI = () => {
                 <hr className="border-gray-200" />
                 <div className="flex justify-between text-lg font-semibold text-gray-800">
                   <span>Total</span>
-                  <span>${grandTotal.toFixed(2)}</span>
-                </div>
+                  <span>${cartItems?.totalAmount}</span>
+                </div>grandTotal
               </div>
 
               <Button 

@@ -23,11 +23,14 @@ exports.updateUserData = async (req, res) => {
         city,
         state,
         address,
+   
         pincode,
         profilePicture,
         mobileNumber,
-        gender
+        gender,
+        fullAddress,
     } = req.body;
+    console.log(req.body)
 
     const userId = req.user._id;
 
@@ -57,16 +60,15 @@ exports.updateUserData = async (req, res) => {
         if (gender !== undefined) updateFields.gender = gender;
 
         // Handle address update
-        if (address || city || state || pincode) {
+        if (fullAddress || city || state || pincode) {
             const addressObj = {
-                fullAddress: address || '',
+                fullAddress: fullAddress,
                 city: city || '',
                 state: state || '',
                 pincode: pincode || '',
                 label: 'home',
                 isDefault: false
             };
-
             if (addressId) {
                 // ✅ Update existing address
                 const index = user.addresses.findIndex(addr => addr._id.toString() === addressId);
@@ -77,9 +79,8 @@ exports.updateUserData = async (req, res) => {
                     });
                 }
 
-                // Replace only specific fields
-                user.addresses[index].fullAddress = addressObj.fullAddress;
-                user.addresses[index].city = addressObj.city;
+                user.addresses[index].fullAddress = addressObj?.fullAddress;
+                user.addresses[index].city = addressObj?.city;
                 user.addresses[index].state = addressObj.state;
                 user.addresses[index].pincode = addressObj.pincode;
             } else {
@@ -90,6 +91,7 @@ exports.updateUserData = async (req, res) => {
                     user.addresses.forEach(addr => (addr.isDefault = false));
                     addressObj.isDefault = true;
                 }
+                console.log(addressObj)
                 user.addresses.push(addressObj);
             }
         }

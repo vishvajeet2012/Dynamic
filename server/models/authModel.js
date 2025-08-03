@@ -102,7 +102,7 @@ const userSchema = new Schema({
         {       email:{type:String,default:function (){
         return this.parent().email 
         }},
-            fullAddress: { type: String, required: true },
+            fullAddress: { type: String, },
             city: { type: String, required: true },
             state: { type: String, required: true },
             pincode: { type: String, required: true },
