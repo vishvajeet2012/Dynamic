@@ -87,59 +87,59 @@ const sendOTPEmail = async (email, otp) => {
     }
 };
 
-// exports.userRegister = async (req, res) => {
-//     try {
-//         const { firstName, lastName, email, password } = req.body;
+exports.userRegister = async (req, res) => {
+    try {
+        const { firstName, lastName, email, password } = req.body;
         
-//         if (!firstName || !lastName || !email || !password) {
-//             return res.status(400).json({ message: "All fields are required" });
-//         }
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
         
-//         const existingUser = await userAuthCollection.findOne({ email });
-//          if (existingUser) {
-//             if (!existingUser.isVerified) {
-//                 // Delete unverified user
-//                 await userAuthCollection.deleteOne({ email });
-//             } else {
-//                 return res.status(400).json({ message: "Email is already registered." });
-//             }
-//         }
+        const existingUser = await userAuthCollection.findOne({ email });
+         if (existingUser) {
+            if (!existingUser.isVerified) {
+                // Delete unverified user
+                await userAuthCollection.deleteOne({ email });
+            } else {
+                return res.status(400).json({ message: "Email is already registered." });
+            }
+        }
 
 
-//         const hash = await bcrypt.hash(password, 10);
-//         const user = new userAuthCollection({
-//             firstName,
-//             lastName,
-//             email,
-//             password: hash,
-//         });
+        const hash = await bcrypt.hash(password, 10);
+        const user = new userAuthCollection({
+            firstName,
+            lastName,
+            email,
+            password: hash,
+        });
 
-//         // Generate OTP
-//         const otp = user.generateOTP();
-//         await user.save();
+        // Generate OTP
+        const otp = user.generateOTP();
+        await user.save();
 
-//         // Send OTP email
-//         const emailSent = await sendOTPEmail(email, otp);
-//         if (!emailSent) {
-//             return res.status(500).json({ message: "Failed to send OTP email" });
-//         }
+        // Send OTP email
+        const emailSent = await sendOTPEmail(email, otp);
+        if (!emailSent) {
+            return res.status(500).json({ message: "Failed to send OTP email" });
+        }
 
-//         res.status(200).json({ 
-//             status: 200,
-//             message: "User registered successfully. Please check your email for OTP.", 
-//             data:{
-//                 firstName,
-//                 lastName,
-//                 email,
-//                 password:"password "
-//             }
-//         });
+        res.status(200).json({ 
+            status: 200,
+            message: "User registered successfully. Please check your email for OTP.", 
+            data:{
+                firstName,
+                lastName,
+                email,
+                password:"password "
+            }
+        });
 
-//     } catch (err) {
-//         console.error("Registration error:", err);
-//         return res.status(500).json({ status: 500, message: "Internal server error" });
-//     }
-// };
+    } catch (err) {
+        console.error("Registration error:", err);
+        return res.status(500).json({ status: 500, message: "Internal server error" });
+    }
+};
 
 
 
@@ -194,61 +194,6 @@ const sendOTPEmail = async (email, otp) => {
 //     }
 // };
 
-exports.userRegister = async (req, res) => {
-    try {
-        const { firstName, lastName, email, password } = req.body;
-        
-        // Check required fields
-        if (!firstName || !lastName || !email || !password) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-        
-        // Check if email is already registered
-        const existingUser = await userAuthCollection.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: "Email already registered" });
-        }
-        
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-        
-        // Create new user
-        const newUser = new userAuthCollection({
-            firstName,
-            lastName,
-            email,
-            password: hashedPassword,
-            isGuest: false
-        });
-        
-        // Generate OTP
-        const otp = newUser.generateOTP();
-        
-        // Save user
-        await newUser.save();
-        
-        // Send OTP email
-        try {
-            await sendOTPEmail(email, otp);
-        } catch (emailError) {
-            console.error('Failed to send OTP email:', emailError);
-            return res.status(500).json({ 
-                message: "Account created but failed to send verification email. Please try again." 
-            });
-        }
-        
-        return res.status(201).json({ 
-            message: "Account created successfully. Please verify your email."
-        });
-        
-    } catch (err) {
-        console.error('Registration error:', err);
-        return res.status(500).json({ 
-            message: "Internal server error try again",
-            ...(process.env.NODE_ENV === 'development' && { error: err.message })
-        });
-    }
-};
 
 
 
