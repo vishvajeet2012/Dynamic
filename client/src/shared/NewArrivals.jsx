@@ -12,7 +12,7 @@ export default function NewArrivals({ query, titile }) {
 
   useEffect(() => {
     getProduct(query)
-  }, [query])
+  }, [])
 
   return (
     <section className="w-full py-6 lg:px-6">

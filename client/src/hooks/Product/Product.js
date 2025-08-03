@@ -35,38 +35,44 @@ export const  useCreateProduct =()=>{
 }
 
 
-export const   useGetProduct=()=>{
-    const [Product, setProduct] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
+export const useGetProduct = () => {
+  const [Product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
-    const getProduct = async (query) => {
-        setLoading(true);
-        setError(null);
-        setSuccess(null);
-        try{
-            const token  = localStorage.getItem('token')
-            const response = await axios.post(`${homeUrl}/getallproduct`,query,
-                {
-                   headers:{
-                
-                authorization:`Bearer ${token}`
-                
-            }
-                }
-            )
-            setProduct(response);
+  const getProduct = async (query) => {
+
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await axios.post(
+        `${homeUrl}/getallproduct`,
+        query,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setProduct(response);
             setSuccess(response?.data);
-            return response?.data
-        }catch(error){
-            setError(error)
-        }finally{
-            setLoading(false)       
-        }   
-       }
-       return {getProduct,loading ,Product, error,success}
-}
+      return response.data;
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { getProduct, loading, Product, error, success };
+};
+
 
 
 
