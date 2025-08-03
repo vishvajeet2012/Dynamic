@@ -236,7 +236,7 @@ const user = await User.findOne({ mobileNumber: userNumber });
 if (order.status === "Shipped") {
   const mailSent = {
     from: process.env.EMAIL_USER,
-    to: emailId,
+    to: user?.email,
     subject: "🚚 Your Order Has Been Shipped - The V Store!",
     html: `
       <div style="max-width:600px;margin:auto;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
@@ -357,7 +357,7 @@ if (order.status === "Shipped") {
 if (order.status === "Delivered") {
   const mailSent = {
     from: process.env.EMAIL_USER,
-    to: emailId,
+    to: user?.email,
     subject: "🎉 Your Order Has Been Delivered - The V Store!",
     html: `
       <div style="max-width:600px;margin:auto;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
