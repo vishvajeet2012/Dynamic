@@ -16,7 +16,7 @@ exports.placeOrder = async (req, res) => {
     const {shippingInfo:datas
  } = req.body;
  const {shippingInfo   ,paymentMethod}=datas
-
+console.log(shippingInfo)
     const user = await User.findById(userId)?.populate('cart.product')
     if (!user || user.cart.length === 0) {
       return res.status(400).json({ message: "Cart is empty" })
@@ -32,6 +32,7 @@ exports.placeOrder = async (req, res) => {
 
 
     }))
+    console.log(shippingInfo)
     const totalPrice = orderItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
     const order = await Order.create({
       user: userId,

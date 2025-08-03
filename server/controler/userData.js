@@ -25,7 +25,7 @@ exports.updateUserData = async (req, res) => {
         state,
         address,
         bio,
-        
+        phoneNo,
         profilePicture,
         pincode,
         mobileNumber,
@@ -60,6 +60,7 @@ exports.updateUserData = async (req, res) => {
         if (mobileNumber !== undefined) updateFields.mobileNumber = mobileNumber;
         if (gender !== undefined) updateFields.gender = gender;
         if(bio!==undefined) updateFields.bio=bio;
+       // if(phoneNo!==undefined) updateFields.phoneNo=phoneNo
 
         // Handle address update
         if (fullAddress || city || state || pincode) {
@@ -69,7 +70,8 @@ exports.updateUserData = async (req, res) => {
                 state: state || '',
                 pincode: pincode || '',
                 label: 'home',
-                isDefault: false
+                isDefault: false,
+                phoneNo:phoneNo||""
             };
             if (addressId) {
                 // ✅ Update existing address
@@ -85,8 +87,9 @@ exports.updateUserData = async (req, res) => {
                 user.addresses[index].city = addressObj?.city;
                 user.addresses[index].state = addressObj.state;
                 user.addresses[index].pincode = addressObj.pincode;
+                user.addresses[index].phoneNo=addressObj.phoneNo
             } else {
-                // ✅ Add new address
+                
                 if (!user.addresses || user.addresses.length === 0) {
                     addressObj.isDefault = true;
                 } else {
@@ -98,7 +101,6 @@ exports.updateUserData = async (req, res) => {
             }
         }
 
-        // Apply profile updates
         Object.assign(user, updateFields);
 
         const updatedUser = await user.save();
