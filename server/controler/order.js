@@ -223,10 +223,10 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
     const userNumber = order?.shippingInfo?.phoneNo
-    const emailId =order?.shippingInfo?.email
-const user = await User.findOne({ mobileNumber: userNumber });
-    console.log(user)
-
+    const userId =order?.user
+    console.log(userId)
+const user = await User.findOne(userId);
+console.log(user)
 
 
     // Update the status

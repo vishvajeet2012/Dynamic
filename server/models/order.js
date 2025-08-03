@@ -30,7 +30,7 @@ const orderSchema = new mongoose.Schema({
     pincode: { type: String, required: true },
     state: { type: String, required: true },
     country: { type: String,default:"India" },
-    phoneNo: { type: String,},
+    phoneNo: { type: String,required:true},
     default:{type:Boolean  }
     
   },
