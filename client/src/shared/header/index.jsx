@@ -179,8 +179,7 @@ useEffect(() => {
         </nav>
       </header>
 
-      {/* Padding for Mobile Bottom Nav */}
-      <div className="md:hidden pb-14" />
+   
     </>
   );
 }

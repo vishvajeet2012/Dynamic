@@ -1,26 +1,41 @@
 const mongoose = require('mongoose');
 
 const bannerSchema = new mongoose.Schema({
-    url: {
-        type: String,
-        required: true
-    },
-    publicId: {
-        type: String,
-        required: true
-    },
+    images: [{
+        url: {
+            type: String,
+            required: true
+        },
+        publicId: {
+            type: String,
+            required: true
+        },
+        mobileUrl: {
+            type: String,
+            default: ""
+        },
+        mobilePublicId: {
+            type: String,
+            required: true
+        },
+        order: {
+            type: Number,
+            default: 0
+        }
+        
+
+
+    }],
     bannerType: {
         type: String,
-        enum: ['homepage', 'promotional', 'category', 'product', 'sidebar', 'footer'],
+        enum: ['homepage', 'promotional', 'category', 'product', 'sidebar', 'footer',"loginPage", "signupPage"],
         required: true,
         default: 'homepage'
     },
-   
     isActive: {
         type: Boolean,
         default: true
     },
- 
     startDate: {
         type: Date,
         required: false
@@ -36,7 +51,7 @@ const bannerSchema = new mongoose.Schema({
     uploadedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+       
     },
     createdAt: {
         type: Date,
@@ -48,7 +63,6 @@ const bannerSchema = new mongoose.Schema({
     }
 });
 
-// Update the updatedAt field before saving
 bannerSchema.pre('save', function(next) {
     this.updatedAt = Date.now();
     next();

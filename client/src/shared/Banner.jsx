@@ -4,64 +4,217 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default function Banner({ bannerType }) {    
     const [bannerData, setBannerData] = useState([]);
+    const [currentSlide, setCurrentSlide] = useState(0);
     const { getAllBannerData, loading, error, success } = useGetBannnerData(bannerType);
 
     useEffect(() => {
         const fetchBannerData = async () => {
             const data = await getAllBannerData();
-            if (data) {
-                setBannerData(data);
+            if (data && data.length > 0) {
+                // Extract and sort images from the first banner data
+                const firstBanner = data[0];
+                if (firstBanner.images && firstBanner.images.length > 0) {
+                    const sortedImages = [...firstBanner.images].sort((a, b) => a.order - b.order);
+                    setBannerData({
+                        ...firstBanner,
+                        images: sortedImages
+                    });
+                }
             }
         };
         fetchBannerData();
     }, [bannerType]);
 
+    // Auto-slide functionality
+    useEffect(() => {
+        if (bannerData.images && bannerData.images.length > 1) {
+            const interval = setInterval(() => {
+                setCurrentSlide((prev) => 
+                    prev === bannerData.images.length - 1 ? 0 : prev + 1
+                );
+            }, 5000); // Change slide every 5 seconds
+
+            return () => clearInterval(interval);
+        }
+    }, [bannerData.images]);
+
+    const nextSlide = () => {
+        if (bannerData.images) {
+            setCurrentSlide((prev) => 
+                prev === bannerData.images.length - 1 ? 0 : prev + 1
+            );
+        }
+    };
+
+    const prevSlide = () => {
+        if (bannerData.images) {
+            setCurrentSlide((prev) => 
+                prev === 0 ? bannerData.images.length - 1 : prev - 1
+            );
+        }
+    };
+
+    const goToSlide = (index) => {
+        setCurrentSlide(index);
+    };
+
+    console.log('Banner Data:', bannerData);
+
     if (loading) return (
         <div className="w-full max-w-[1920px] mx-auto" aria-label="Loading banner">
-            {/*
-              - `animate-pulse`: This is the Tailwind class that creates the gentle pulsing effect.
-              - `bg-gray-200`: A standard light gray color for skeletons.
-              - `aspect-video`: On mobile, this gives the skeleton a 16:9 aspect ratio, a common banner shape.
-              - `md:h-[400px] lg:h-[500px]`: On desktop, we set the height to match the `max-h` of your
-                final banner image. This is key to preventing layout shift.
-            */}
-            <div className="w-full animate-pulse bg-gray-200 aspect-video md:h-[400px] lg:h-[500px]"></div>
+            <div className="block md:hidden px-4">
+                <div className="w-full animate-pulse bg-gray-200 aspect-[4/3] rounded-lg"></div>
+            </div>
+            <div className="hidden md:block">
+                <div className="w-full animate-pulse bg-gray-200 h-[400px] lg:h-[500px] rounded-lg"></div>
+            </div>
         </div>
     );
     
     if (error) return (
-        <div className="w-full p-8 text-center bg-gray-100 text-gray-800">
+        <div className="w-full p-8 text-center bg-gray-100 text-gray-800 rounded-lg">
             Error loading banner
         </div>
-    )
+    );
     
-    if (!success || !bannerData.length) return null;
+    if (!success || !bannerData.images || !bannerData.images.length) return null;
 
     return (
-        // Simple container for the banners
         <div className="w-full max-w-[1920px] mx-auto relative overflow-hidden">
-            {bannerData.map((banner, index) => (
-                // 1. Control visibility with responsive and `first:` classes
-                // - `hidden`: By default (mobile-first), hide all banners.
-                // - `first:block`: BUT, for the very first banner, override `hidden` and make it visible.
-                // - `md:block`: On medium screens and up, make ALL banners visible again.
-                <div key={index} className="w-full relative hidden first:block md:block">
-                    <a href={banner.link || '#'} aria-label={banner.altText || 'Banner image'}>
-                        <picture>
-                            <source media="(min-width: 1200px)" srcSet={banner.url} />
-                            <source media="(min-width: 768px)" srcSet={banner.url} />
-                            <LazyLoadImage 
-                                src={banner.url} 
-                                alt={banner.altText || ''}
-                                // 2. Using your original, preferred classes for the image
-                                className="w-full h-auto block object-cover transition-transform duration-300 ease-in-out hover:scale-[1.02] md:max-h-[400px] lg:max-h-[500px]"
-                                // Load the first image eagerly, the rest (for desktop) lazily
-                                loading={index === 0 ? "eager" : "lazy"}
-                            />
-                        </picture>
-                    </a>
+            {/* Mobile Slider */}
+            <div className="block md:hidden  ">
+                <div className="relative bg-white  shadow-lg overflow-hidden">
+                    {/* Mobile Images Container */}
+                    <div className="relative h-full overflow-hidden">
+                        <div 
+                            className="flex transition-transform duration-500 ease-in-out h-full"
+                            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                        >
+                            {bannerData.images.map((image, index) => (
+                                <div key={image._id || index} className="w-full flex-shrink-0 h-full">
+                                    <a 
+                                        href={bannerData.redirectUrl || '#'} 
+                                        aria-label={`Mobile banner ${index + 1}`}
+                                        className="block h-full"
+                                    >
+                                        <LazyLoadImage 
+                                            src={image.mobileUrl} 
+                                            alt={`Mobile banner ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                            loading={index === 0 ? "eager" : "lazy"}
+                                        />
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Mobile Navigation Arrows */}
+                        {bannerData.images.length > 1 && (
+                            <>
+                                <button
+                                    onClick={prevSlide}
+                                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all duration-200 z-10"
+                                    aria-label="Previous slide"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <button
+                                    onClick={nextSlide}
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all duration-200 z-10"
+                                    aria-label="Next slide"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Mobile Dots Indicator */}
+                   
                 </div>
-            ))}
+            </div>
+
+            {/* Desktop Slider */}
+            <div className="hidden md:block">
+                <div className="relative rounded-lg overflow-hidden shadow-lg">
+                    {/* Desktop Images Container */}
+                    <div className="relative h-[400px] lg:h-[500px] overflow-hidden">
+                        <div 
+                            className="flex transition-transform duration-700 ease-in-out h-full"
+                            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                        >
+                            {bannerData.images.map((image, index) => (
+                                <div key={image._id || index} className="w-full flex-shrink-0 h-full">
+                                    <a 
+                                        href={bannerData.redirectUrl || '#'} 
+                                        aria-label={`Desktop banner ${index + 1}`}
+                                        className="block h-full group"
+                                    >
+                                        <picture className="h-full block">
+                                            <source media="(min-width: 1200px)" srcSet={image.url} />
+                                            <source media="(min-width: 768px)" srcSet={image.url} />
+                                            <LazyLoadImage 
+                                                src={image.url} 
+                                                alt={`Banner ${index + 1}`}
+                                                className="w-full h-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.02]"
+                                                loading={index === 0 ? "eager" : "lazy"}
+                                            />
+                                        </picture>
+                                        {/* Hover overlay effect */}
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 ease-in-out"></div>
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Desktop Navigation Arrows */}
+                        {bannerData.images.length > 1 && (
+                            <>
+                                <button
+                                    onClick={prevSlide}
+                                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
+                                    aria-label="Previous slide"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <button
+                                    onClick={nextSlide}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
+                                    aria-label="Next slide"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </>
+                        )}
+
+                        {/* Desktop Dots Indicator */}
+                        {bannerData.images.length > 1 && (
+                            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-3 z-10">
+                                {bannerData.images.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => goToSlide(index)}
+                                        className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                                            currentSlide === index 
+                                                ? 'bg-white shadow-lg scale-125' 
+                                                : 'bg-white/50 hover:bg-white/80'
+                                        }`}
+                                        aria-label={`Go to slide ${index + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

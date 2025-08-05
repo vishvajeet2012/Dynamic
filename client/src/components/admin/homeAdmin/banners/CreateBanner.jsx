@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useBannerCreate, usegetBannersByType, useUplaodImage } from "../../../../hooks/client/homePageHooks/use-banner";
 
 export default function CreateBanner() {
-  // Image upload state
-  const [previewImage, setPreviewImage] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  // Image upload states
+  const [desktopImages, setDesktopImages] = useState([]);
+  const [mobileImages, setMobileImages] = useState([]);
+  const [imageOrders, setImageOrders] = useState({});
   
   // Banner form state
   const [formData, setFormData] = useState({
@@ -15,26 +16,79 @@ export default function CreateBanner() {
     endDate: ''
   });
 
-  // Banner data state that will be sent to createBanner
-  const [bannerData, setBannerData] = useState(null);
-
   // API hooks
-  const { uploadImage, loading: uploadLoading, error: uploadError ,banners } = useUplaodImage();
+  const { uploadImage, loading: uploadLoading, error: uploadError } = useUplaodImage();
   const { createBanner, loading: createLoading, error: createError, success: createSuccess } = useBannerCreate();
 
-  // Handle file selection
-  const handleFileChange = (e) => {
+  // Handle desktop image upload
+  const handleDesktopUpload = async (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', file);
+      const response = await uploadImage(uploadFormData);
+
+      if (response && response.url && response.publicId) {
+        setDesktopImages(prev => [...prev, {
+          url: response.url,
+          publicId: response.publicId,
+          order: desktopImages.length
+        }]);
+      }
+    } catch (error) {
+      console.error("Error uploading desktop image:", error);
+    }
+  };
+
+  const handleMobileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', file);
+      const response = await uploadImage(uploadFormData);
+
+      if (response && response.url && response.publicId) {
+        setMobileImages(prev => [...prev, {
+          url: response.url,
+          publicId: response.publicId,
+          order: mobileImages.length
+        }]);
+      }
+    } catch (error) {
+      console.error("Error uploading mobile image:", error);
+    }
+  };
+
+  // Remove an image from either desktop or mobile list
+  const removeImage = (type, index) => {
+    if (type === 'desktop') {
+      setDesktopImages(prev => prev.filter((_, i) => i !== index));
     } else {
-      setPreviewImage(null);
-      setSelectedFile(null);
+      setMobileImages(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  // Update image order
+  const updateImageOrder = (type, index, newOrder) => {
+    const numericOrder = Number(newOrder);
+    if (isNaN(numericOrder)) return;
+
+    if (type === 'desktop') {
+      setDesktopImages(prev => {
+        const updated = [...prev];
+        updated[index].order = numericOrder;
+        return updated.sort((a, b) => a.order - b.order);
+      });
+    } else {
+      setMobileImages(prev => {
+        const updated = [...prev];
+        updated[index].order = numericOrder;
+        return updated.sort((a, b) => a.order - b.order);
+      });
     }
   };
 
@@ -51,49 +105,45 @@ export default function CreateBanner() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!selectedFile) {
-      alert("Please select an image file");
+    if (desktopImages.length === 0 || mobileImages.length === 0) {
+      alert("Please upload at least one desktop and one mobile image");
       return;
     }
 
+    // Match desktop and mobile images by index (simplified approach)
+    const images = desktopImages.map((desktopImg, index) => ({
+      url: desktopImg.url,
+      publicId: desktopImg.publicId,
+      mobileUrl: mobileImages[index]?.url || desktopImg.url, // Fallback to desktop if mobile missing
+      mobilePublicId: mobileImages[index]?.publicId || desktopImg.publicId,
+      order: desktopImg.order
+    }));
+
     try {
-      // First upload the image
-      const uploadFormData = new FormData();
-      uploadFormData.append('image', selectedFile);
-      const uploadResponse = await uploadImage(uploadFormData);
+      const bannerPayload = {
+        images,
+        bannerType: formData.bannerType,
+        isActive: formData.isActive,
+        redirectUrl: formData.redirectUrl || undefined,
+        startDate: formData.startDate || undefined,
+        endDate: formData.endDate || undefined,
+        uploadedBy: "currentUserId" // Replace with actual user ID from auth context
+      };
+      
+      console.log(bannerPayload,"this sishdi")
+      await createBanner(bannerPayload);
 
-      if (uploadResponse && uploadResponse.url && uploadResponse.publicId) {
-        // Prepare the banner data
-        const bannerPayload = {
-          url: uploadResponse.url,
-          publicId: uploadResponse.publicId,
-          bannerType: formData.bannerType,
-          isActive: formData.isActive,
-          redirectUrl: formData.redirectUrl || undefined,
-          startDate: formData.startDate || undefined,
-          endDate: formData.endDate || undefined,
-          uploadedBy: uploadResponse.uploadedBy
-        };
-
-        // Set the banner data state
-        setBannerData(bannerPayload);
-
-        // Then create the banner with the prepared data
-        await createBanner(bannerPayload);
-
-        // Reset form on success
-        if (createSuccess) {
-          setFormData({
-            bannerType: 'homepage',
-            isActive: true,
-            redirectUrl: '',
-            startDate: '',
-            endDate: ''
-          });
-          setPreviewImage(null);
-          setSelectedFile(null);
-          setBannerData(null);
-        }
+      // Reset form on success
+      if (createSuccess) {
+        setFormData({
+          bannerType: 'homepage',
+          isActive: true,
+          redirectUrl: '',
+          startDate: '',
+          endDate: ''
+        });
+        setDesktopImages([]);
+        setMobileImages([]);
       }
     } catch (error) {
       console.error("Error creating banner:", error);
@@ -102,55 +152,96 @@ export default function CreateBanner() {
 
   return (
     <div className="w-full min-h-screen bg-slate-100 text-black p-4">
-      <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <h1 className="text-2xl font-semibold mb-6">Create New Banner</h1>
         
         <form onSubmit={handleSubmit}>
-          {/* Image Upload Section */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Banner Image</label>
-            {previewImage ? (
-              <div className="mb-4 flex flex-col items-center">
-                <img 
-                  src={previewImage} 
-                  alt="Preview" 
-                  className="max-h-48 object-contain border rounded"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPreviewImage(null);
-                    setSelectedFile(null);
-                  }}
-                  className="mt-2 text-sm text-red-600 hover:text-red-800"
-                >
-                  Remove Image
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                    </svg>
-                    <p className="mb-2 text-sm text-gray-500">Click to upload or drag and drop</p>
-                    <p className="text-xs text-gray-500">PNG, JPG, JPEG (Max 5MB)</p>
-                  </div>
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    onChange={handleFileChange}
-                    accept="image/*"
+          {/* Desktop Images Section */}
+          <div className="mb-8">
+            <h2 className="text-lg font-medium mb-4">Desktop Images</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              {desktopImages.map((image, index) => (
+                <div key={index} className="border rounded p-3 flex flex-col">
+                  <img 
+                    src={image.url} 
+                    alt={`Desktop ${index}`} 
+                    className="h-40 object-contain mb-2"
                   />
-                </label>
-              </div>
-            )}
-            {uploadError && <p className="mt-2 text-sm text-red-600">{uploadError}</p>}
+                  <div className="flex items-center mb-2">
+                    <label className="mr-2 text-sm">Order:</label>
+                    <input
+                      type="number"
+                      value={image.order}
+                      onChange={(e) => updateImageOrder('desktop', index, e.target.value)}
+                      className="w-16 p-1 border rounded"
+                      min="0"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeImage('desktop', index)}
+                    className="mt-auto text-sm text-red-600 hover:text-red-800"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            <label className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer">
+              Upload Desktop Image
+              <input 
+                type="file" 
+                className="hidden" 
+                onChange={handleDesktopUpload}
+                accept="image/*"
+              />
+            </label>
+          </div>
+
+          {/* Mobile Images Section */}
+          <div className="mb-8">
+            <h2 className="text-lg font-medium mb-4">Mobile Images</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              {mobileImages.map((image, index) => (
+                <div key={index} className="border rounded p-3 flex flex-col">
+                  <img 
+                    src={image.url} 
+                    alt={`Mobile ${index}`} 
+                    className="h-40 object-contain mb-2"
+                  />
+                  <div className="flex items-center mb-2">
+                    <label className="mr-2 text-sm">Order:</label>
+                    <input
+                      type="number"
+                      value={image.order}
+                      onChange={(e) => updateImageOrder('mobile', index, e.target.value)}
+                      className="w-16 p-1 border rounded"
+                      min="0"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeImage('mobile', index)}
+                    className="mt-auto text-sm text-red-600 hover:text-red-800"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            <label className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer">
+              Upload Mobile Image
+              <input 
+                type="file" 
+                className="hidden" 
+                onChange={handleMobileUpload}
+                accept="image/*"
+              />
+            </label>
           </div>
 
           {/* Banner Details Form */}
-          <div className="space-y-4">
+          <div className="space-y-4 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Banner Type</label>
               <select
@@ -166,6 +257,8 @@ export default function CreateBanner() {
                 <option value="product">Product</option>
                 <option value="sidebar">Sidebar</option>
                 <option value="footer">Footer</option>
+                <option value="loginPage">Login Page</option>
+                <option value="signupPage">Signup Page</option>
               </select>
             </div>
 
@@ -220,7 +313,7 @@ export default function CreateBanner() {
           <div className="mt-6">
             <button
               type="submit"
-              disabled={uploadLoading || createLoading}
+              disabled={uploadLoading || createLoading || desktopImages.length === 0 || mobileImages.length === 0}
               className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               {uploadLoading || createLoading ? (
@@ -229,6 +322,7 @@ export default function CreateBanner() {
                 <span>Create Banner</span>
               )}
             </button>
+            {uploadError && <p className="mt-2 text-sm text-red-600">{uploadError}</p>}
             {createError && <p className="mt-2 text-sm text-red-600">{createError}</p>}
             {createSuccess && (
               <p className="mt-2 text-sm text-green-600">Banner created successfully!</p>

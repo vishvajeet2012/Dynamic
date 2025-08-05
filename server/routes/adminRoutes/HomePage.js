@@ -7,12 +7,13 @@ const logoController = require("../../controler/HomePage/HomePage"); // Note: co
 const {  createSubCategory, updateSubCategory, getChildCategoryById } = require('../../controler/SubCategoryControler');
 const auth = require('../../middleware/authmiddleware');
 const uploadImageMiddleware = require('../../middleware/uploadImageMiddleware');
-const { createBanner, updateBanner, deleteBanner, toggleBannerActive, getBannersByType } = require('../../controler/BannerControler');
 const { createProduct, getProducts, productDelete, updateProduct, getProductbykeys, getFiltersForSubcategory, getProductSearchPage, searchThemeNames, getProductBySlug } = require('../../controler/Productcontroler');
 const { createChildCategory } = require('../../controler/childCategoryControler');
 const { addtoWishlist, getAllProductsWithWishlist, getUserWishlist } = require('../../controler/wishlist');
 const { addToCartControler, getCartItems, updateCartItem, removeCartItem } = require('../../controler/cart');
 const { placeOrder, updateOrderStatus, getAllOrders } = require('../../controler/order');
+const { getBannersByType, createBanner, updateBanner, deleteBanner } = require('../../controler/BannerControler');
+const admin = require('../../middleware/adminMiddleWare');
 
 router.post("/homelogo", logoController.createLogo);
 router.get("/gethomelogo", logoController.getLogo); 
@@ -23,7 +24,7 @@ router.get('/categoryupdatebyid/:id', GetCategoryById);
 router.put('/updatecategory/:id', UpdateCategory);
 router.delete('/deletecategory/:id', DeleteCategory);
 
-router.post('/createaboutus',auth, CreateAboutusControler )
+router.post('/createaboutus',admin, CreateAboutusControler )
 router.get('/getaboutus', getAboutUs)
 
 
@@ -46,7 +47,7 @@ router.post('/bannercreates', auth, createBanner);
 router.put('/updatebanner/:id', auth,updateBanner);
 router.delete('/deletebaner/:id', auth,deleteBanner);
 router.post('/getbannersbytype' ,getBannersByType)
-router.patch('/:id/toggle-active',auth, toggleBannerActive);
+//router.patch('/:id/toggle-active',auth, toggleBannerActive);
 
 
     /////////////////////////Product ////////////////

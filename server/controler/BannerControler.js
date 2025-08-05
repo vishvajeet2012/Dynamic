@@ -28,7 +28,7 @@ exports.getBanners = async (req, res) => {
         }
         
         const banners = await Banner.find(query)
-            .sort({ position: 1, createdAt: -1 })
+            .sort({ 'images.order': 1, createdAt: -1 })
             .populate('uploadedBy', 'name email');
             
         res.status(200).json({
@@ -37,6 +37,7 @@ exports.getBanners = async (req, res) => {
             data: banners
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -44,9 +45,7 @@ exports.getBanners = async (req, res) => {
     }
 };
 
-// @desc    Get single banner
-// @route   GET /api/banners/:id
-// @access  Public// @desc    Get banners by type (using POST)
+// @desc    Get banners by type (using POST)
 // @route   POST /api/banner/filter
 // @access  Public
 exports.getBannersByType = async (req, res) => {
@@ -54,7 +53,7 @@ exports.getBannersByType = async (req, res) => {
         const { bannerType, isActive } = req.body;
         
         // Validate bannerType against enum values
-        const validTypes = ['homepage', 'promotional', 'category', 'product', 'sidebar', 'footer'];
+        const validTypes = ['homepage', 'promotional', 'category', 'product', 'sidebar', 'footer', 'loginPage', 'signupPage'];
         
         if (bannerType && !validTypes.includes(bannerType)) {
             return res.status(400).json({
@@ -89,7 +88,7 @@ exports.getBannersByType = async (req, res) => {
         }
         
         const banners = await Banner.find(query)
-            .sort({ position: 1, createdAt: -1 })
+            .sort({ 'images.order': 1, createdAt: -1 })
             .populate('uploadedBy', 'name email');
             
         res.status(200).json({
@@ -98,6 +97,7 @@ exports.getBannersByType = async (req, res) => {
             data: banners
         });
     } catch (err) {
+        console.error(err);
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -108,29 +108,38 @@ exports.getBannersByType = async (req, res) => {
 // @desc    Create banner
 // @route   POST /api/banners
 // @access  Private/Admin
-
 exports.createBanner = async (req, res) => {
     try {
-        const { url, publicId, bannerType, isActive, startDate, endDate, redirectUrl, uploadedBy } = req.body;
-        console.log(url,publicId,uploadedBy)
-        console.log(req.body)
+                const userId =req?.user?._id
+
+        const { images, bannerType, isActive, startDate, endDate, redirectUrl } = req.body;
         // Validate required fields
-        if (!url || !publicId || !uploadedBy) {
+        if (!images || !Array.isArray(images) || images.length === 0 ) {
             return res.status(400).json({
                 success: false,
-                error: 'URL, publicId, and uploadedBy are required fields'
+                error: 'Images array and uploadedBy are required fields'
             });
         }
 
+        // Validate each image in the array
+        for (const image of images) {
+            if (!image.url || !image.publicId || !image.mobilePublicId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Each image must have url, publicId, and mobilePublicId'
+                });
+            }
+        }
+
         const banner = await Banner.create({
-            url,
-            publicId,
+            images,
             bannerType: bannerType || 'homepage',
             isActive: isActive !== undefined ? isActive : true,
             startDate,
             endDate,
             redirectUrl,
-            uploadedBy
+            uploadedBy:userId|| "",
+            
         });
         
         res.status(201).json({
@@ -153,6 +162,7 @@ exports.createBanner = async (req, res) => {
         }
     }
 };
+
 // @desc    Update banner
 // @route   PUT /api/banners/:id
 // @access  Private/Admin
@@ -167,29 +177,21 @@ exports.updateBanner = async (req, res) => {
             });
         }
         
-        // Check if user is authorized to update this banner
-        // if (banner.uploadedBy.toString() !== req.user.id && req.user.role !== 'admin') {
-        //     return res.status(401).json({
-        //         success: false,
-        //         error: 'Not authorized to update this banner'
-        //     });
-        // }
+        const { images, ...updateData } = req.body;
         
-        const { image, publicId, ...updateData } = req.body;
-        
-        // If you want to handle image updates
-        // if (image) {
-        //     // First delete old image from Cloudinary
-        //     await cloudinary.uploader.destroy(banner.publicId);
-            
-        //     // Upload new image
-        //     const uploadedResponse = await cloudinary.uploader.upload(image, {
-        //         upload_preset: 'banner_preset'
-        //     });
-            
-        //     updateData.url = uploadedResponse.secure_url;
-        //     updateData.publicId = uploadedResponse.public_id;
-        // }
+        // If updating images array
+        if (images && Array.isArray(images)) {
+            // Validate each image in the array
+            for (const image of images) {
+                if (!image.url || !image.publicId || !image.mobilePublicId) {
+                    return res.status(400).json({
+                        success: false,
+                        error: 'Each image must have url, publicId, and mobilePublicId'
+                    });
+                }
+            }
+            updateData.images = images;
+        }
         
         banner = await Banner.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
@@ -213,6 +215,7 @@ exports.updateBanner = async (req, res) => {
                 error: messages
             });
         } else {
+            console.error(err);
             res.status(500).json({
                 success: false,
                 error: 'Server Error'
@@ -235,16 +238,11 @@ exports.deleteBanner = async (req, res) => {
             });
         }
         
-        // Check if user is authorized to delete this banner
-        // if (banner.uploadedBy.toString() !== req.user.id && req.user.role !== 'admin') {
-        //     return res.status(401).json({
-        //         success: false,
-        //         error: 'Not authorized to delete this banner'
-        //     });
+        // Here you would typically delete images from Cloudinary
+        // for (const image of banner.images) {
+        //     await cloudinary.uploader.destroy(image.publicId);
+        //     await cloudinary.uploader.destroy(image.mobilePublicId);
         // }
-        
-        // Delete image from Cloudinary
-        // await cloudinary.uploader.destroy(banner.publicId);
         
         await banner.remove();
         
@@ -259,6 +257,7 @@ exports.deleteBanner = async (req, res) => {
                 error: 'Banner not found'
             });
         }
+        console.error(err);
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -294,6 +293,60 @@ exports.toggleBannerActive = async (req, res) => {
                 error: 'Banner not found'
             });
         }
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        });
+    }
+};
+
+// @desc    Update banner image order
+// @route   PATCH /api/banners/:id/order
+// @access  Private/Admin
+exports.updateBannerImageOrder = async (req, res) => {
+    try {
+        const { imageId, newOrder } = req.body;
+        
+        if (!imageId || newOrder === undefined) {
+            return res.status(400).json({
+                success: false,
+                error: 'imageId and newOrder are required'
+            });
+        }
+        
+        const banner = await Banner.findById(req.params.id);
+        
+        if (!banner) {
+            return res.status(404).json({
+                success: false,
+                error: 'Banner not found'
+            });
+        }
+        
+        // Find the image in the array
+        const imageIndex = banner.images.findIndex(img => img._id.toString() === imageId);
+        if (imageIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                error: 'Image not found in banner'
+            });
+        }
+        
+        // Update the order
+        banner.images[imageIndex].order = newOrder;
+        
+        // Sort images by order
+        banner.images.sort((a, b) => a.order - b.order);
+        
+        await banner.save();
+        
+        res.status(200).json({
+            success: true,
+            data: banner
+        });
+    } catch (err) {
+        console.error(err);
         res.status(500).json({
             success: false,
             error: 'Server Error'

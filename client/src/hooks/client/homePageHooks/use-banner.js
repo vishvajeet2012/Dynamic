@@ -11,7 +11,7 @@ export const useBannerCreate = ()=>{
         setloading(true)
         setError(null)
         setSuccess(null)
-       const { 
+       const { images,
   bannerType, 
   endDate, 
   isActive, 
@@ -24,9 +24,10 @@ export const useBannerCreate = ()=>{
         console.log(bannerPayload,"supeerkbh")
         try{
             const token   = localStorage.getItem('token')
-            const response = await axios.post(`${homeUrl}/bannercreates`,{url,uploadedBy,startDate,endDate,isActive,publicId,redirectUrl,bannerType},{
+            const response = await axios.post(`${homeUrl}/bannercreates`,bannerPayload,{
                 headers:{
-                 
+                               'Content-Type': 'application/json',
+
                     Authorization: `Bearer ${token}`
                 }
             })
