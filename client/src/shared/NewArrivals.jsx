@@ -7,13 +7,25 @@ import { Carousel } from '@/components/ui/carousel'
 import LoadingBar from './loading'
 import SkeletonProductCard from './skeltonProductCArd'
 
-export default function NewArrivals({ query, titile }) {
+export default function NewArrivals({ query, titile ,setMainLoading }) {
   const { getProduct, loading, Product } = useGetProduct()
 
   useEffect(() => {
     getProduct(query)
   }, [])
 
+  useEffect(()=>{
+
+  setTimeout(()=>{
+if(loading){
+  setMainLoading(true)
+
+}else{
+ setMainLoading(false)
+}
+  },2000)
+  },[Product])
+console.log(Product,"fdsjk")
   return (
     <section className="w-full py-6 lg:px-6">
      

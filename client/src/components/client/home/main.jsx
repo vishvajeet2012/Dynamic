@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Banner from "../../../shared/Banner";
 import Header from "../../../shared/header";
 import AboutUs from "../../../shared/HomePage/Aboutus";
@@ -8,6 +8,7 @@ import CategorySection from "../../../shared/HomePage/CategorySection";
 
 export default function Home() {
   const { loading, error, categories, fetechCategories } = useGetAllCategories();
+  const [mainLoading ,setMainLoading ]=useState(true)
 
   useEffect(() => {
     fetechCategories();
@@ -17,9 +18,9 @@ export default function Home() {
     <>
     
       <Banner bannerType="homepage" />
-      <NewArrivals titile={"New Arrival"} query={{ isNewArrival: true }} />
-      <CategorySection categoriesLoading={loading} categories={categories} />
-         <NewArrivals titile={"Featured"} query={{ isFeatured: true }} />
+      <NewArrivals setMainLoading={setMainLoading} titile={"New Arrival"} query={{ isNewArrival: true }} />
+      <CategorySection  categoriesLoading={mainLoading} categories={categories} />
+         <NewArrivals setMainLoading={setMainLoading} titile={"Featured"} query={{ isFeatured: true }} />
       <AboutUs />
     </>
   );

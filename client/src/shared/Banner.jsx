@@ -58,7 +58,6 @@ export default function Banner({ bannerType }) {
         setCurrentSlide(index);
     };
 
-    console.log('Banner Data:', bannerData);
 
     if (loading) return (
         <div className="w-full max-w-[1920px] mx-auto" aria-label="Loading banner">

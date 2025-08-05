@@ -4,6 +4,7 @@ import { FaStar, FaRegStar, FaMinus, FaPlus } from 'react-icons/fa';
 import ProductImage from './productImage';
 import { useProductDetail } from '../../../hooks/Product/Product';
 import AddToCart from '../cartPage/AddToCart';
+import LoadingBar from '../../../shared/loading'
 
 const ProductPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -58,7 +59,7 @@ SetSelectedSize(e)
 
 
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingBar/>
   if (error) return <div>Error loading product</div>;
 
   return (

@@ -27,7 +27,7 @@ export const CardCarousel = ({
   const css = `
   .swiper {
     width: 100%;
-    padding-bottom: 50px;
+
   }
   
   .swiper-slide {
@@ -55,7 +55,7 @@ export const CardCarousel = ({
     <section className="w-ace-y-4">
       <style>{css}</style>
       <div
-        className="mx-auto w-full max-w-4xl rounded-[24px] border bg-red-500  border-black/5 p-2 shadow-sm md:rounded-t-[44px]">
+        className="mx-auto w-full h-[24rem] max-w-4xl rounded-[24px] border bg-red-500  border-black/5 p-2 shadow-sm md:rounded-t-[44px]">
         <div
           className="relative mx-auto flex w-full flex-col bg-white rounded-[24px] border border-black/5 bg-neutral-800/5 p-2 shadow-sm md:items-start md:gap-8 md:rounded-b-[20px] md:rounded-t-[40px] md:p-2">
           <Badge

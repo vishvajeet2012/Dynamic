@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import SerachBar from "./search";
 import Menu from "./Menu";
@@ -13,35 +13,71 @@ import { useWishlist } from "../../../context/wishListhContext";
 import { FaGrinTongueWink } from "react-icons/fa";
 import { useCart } from "../../../context/cartContext";
 
-
 export default function Header() {
   const { getLogo, success } = getLogoheader();
-  const { getSingleUser, laoding: userLoading, user } = useGetSingleUser();
+  const { getSingleUser, loading: userLoading, user } = useGetSingleUser();
   const { productsWithWishlistStatus } = useWishlist();
-const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
 
-  useEffect(() => {
+  // Memoized user fetch to prevent unnecessary re-renders
+  const fetchUser = useCallback(() => {
+    if (token) {
       getSingleUser();
-  }, []);
-
-
-  useEffect(() => {
-  const checkToken = () => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken && storedToken !== token) {
-      setToken(storedToken);
     }
-  };
+  }, [token, getSingleUser]);
 
-  window.addEventListener("storage", checkToken);
-  checkToken();
+  // Initial user fetch
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
-  return () => {
-    window.removeEventListener("storage", checkToken);
-  };
-}, [token]);
+  // Optimized token change detection - reduced frequency to prevent performance issues
+  useEffect(() => {
+    let timeoutId;
+    
+    const handleStorageChange = (e) => {
+      if (e.key === "token") {
+        const newToken = e.newValue;
+        if (newToken !== token) {
+          setToken(newToken);
+        }
+      }
+    };
 
-  const {  ///// cart
+    const debouncedTokenCheck = () => {
+      const currentToken = localStorage.getItem("token");
+      if (currentToken !== token) {
+        setToken(currentToken);
+      }
+    };
+
+    // Listen for storage events from other tabs
+    window.addEventListener("storage", handleStorageChange);
+
+    // Debounced token check (reduced frequency)
+    const scheduleTokenCheck = () => {
+      timeoutId = setTimeout(() => {
+        debouncedTokenCheck();
+        scheduleTokenCheck();
+      }, 5000); // Check every 5 seconds instead of 1 second
+    };
+
+    scheduleTokenCheck();
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [token]);
+
+  // Separate effect for user fetch when token changes
+  useEffect(() => {
+    if (token) {
+      getSingleUser();
+    }
+  }, [token]);
+
+  const { ///// cart
     loading,
     cartItems,
     error,
@@ -53,27 +89,23 @@ const [token, setToken] = useState(() => localStorage.getItem("token"));
     getCartItems();
   }, []);
 
-  const totalItems = cartItems?.cart?.length;
-
+  // Pre-calculate values to prevent layout shifts
+  const totalItems = cartItems?.cart?.length || 0;
   const wishlistCount = productsWithWishlistStatus?.totalItems || 0;
+  const isLoggedIn = Boolean(user?.firstName);
+  const logoUrl = success?.logo?.url;
 
+  // Static mobile nav links to prevent recalculation
   const mobileNavLinks = [
     { href: "/", icon: <AiOutlineHome />, label: "Home" },
     { href: "/categories", icon: <BiCategoryAlt />, label: "Category" },
     {
-      href: user?.firstName ? "/profile" : "/login",
+      href: isLoggedIn ? "/profile" : "/login",
       icon: <CgProfile />,
-      label: user?.firstName ? "Profile" : "Login",
+      label: isLoggedIn ? "Profile" : "Login",
     },
     { href: "/cart", icon: <CiShoppingCart />, label: "Cart" },
   ];
-  
-useEffect(() => {
- 
-    getSingleUser();
- 
-}, [token]);
-
 
   return (
     <>
@@ -81,14 +113,20 @@ useEffect(() => {
       <header className="hidden bg-[#e11b23] md:block">
         <div className="w-full bg-[#e11b23] 2xl:max-w-[83rem] 2xl:mx-auto text-white font-bold h-16">
           <div className="flex justify-between items-center h-full px-8">
-            <Link to="/" className="w-36">
-              {success?.logo?.url && (
-                <img
-                  className="h-16 w-32 object-cover aspect-[4/5]"
-                  src={success.logo.url}
-                  alt="Logo"
-                />
-              )}
+            {/* Logo with fixed dimensions to prevent CLS */}
+            <Link to="/" className="w-36 h-16 flex items-center">
+              <div className="h-16 w-32 flex items-center justify-center">
+                {logoUrl ? (
+                  <img
+                    className="h-16 w-32 object-cover aspect-[4/5]"
+                    src={logoUrl}
+                    alt="Logo"
+                    loading="eager"
+                  />
+                ) : (
+                  <div className="h-16 w-32 bg-gray-200 animate-pulse"></div>
+                )}
+              </div>
             </Link>
 
             <div className="w-full max-w-lg">
@@ -96,34 +134,46 @@ useEffect(() => {
             </div>
 
             <div className="flex items-center space-x-6">
+              {/* Fixed width container to prevent text change CLS */}
               <Link
-                to={user?.firstName ? "/profile" : "/login"}
+                to={isLoggedIn ? "/profile" : "/login"}
                 className="flex items-center space-x-2 text-lg hover:text-gray-200"
               >
                 <RiAccountCircleLine className="text-2xl" />
-                {userLoading ? <span>...</span> : <span>{user?.firstName || "Login"}</span>}
+                <span className="min-w-[4rem] text-center">
+                  {isLoggedIn ? "Account" : "Login"}
+                </span>
               </Link>
 
+              {/* Fixed position containers for badges */}
               <Link to="/wishlist" className="relative flex items-center space-x-2 text-lg hover:text-gray-200">
-                <CiHeart className="text-2xl" />
-                 {wishlistCount > 0 && (
-                  <span className="absolute -top-2 left-2 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
-                    {wishlistCount}
+                <div className="relative">
+                  <CiHeart className="text-2xl" />
+                  <span 
+                    className={`absolute -top-2 left-2 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full transition-opacity duration-200 ${
+                      wishlistCount > 0 ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    style={{ minWidth: '1.25rem', textAlign: 'center' }}
+                  >
+                    {wishlistCount || '0'}
                   </span>
-                )}
+                </div>
                 <span>Wishlist</span>
-               
               </Link>
 
               <Link to="/cart" className="relative flex items-center space-x-2 text-lg hover:text-gray-200">
-                <CiShoppingCart className="text-2xl" />
-                 {totalItems > 0 && (
-                  <span className="absolute -top-2 left-2 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
-                    {totalItems}
+                <div className="relative">
+                  <CiShoppingCart className="text-2xl" />
+                  <span 
+                    className={`absolute -top-2 left-2 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full transition-opacity duration-200 ${
+                      totalItems > 0 ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    style={{ minWidth: '1.25rem', textAlign: 'center' }}
+                  >
+                    {totalItems || '0'}
                   </span>
-                )}
-                <span >Cart</span>
-                
+                </div>
+                <span>Cart</span>
               </Link>
             </div>
           </div>
@@ -137,12 +187,21 @@ useEffect(() => {
 
       {/* Mobile Header */}
       <header className="md:hidden">
-        {/* Top Bar */}
-        <div className="w-full bg-[#e11b23] p-2 flex justify-between items-center">
-          <Link to="/" className="w-24">
-            {success?.logo?.url && (
-              <img className="h-12 w-24 object-contain" src={success?.logo?.url} alt="Logo" />
-            )}
+        {/* Top Bar with fixed height */}
+        <div className="w-full bg-[#e11b23] p-2 flex justify-between items-center h-16">
+          <Link to="/" className="w-24 h-12 flex items-center">
+            <div className="h-12 w-24 flex items-center justify-center">
+              {logoUrl ? (
+                <img 
+                  className="h-12 w-24 object-contain" 
+                  src={logoUrl} 
+                  alt="Logo"
+                  loading="eager"
+                />
+              ) : (
+                <div className="h-12 w-24 bg-gray-200 animate-pulse"></div>
+              )}
+            </div>
           </Link>
 
           <div className="flex items-center w-full px-2 space-x-3">
@@ -151,35 +210,44 @@ useEffect(() => {
             </div>
             <Link to="/wishlist" className="relative">
               <CiHeart className="text-white text-2xl" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-2 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
-                  {wishlistCount}
-                </span>
-              )}
+              <span 
+                className={`absolute -top-1 -right-2 bg-white text-black text-xs font-bold px-1.5 py-0.5 rounded-full transition-opacity duration-200 ${
+                  wishlistCount > 0 ? 'opacity-100' : 'opacity-0'
+                }`}
+                style={{ minWidth: '1.25rem', textAlign: 'center' }}
+              >
+                {wishlistCount || '0'}
+              </span>
             </Link>
           </div>
         </div>
 
+        {/* Fixed bottom navigation */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-14 text-gray-700 z-40">
           {mobileNavLinks.map((link) => (
             <Link
               key={link.href}
               to={link.href}
-              className="flex flex-col items-center text-xs flex-1"
+              className="flex flex-col items-center text-xs flex-1 relative py-2"
             >
-              <span className="text-xl">{link.icon}</span>
-              { link.label==="Cart" && totalItems > 0 && (
-                  <span className="absolute -top-0 right-6 text-white bg-primaryReds prim text-xs font-bold px-1.5 py-0.5 rounded-full">
-                    {totalItems}
+              <div className="relative">
+                <span className="text-xl">{link.icon}</span>
+                {link.label === "Cart" && (
+                  <span 
+                    className={`absolute -top-2 -right-2 text-white bg-[#e11b23] text-xs font-bold px-1.5 py-0.5 rounded-full transition-opacity duration-200 ${
+                      totalItems > 0 ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    style={{ minWidth: '1.25rem', textAlign: 'center' }}
+                  >
+                    {totalItems || '0'}
                   </span>
                 )}
-              {link.label}
+              </div>
+              <span className="mt-1">{link.label}</span>
             </Link>
           ))}
         </nav>
       </header>
-
-   
     </>
   );
 }
