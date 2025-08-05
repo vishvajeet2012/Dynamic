@@ -41,6 +41,8 @@
     "react-multi-carousel": "^2.8.6",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.5.0",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1",
     "sonner": "^2.0.6",
     "swiper": "^11.2.10",
     "tailwind-merge": "^3.3.1",

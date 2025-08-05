@@ -258,7 +258,7 @@ export const useSubcategoryFilters = ()=>{
 export const useProductDetail =()=>{
 
 
-    const [loading,setloading]= useState(false)
+    const [loading,setloading]= useState(true)
     const [error,setError]= useState(null)
     const [success,setSuccess]=useState(false)
     const [productDetail, setProductDetail] = useState(null);
