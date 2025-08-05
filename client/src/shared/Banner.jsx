@@ -80,11 +80,11 @@ export default function Banner({ bannerType }) {
     if (!success || !bannerData.images || !bannerData.images.length) return null;
 
     return (
-        <div className="w-full max-w-[1920px] mx-auto relative overflow-hidden">
-            {/* Mobile Slider */}
+        <div className="w-full mb-4 max-w-[1920px] mx-auto relative overflow-hidden">
+         
             <div className="block md:hidden  ">
                 <div className="relative bg-white  shadow-lg overflow-hidden">
-                    {/* Mobile Images Container */}
+                  
                     <div className="relative h-full overflow-hidden">
                         <div 
                             className="flex transition-transform duration-500 ease-in-out h-full"
@@ -108,7 +108,7 @@ export default function Banner({ bannerType }) {
                             ))}
                         </div>
 
-                        {/* Mobile Navigation Arrows */}
+                      
                         {bannerData.images.length > 1 && (
                             <>
                                 <button
@@ -133,15 +133,13 @@ export default function Banner({ bannerType }) {
                         )}
                     </div>
 
-                    {/* Mobile Dots Indicator */}
+                  
                    
                 </div>
             </div>
 
-            {/* Desktop Slider */}
             <div className="hidden md:block">
-                <div className="relative rounded-lg overflow-hidden shadow-lg">
-                    {/* Desktop Images Container */}
+                <div className="relative  overflow-hidden shadow-lg">
                     <div className="relative h-[400px] lg:h-[500px] overflow-hidden">
                         <div 
                             className="flex transition-transform duration-700 ease-in-out h-full"
@@ -164,14 +162,12 @@ export default function Banner({ bannerType }) {
                                                 loading={index === 0 ? "eager" : "lazy"}
                                             />
                                         </picture>
-                                        {/* Hover overlay effect */}
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 ease-in-out"></div>
                                     </a>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Desktop Navigation Arrows */}
                         {bannerData.images.length > 1 && (
                             <>
                                 <button
