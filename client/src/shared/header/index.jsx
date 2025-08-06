@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SerachBar from "./search";
 import Menu from "./Menu";
@@ -10,8 +10,8 @@ import { AiOutlineHome } from "react-icons/ai";
 import { BiCategoryAlt } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { useWishlist } from "../../../context/wishListhContext";
-import { FaGrinTongueWink } from "react-icons/fa";
 import { useCart } from "../../../context/cartContext";
+// Removed unused FaGrinTongueWink import
 
 export default function Header() {
   const { getLogo, success } = getLogoheader();
@@ -19,22 +19,17 @@ export default function Header() {
   const { productsWithWishlistStatus } = useWishlist();
   const [token, setToken] = useState(() => localStorage.getItem("token"));
 
-  // Memoized user fetch to prevent unnecessary re-renders
-  const fetchUser = useCallback(() => {
+  // Only one effect for user fetch when token changes
+  useEffect(() => {
     if (token) {
       getSingleUser();
     }
   }, [token, getSingleUser]);
 
-  // Initial user fetch
-  useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
-
   // Optimized token change detection - reduced frequency to prevent performance issues
   useEffect(() => {
     let timeoutId;
-    
+
     const handleStorageChange = (e) => {
       if (e.key === "token") {
         const newToken = e.newValue;
@@ -51,15 +46,13 @@ export default function Header() {
       }
     };
 
-    // Listen for storage events from other tabs
     window.addEventListener("storage", handleStorageChange);
 
-    // Debounced token check (reduced frequency)
     const scheduleTokenCheck = () => {
       timeoutId = setTimeout(() => {
         debouncedTokenCheck();
         scheduleTokenCheck();
-      }, 5000); // Check every 5 seconds instead of 1 second
+      }, 5000);
     };
 
     scheduleTokenCheck();
@@ -70,24 +63,14 @@ export default function Header() {
     };
   }, [token]);
 
-  // Separate effect for user fetch when token changes
-  useEffect(() => {
-    if (token) {
-      getSingleUser();
-    }
-  }, [token]);
-
-  const { ///// cart
-    loading,
+  const {
     cartItems,
-    error,
     getCartItems,
-    updateCartItem,
   } = useCart();
 
   useEffect(() => {
     getCartItems();
-  }, []);
+  }, [getCartItems]); // Added dependency
 
   // Pre-calculate values to prevent layout shifts
   const totalItems = cartItems?.cart?.length || 0;
@@ -134,7 +117,6 @@ export default function Header() {
             </div>
 
             <div className="flex items-center space-x-6">
-              {/* Fixed width container to prevent text change CLS */}
               <Link
                 to={isLoggedIn ? "/profile" : "/login"}
                 className="flex items-center space-x-2 text-lg hover:text-gray-200"
@@ -145,7 +127,6 @@ export default function Header() {
                 </span>
               </Link>
 
-              {/* Fixed position containers for badges */}
               <Link to="/wishlist" className="relative flex items-center space-x-2 text-lg hover:text-gray-200">
                 <div className="relative">
                   <CiHeart className="text-2xl" />
@@ -179,7 +160,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Category Menu */}
         <div className="border-b">
           <Menu />
         </div>
@@ -187,7 +167,6 @@ export default function Header() {
 
       {/* Mobile Header */}
       <header className="md:hidden">
-        {/* Top Bar with fixed height */}
         <div className="w-full bg-[#e11b23] p-2 flex justify-between items-center h-16">
           <Link to="/" className="w-24 h-12 flex items-center">
             <div className="h-12 w-24 flex items-center justify-center">
@@ -222,7 +201,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Fixed bottom navigation */}
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-14 text-gray-700 z-40">
           {mobileNavLinks.map((link) => (
             <Link
