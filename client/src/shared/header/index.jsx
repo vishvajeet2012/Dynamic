@@ -24,7 +24,7 @@ export default function Header() {
     if (token) {
       getSingleUser();
     }
-  }, [token, getSingleUser]);
+  }, [token,]);
 
   // Optimized token change detection - reduced frequency to prevent performance issues
   useEffect(() => {
@@ -70,9 +70,8 @@ export default function Header() {
 
   useEffect(() => {
     getCartItems();
-  }, [getCartItems]); // Added dependency
+  }, []);
 
-  // Pre-calculate values to prevent layout shifts
   const totalItems = cartItems?.cart?.length || 0;
   const wishlistCount = productsWithWishlistStatus?.totalItems || 0;
   const isLoggedIn = Boolean(user?.firstName);
