@@ -8,12 +8,7 @@ export default function Menu() {
   useEffect(() => {
     fetechCategories();
   }, []);
-
-  if (loading) return (
-    <div className="p-6 text-center text-gray-600 animate-pulse">
-      Loading menu...
-    </div>
-  );
+ 
   
   if (error) return (
     <div className="p-6 text-center text-red-600 bg-red-50 border border-red-100 rounded-lg">
