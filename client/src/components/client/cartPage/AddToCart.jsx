@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCart } from "../../../../context/cartContext";
+import { motion } from "framer-motion"; // Import motion from framer-motion
 
 export default function AddToCart({ productDetail, productId, quantity, size, color }) {
   const {
@@ -27,15 +28,26 @@ export default function AddToCart({ productDetail, productId, quantity, size, co
 
   return (
     <>
-      <button
+      {/*
+        Using motion.button for animations.
+        whileTap provides a subtle scale effect when clicked.
+        whileHover provides a slight scale and shadow effect when hovered over.
+        The background color is updated to #e11b23 and a slightly darker shade for hover.
+        Added default shadow, focus ring, and improved disabled state for a more professional look.
+      */}
+      <motion.button
         onClick={() => handleAddToCart({ productId, quantity, size, color })}
-        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md font-medium transition-colors"
+        className="flex-1 bg-[#e11b23] hover:bg-[#c81a1f] text-white py-3 px-8 rounded-lg font-semibold shadow-md
+                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#e11b23]
+                   disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 ease-in-out"
         disabled={productDetail?.stock <= 0}
+        whileTap={{ scale: 0.95 }} // Shrinks slightly when tapped
+        whileHover={{ scale: 1.02, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)" }} // Grows slightly and adds a more pronounced shadow on hover
       >
         {productDetail?.stock > 0 ? "Add to Cart" : "Out of Stock"}
-      </button>
+      </motion.button>
 
-      {/* Modal */}
+      {/* Modal for size required */}
       {openModal && (
         <div className="fixed inset-0 z-50 flex transition duration-200 items-center justify-center backdrop-blur-lg bg-opacity-50">
           <div className="bg-white p-6 rounded-md shadow-lg w-[90%] max-w-sm">

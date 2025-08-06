@@ -59,7 +59,7 @@ SetSelectedSize(e)
 
 
 
-  if (loading) return <LoadingBar/>
+  if (loading) return <LoadingBar productDetailsPage={"productDetailsPage"}/>
   if (error) return <div>Error loading product</div>;
 
   return (

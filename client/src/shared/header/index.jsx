@@ -90,7 +90,6 @@ export default function Header() {
 
   return (
     <>
-      {/* Desktop Header */}
       <header className="hidden bg-[#e11b23] md:block">
         <div className="w-full bg-[#e11b23] 2xl:max-w-[83rem] 2xl:mx-auto text-white font-bold h-16">
           <div className="flex justify-between items-center h-full px-8">
@@ -162,7 +161,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile Header */}
       <header className="md:hidden">
         <div className="w-full bg-[#e11b23] p-2 flex justify-between items-center h-16">
           <Link to="/" className="w-24 h-12 flex items-center">
@@ -198,7 +196,7 @@ export default function Header() {
           </div>
         </div>
 
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-14 text-gray-700 z-40">
+        <nav className="fixed bottom-0 left-0 right-0 bg-[#e11b23] border-t flex justify-around items-center h-14 text-white z-40">
           {mobileNavLinks.map((link) => (
             <Link
               key={link.href}
@@ -209,7 +207,7 @@ export default function Header() {
                 <span className="text-xl">{link.icon}</span>
                 {link.label === "Cart" && (
                   <span 
-                    className={`absolute -top-2 -right-2 text-white bg-[#e11b23] text-xs font-bold px-1.5 py-0.5 rounded-full transition-opacity duration-200 ${
+                    className={`absolute -top-2 -right-2 text-black bg-white text-xs font-bold px-1.5 py-0.5 rounded-full transition-opacity duration-200 ${
                       totalItems > 0 ? 'opacity-100' : 'opacity-0'
                     }`}
                     style={{ minWidth: '1.25rem', textAlign: 'center' }}
@@ -218,7 +216,7 @@ export default function Header() {
                   </span>
                 )}
               </div>
-              <span className="mt-1">{link.label}</span>
+              <span className="mt-1 font-medium">{link.label}</span>
             </Link>
           ))}
         </nav>
