@@ -267,7 +267,7 @@ export const useProductDetail =()=>{
         try{
             const response = await axios.post(`${homeUrl}/getProductBySlug`,{slug},{
                 headers:{
-                    'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
                     authorization:`Bearer ${localStorage.getItem('token')}`
                 }
             })

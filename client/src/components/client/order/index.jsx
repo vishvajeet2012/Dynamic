@@ -1,59 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { CreditCard, Truck, ShoppingCart, Package, ShoppingBag, Plus, MapPin, CheckCircle } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { CreditCard, MapPin, ShoppingBag, Plus, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useGetSingleUser } from '../../../hooks/auth/use-Auth';
-import { usePlaceOrder } from '../../../hooks/userOrder';
 import { useCart } from '../../../../context/cartContext';
 import { useUserProfileUpdate } from '../../../hooks/client/homePageHooks/use-user';
-
-const mockOrderItems = [
-  {
-    product: '60d5f2f9a3b4c9001f7e8a3a',
-    name: 'Classic Crewneck T-Shirt',
-    image: 'https://placehold.co/100x100/f0f0f0/333?text=T-Shirt',
-    price: 25.00,
-    size: 'L',
-    color: 'White',
-    quantity: 2,
-  },
-  {
-    product: '60d5f2f9a3b4c9001f7e8a3b',
-    name: 'Slim-Fit Denim Jeans',
-    image: 'https://placehold.co/100x100/e0e0e0/333?text=Jeans',
-    price: 75.00,
-    size: '32/32',
-    color: 'Blue',
-    quantity: 1,
-  },
-  {
-    product: '60d5f2f9a3b4c9001f7e8a3c',
-    name: 'Leather Ankle Boots',
-    image: 'https://placehold.co/100x100/d0d0d0/333?text=Boots',
-    price: 120.00,
-    size: '9',
-    color: 'Black',
-    quantity: 1,
-  }
-];
+import CartNavigation from '../cartPage/CartNavigation';
+import OrderSumary from '../cartPage/oderSummery';
 
 const OrderPlacementUI = () => {
-  const { placeOrder, loading, placeOrderData,getCartItems, error, success, cartItems } = useCart();
-  const { getSingleUser, loading: userLoading, error: userError, user } = useGetSingleUser();
-  const {userProfileUpdate,loading:addressUpdate,error:addressupdateError,success:adrreessUpdateSuceess}=useUserProfileUpdate()
-
-
-
-
-  useEffect(() => {
-    getSingleUser();
-    getCartItems()
-  }, []);
-
-
-
+  const { placeOrder, loading, error, success, cartItems, getCartItems } = useCart();
+  const { getSingleUser, loading: userLoading, user } = useGetSingleUser();
+  const { userProfileUpdate, loading: addressUpdate, error: addressUpdateError, success: addressUpdateSuccess } = useUserProfileUpdate();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
@@ -70,6 +30,28 @@ const OrderPlacementUI = () => {
     default: false
   });
 
+  // Calculate totals properly
+  const orderCalculations = useMemo(() => {
+    if (!cartItems?.cart || cartItems.cart.length === 0) {
+      return { subtotal: 0, shippingFee: 0, grandTotal: 0 };
+    }
+
+    const subtotal = cartItems.cart.reduce((sum, item) => {
+      return sum + (item.sellingPrice || item.price || 0) * (item.quantity || 1);
+    }, 0);
+
+    const shippingFee = subtotal > 500 ? 0 : 50; // Free shipping above ₹500
+    const grandTotal = subtotal + shippingFee;
+
+    return { subtotal, shippingFee, grandTotal };
+  }, [cartItems]);
+
+  useEffect(() => {
+    getSingleUser();
+    getCartItems();
+  }, []);
+
+  // Set default address when user data loads
   useEffect(() => {
     if (user?.addresses && user.addresses.length > 0 && !selectedAddress) {
       const defaultAddr = user.addresses.find(addr => addr.default) || user.addresses[0];
@@ -77,14 +59,26 @@ const OrderPlacementUI = () => {
     }
   }, [user, selectedAddress]);
 
-  const orderItems = cartItems?.cart
- 
-  const subtotal = 21;
-  const shippingFee = 5.00;
-  const grandTotal = subtotal + shippingFee;
+  // Show success modal when order is placed successfully
+  useEffect(() => {
+    if (success) {
+      setShowSuccessModal(true);
+    }
+  }, [success]);
 
-  const handleAddAddress = async() => {
-    if (newAddress.label && newAddress.fullAddress && newAddress.city && newAddress.pincode && newAddress.phoneNo) {
+  const handleAddAddress = async () => {
+    const requiredFields = ['label', 'fullAddress', 'city', 'pincode', 'phoneNo'];
+    const missingFields = requiredFields.filter(field => !newAddress[field]?.trim());
+
+    if (missingFields.length > 0) {
+      alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    try {
+      await userProfileUpdate(newAddress);
+      
+      // Reset form
       setNewAddress({
         label: '',
         fullAddress: '',
@@ -95,18 +89,23 @@ const OrderPlacementUI = () => {
         phoneNo: '',
         default: false
       });
+      
       setIsDialogOpen(false);
-     await userProfileUpdate(newAddress)
-      // Refresh user data to get updated addresses
-      getSingleUser();
-    } else {
-      alert('Please fill in all required fields');
+      await getSingleUser(); // Refresh user data
+    } catch (error) {
+      console.error('Failed to add address:', error);
+      alert('Failed to add address. Please try again.');
     }
   };
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress) {
       alert('Please select a delivery address');
+      return;
+    }
+
+    if (!cartItems?.cart || cartItems.cart.length === 0) {
+      alert('Your cart is empty');
       return;
     }
 
@@ -124,27 +123,24 @@ const OrderPlacementUI = () => {
           phoneNo: selectedAddress.phoneNo,
           isDefault: selectedAddress.default || false
         },
-        orderItems: orderItems.map(item => ({
-          product: item.product || item._id,
+        orderItems: cartItems.cart.map(item => ({
+          product: item._id || item.product,
           name: item.name,
-          image: item.image,
-          price: item.price,
+          image: item.images?.[0]?.imagesUrls || item.image,
+          price: item.sellingPrice || item.price,
           size: item.size,
           color: item.color,
           quantity: item.quantity
         })),
-        itemsPrice: subtotal,
-        shippingPrice: shippingFee,
-        totalPrice: grandTotal
+        itemsPrice: orderCalculations.subtotal,
+        shippingPrice: orderCalculations.shippingFee,
+        totalPrice: orderCalculations.grandTotal
       };
 
       await placeOrder(orderData);
-      
-      if (success) {
-        setShowSuccessModal(true);
-      }
     } catch (err) {
       console.error('Order placement failed:', err);
+      alert('Failed to place order. Please try again.');
     }
   };
 
@@ -176,17 +172,22 @@ const OrderPlacementUI = () => {
     }
   ];
 
-  return (
-    <div className="bg-gray-50 min-h-screen font-sans">
-      <div className="container mx-auto px-4 py-8 lg:py-12">
-        <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 text-center mb-8 lg:mb-12">
-          Complete Your Order
-        </h1>
+  if (userLoading || loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
+  return (
+    <div className="w-full mt-4 px-4 lg:px-6 2xl:max-w-7xl 2xl:mx-auto">
+      <CartNavigation />
+      <div className="container mx-auto px-4 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           <div className="lg:col-span-7">
             <div className="bg-white p-6 lg:p-8 rounded-xl shadow-md">
-              {/* Address Section */}
+              {/* Delivery Address Section */}
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-semibold text-gray-700 flex items-center">
@@ -233,7 +234,7 @@ const OrderPlacementUI = () => {
                             />
                           </div>
                           <div>
-                            <Label htmlFor="newState">State *</Label>
+                            <Label htmlFor="newState">State</Label>
                             <Input
                               id="newState"
                               placeholder="State"
@@ -280,8 +281,12 @@ const OrderPlacementUI = () => {
                           />
                           <Label htmlFor="defaultAddress">Set as default address</Label>
                         </div>
-                        <Button onClick={handleAddAddress} className="w-full">
-                          Add Address
+                        <Button 
+                          onClick={handleAddAddress} 
+                          className="w-full"
+                          disabled={addressUpdate}
+                        >
+                          {addressUpdate ? 'Adding...' : 'Add Address'}
                         </Button>
                       </div>
                     </DialogContent>
@@ -289,9 +294,7 @@ const OrderPlacementUI = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  {userLoading ? (
-                    <div className="text-center py-4">Loading addresses...</div>
-                  ) : user?.addresses && user.addresses.length > 0 ? (
+                  {user?.addresses && user.addresses.length > 0 ? (
                     user.addresses.map((addr) => (
                       <div
                         key={addr._id}
@@ -373,31 +376,33 @@ const OrderPlacementUI = () => {
               
               <hr className="my-8 border-gray-200" />
 
-              {/* Order Items section */}
+              {/* Order Items Section */}
               <div>
                 <h2 className="text-2xl font-semibold text-gray-700 mb-6 flex items-center">
                   <ShoppingBag className="w-6 h-6 mr-3 text-indigo-600" /> Your Items
                 </h2>
                 <div className="space-y-4">
-                  {orderItems?.map((item, index) => (
-                    <div key={item.product || item._id || index} className="flex items-center space-x-4">
+                  {cartItems?.cart?.map((item, index) => (
+                    <div key={item._id || index} className="flex items-center space-x-4">
                       <img 
-                        src={item.images[0]?.imagesUrls} 
+                        src={item.images?.[0]?.imagesUrls || 'https://placehold.co/100x100/ccc/FFF?text=Product'} 
                         alt={item.name} 
                         className="w-20 h-20 rounded-lg aspect-[8/9] object-contain border" 
                         onError={(e) => { 
                           e.target.onerror = null; 
-                          e.target.src='https://placehold.co/100x100/ccc/FFF?text=Error'; 
+                          e.target.src = 'https://placehold.co/100x100/ccc/FFF?text=Error'; 
                         }}
                       />
                       <div className="flex-grow">
                         <p className="font-semibold text-gray-800">{item.name}</p>
                         <p className="text-sm text-gray-500">
-                          {item.color} / {item.size}
+                          {item.color} {item.size && `/ ${item.size}`}
                         </p>
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                       </div>
-                      <p className="font-semibold text-gray-800">{(item.sellingPrice * item.quantity).toFixed(2)}</p>
+                      <p className="font-semibold text-gray-800">
+                        ₹{((item.sellingPrice || item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -405,49 +410,12 @@ const OrderPlacementUI = () => {
             </div>
           </div>
 
-          {/* Right Column: Order Summary */}
           <div className="lg:col-span-5">
-            <div className="bg-white p-6 lg:p-8 rounded-xl shadow-md sticky top-8">
-              <h2 className="text-2xl font-semibold text-gray-700 mb-6 flex items-center">
-                <Package className="w-6 h-6 mr-3 text-indigo-600" /> Order Summary
-              </h2>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span>${shippingFee.toFixed(2)}</span>
-                </div>
-                <hr className="border-gray-200" />
-                <div className="flex justify-between text-lg font-semibold text-gray-800">
-                  <span>Total</span>
-                  <span>${cartItems?.totalAmount}</span>
-                </div>grandTotal
-              </div>
-
-              <Button 
-                onClick={handlePlaceOrder} 
-                disabled={loading || !selectedAddress}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition text-lg"
-              >
-                {loading ? 'Placing Order...' : 'Place Order'}
-              </Button>
-
-              {error && (
-                <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                  {error}
-                </div>
-              )}
-
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-500">
-                  By placing your order, you agree to our terms and conditions.
-                </p>
-              </div>
-            </div>
+            <OrderSumary  
+              totalPrice={orderCalculations.grandTotal}  
+              disabled={loading || !selectedAddress || !cartItems?.cart?.length}  
+              handlePlaceOrder={handlePlaceOrder}
+            />
           </div>
         </div>
       </div>

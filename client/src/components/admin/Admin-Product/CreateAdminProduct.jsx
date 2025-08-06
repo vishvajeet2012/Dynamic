@@ -6,10 +6,13 @@ import { useGetAllCategories } from '../../../hooks/useCategories';
 export default function CreateAdminProduct() {
   const { uploadImage, loading: uploadLoading, error: uploadError } = useUplaodImage();
   const { createProduct, loading, error, success } = useCreateProduct();
-  const [imagesUrls, setImageUrls] = useState(null);
-  const [publicIds, setPublicId] = useState(null);
+  
+  // Changed to arrays to store multiple images
+  const [imagesUrls, setImageUrls] = useState([]);
+  const [publicIds, setPublicIds] = useState([]);
+  
   const { categories, loading: categoriesLoading, error: categoriesError, fetechCategories } = useGetAllCategories();
-  const { searchThemeNames, themeNames } =useSearchThemeNames()
+  const { searchThemeNames, themeNames } = useSearchThemeNames();
 
   const [productData, setProductData] = useState({
     name: '',
@@ -22,15 +25,13 @@ export default function CreateAdminProduct() {
     gender: 'unisex',
     category: '',
     subcategories: [],
-    childCategories: [], // <-- Added state for child categories
+    childCategories: [],
     stock: 0,
     isNewArrival: false,
     images: [],
-    
     slug: '',
-    theme:""
-  , isFeatured:false,
-
+    theme: "",
+    isFeatured: false,
   });
 
   const [imageFiles, setImageFiles] = useState([]);
@@ -45,14 +46,12 @@ export default function CreateAdminProduct() {
     setProductData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
-      // Reset subcategories and child categories when category changes
       ...(name === 'category' && { subcategories: [], childCategories: [] })
-    }));if (name === 'theme') {
+    }));
+    
+    if (name === 'theme') {
       searchThemeNames(value);
-      
     }
-    // For debugging purposes
-  
   };
 
   const handleSizeChange = (e) => {
@@ -67,13 +66,10 @@ export default function CreateAdminProduct() {
   };
 
   const selectedCategory = categories?.find(cat => cat._id === productData.category);
-  
   const activeSubcategories = selectedCategory?.subcategories?.filter(sub => sub.isActive) || [];
 
   const handleSubcategoryChange = (e) => {
-    const { value, checked } = e.target; // value is the subcategory._id
-
-    // Find the full subcategory object to access its children
+    const { value, checked } = e.target;
     const subcategory = activeSubcategories.find(sub => sub._id === value);
     const childIdsOfThisSub = subcategory?.childCategory?.map(child => child._id) || [];
 
@@ -82,7 +78,6 @@ export default function CreateAdminProduct() {
         ? [...prev.subcategories, value]
         : prev.subcategories.filter(id => id !== value);
 
-      // If a subcategory is unchecked, remove its children from the state
       const newChildCategories = checked
         ? prev.childCategories
         : prev.childCategories.filter(childId => !childIdsOfThisSub.includes(childId));
@@ -105,41 +100,73 @@ export default function CreateAdminProduct() {
     });
   };
 
-
+  // Modified image upload function to handle multiple images
   const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
-    const formData = new FormData();
-    formData.append("image", files[0]); /// [files[0]]); // Assuming you want to upload multiple images
+    // Upload each file individually and accumulate the results
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append("image", file);
 
-    try {
-        const v = await uploadImage(formData);
-        if (v.url) {
-            setPublicId(v.publicId);
-            setImageUrls(v.url);
+      try {
+        const uploadResult = await uploadImage(formData);
+        if (uploadResult.url) {
+          // Create image object with the required schema format
+          const imageObject = {
+            publicIds: uploadResult.publicId,
+            imagesUrls: uploadResult.url
+          };
+          
+          // Add new image object to existing arrays
+          setImageUrls(prev => [...prev, imageObject]);
+          setPublicIds(prev => [...prev, uploadResult.publicId]); // Keep this for easy access if needed
+          
+          // Add to preview images
+          const preview = URL.createObjectURL(file);
+          setPreviewImages(prev => [...prev, preview]);
+          setImageFiles(prev => [...prev, file]);
         } else {
-            throw new Error('Image upload failed to return a URL.');
+          throw new Error('Image upload failed to return a URL.');
         }
-    } catch (uploadError) {
+      } catch (uploadError) {
         console.error("Upload error:", uploadError);
-        // Optionally, display this error to the user
-        return;
+        // You might want to show this error to the user
+        alert(`Failed to upload image ${i + 1}: ${uploadError.message}`);
+        continue; // Continue with next image even if one fails
+      }
     }
 
+    // Clear the file input after processing
+    e.target.value = '';
+  };
 
-    setImageFiles(files);
-    const previews = files.map(file => URL.createObjectURL(file));
-    setPreviewImages(previews);
+  // Function to remove a specific image
+  const removeImage = (indexToRemove) => {
+    setImageUrls(prev => prev.filter((_, index) => index !== indexToRemove));
+    setPublicIds(prev => prev.filter((_, index) => index !== indexToRemove));
+    setPreviewImages(prev => {
+      // Revoke the object URL to free memory
+      URL.revokeObjectURL(prev[indexToRemove]);
+      return prev.filter((_, index) => index !== indexToRemove);
+    });
+    setImageFiles(prev => prev.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prepare the product object to send
+    // Check if at least one image is uploaded
+    if (imagesUrls.length === 0) {
+      alert('Please upload at least one image');
+      return;
+    }
+
     const productToCreate = {
       name: productData.name,
-      isFeatured:productData.isFeatured,
+      isFeatured: productData.isFeatured,
       slug: productData.slug,
       description: productData.description,
       basePrice: parseFloat(productData.basePrice),
@@ -150,15 +177,14 @@ export default function CreateAdminProduct() {
       category: productData.category,
       stock: parseInt(productData.stock),
       isNewArrival: productData.isNewArrival,
-      publicId: publicIds,
-      imagesUrls: imagesUrls,
+      images: imagesUrls, // Now contains array of objects with publicIds and imagesUrls
       size: productData.size,
       subcategories: productData.subcategories,
-      childCategory: productData.childCategories // <-- Added for submission
-      ,
+      childCategory: productData.childCategories,
       theme: productData.theme
     };
 
+    console.log('Product payload:', productToCreate); // For debugging
     await createProduct(productToCreate);
   };
 
@@ -202,9 +228,6 @@ export default function CreateAdminProduct() {
                 required
               />
             </div>
-
-             
-                  
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
@@ -254,41 +277,40 @@ export default function CreateAdminProduct() {
                 required
               />
             </div>
-             <div className="mb-4">
-               <label className="block text-gray-700 mb-2">Slug*</label>
-               <input
-                 type="text"
-                 name="slug"
-                 value={productData.slug}
-                 onChange={handleChange}
-                 className="w-full px-3 py-2 border rounded"
-                 required
-               />
-             </div>
-             <div className="mb-4">
-  <label className="block text-gray-700 mb-2">Theme*</label>
+            
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Slug*</label>
+              <input
+                type="text"
+                name="slug"
+                value={productData.slug}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded"
+                required
+              />
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Theme*</label>
+              <input
+                type="text"
+                name="theme"
+                value={productData.theme}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded"
+              />
+              <p className="mt-2 animate-pulse text-sm text-red-500">
+                Clothing Theme like (Harry Potter, Spiderman, Marvel, Hulk)
+              </p>
 
-  <input
-    type="text"
-    name="theme"
-    value={productData.theme}
-    onChange={handleChange}
-    className="w-full px-3 py-2 border rounded"
-  />
-
-  <p className="mt-2 animate-pulse text-sm text-red-500">
-    Clothing Theme like (Harry Potter, Spiderman, Marvel, Hulk)
-  </p>
-
-  {/* ✅ Theme List */}
-  {themeNames?.themes&& themeNames?.themes?.length > 0 && (
-    <ul className="mt-3 list-disc list-inside text-sm text-gray-700">
-      {themeNames?.themes.map((theme, index) => (
-        <li key={index}>{theme}</li>
-      ))}
-    </ul>
-  )}
-</div>
+              {themeNames?.themes && themeNames?.themes?.length > 0 && (
+                <ul className="mt-3 list-disc list-inside text-sm text-gray-700">
+                  {themeNames?.themes.map((theme, index) => (
+                    <li key={index}>{theme}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
           {/* Category & Attributes */}
@@ -332,14 +354,13 @@ export default function CreateAdminProduct() {
               {categoriesLoading && <p className="text-sm text-gray-500">Loading categories...</p>}
             </div>
             
-            {/* --- CHILD CATEGORY LOGIC START --- */}
+            {/* Subcategory and Child Category Logic */}
             {productData.category && activeSubcategories.length > 0 && (
               <div className="mb-4 p-3 border rounded">
                 <label className="block text-gray-700 mb-2 font-semibold">Subcategories</label>
                 <div className="space-y-3">
                   {activeSubcategories.map(subcategory => (
                     <div key={subcategory._id}>
-                      {/* Subcategory Checkbox */}
                       <div className="flex items-center">
                         <input
                           type="checkbox"
@@ -354,7 +375,6 @@ export default function CreateAdminProduct() {
                         </label>
                       </div>
 
-                      {/* Child Category Checkboxes (shown if parent subcategory is checked) */}
                       {productData.subcategories.includes(subcategory._id) && subcategory.childCategory?.length > 0 && (
                         <div className="ml-8 mt-2 space-y-2 border-l-2 pl-4">
                           {subcategory.childCategory.map(child => (
@@ -379,7 +399,6 @@ export default function CreateAdminProduct() {
                 </div>
               </div>
             )}
-            {/* --- CHILD CATEGORY LOGIC END --- */}
 
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Sizes</label>
@@ -422,8 +441,9 @@ export default function CreateAdminProduct() {
                 className="mr-2"
               />
               <label htmlFor="isNewArrival" className="text-gray-700">Mark as New Arrival</label>
-            </div> 
-                    <div className="flex items-center mb-4">
+            </div>
+            
+            <div className="flex items-center mb-4">
               <input
                 type="checkbox"
                 name="isFeatured"
@@ -434,37 +454,66 @@ export default function CreateAdminProduct() {
               />
               <label htmlFor="isFeatured" className="text-gray-700">Mark as Feature Product</label>
             </div>
-
-
           </div>
         </div>
 
-        {/* Image Upload */}
+        {/* Image Upload - Enhanced for Multiple Images */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Product Images</h2>
+          
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Upload Images*</label>
+            <label className="block text-gray-700 mb-2">
+              Add More Images (Current: {imagesUrls.length} images)
+            </label>
             <input
               type="file"
               multiple
               onChange={handleImageChange}
               className="w-full px-3 py-2 border rounded"
               accept="image/*"
-              required
             />
-            {uploadLoading && <p className="text-sm text-gray-500">Uploading image...</p>}
+            {uploadLoading && <p className="text-sm text-blue-500">Uploading images...</p>}
             {uploadError && <p className="text-sm text-red-500">{uploadError}</p>}
+            <p className="text-sm text-gray-500 mt-1">
+              You can select multiple images at once or add them one by one
+            </p>
           </div>
 
           {previewImages.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-md font-medium mb-2">Preview</h3>
-              <div className="flex flex-wrap gap-4">
+            <div className="mb-4">
+              <h3 className="text-md font-medium mb-2">Uploaded Images ({imagesUrls.length})</h3>
+              <div className="grid grid-cols-4 gap-4">
                 {previewImages.map((src, index) => (
-                  <div key={index} className="w-24 h-24 border rounded overflow-hidden">
-                    <img src={src} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                  <div key={index} className="relative w-24 h-24 border rounded overflow-hidden group">
+                    <img 
+                      src={src} 
+                      alt={`Preview ${index + 1}`} 
+                      className="w-full h-full object-cover" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Remove image"
+                    >
+                      ×
+                    </button>
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 text-center">
+                      {index + 1}
+                    </div>
+                    <div className="absolute top-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1">
+                      <div className="text-xs truncate">ID: {imagesUrls[index]?.publicIds}</div>
+                    </div>
                   </div>
                 ))}
+              </div>
+              
+              {/* Debug info - remove in production */}
+              <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
+                <strong>Debug - Images Array Structure:</strong>
+                <pre className="mt-1 text-xs overflow-x-auto">
+                  {JSON.stringify(imagesUrls, null, 2)}
+                </pre>
               </div>
             </div>
           )}
@@ -474,7 +523,11 @@ export default function CreateAdminProduct() {
           <button
             type="submit"
             disabled={loading || categoriesLoading || uploadLoading}
-            className={`px-4 py-2 rounded text-white ${loading || categoriesLoading || uploadLoading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+            className={`px-4 py-2 rounded text-white ${
+              loading || categoriesLoading || uploadLoading 
+                ? 'bg-gray-400' 
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
             {loading ? 'Creating...' : 'Create Product'}
           </button>

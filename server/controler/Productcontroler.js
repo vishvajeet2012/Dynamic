@@ -33,7 +33,7 @@ exports.createProduct = async (req, res) => {
       theme
     } = req.body;
 
-    // ✅ Required Fields Validation
+    // ✅ Required Fields alidation
     if (!name || !description || !basePrice || !category || !subcategories) {
       return res.status(400).json({
         message: "Missing required fields: name, description, basePrice, category, subcategories"
@@ -114,10 +114,7 @@ exports.createProduct = async (req, res) => {
       category,
       subcategories: givenSubIds,
       childCategory: givenChildIds,
-      images: {
-        publicId,
-        imagesUrls
-      },
+      images,
       stock,
       isNewArrival,
       color,
