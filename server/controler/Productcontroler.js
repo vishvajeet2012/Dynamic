@@ -33,7 +33,6 @@ exports.createProduct = async (req, res) => {
       theme
     } = req.body;
 
-    // ✅ Required Fields alidation
     if (!name || !description || !basePrice || !category || !subcategories) {
       return res.status(400).json({
         message: "Missing required fields: name, description, basePrice, category, subcategories"
