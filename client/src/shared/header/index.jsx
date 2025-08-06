@@ -77,7 +77,6 @@ export default function Header() {
   const isLoggedIn = Boolean(user?.firstName);
   const logoUrl = success?.logo?.url;
 
-  // Static mobile nav links to prevent recalculation
   const mobileNavLinks = [
     { href: "/", icon: <AiOutlineHome />, label: "Home" },
     { href: "/categories", icon: <BiCategoryAlt />, label: "Category" },
@@ -95,7 +94,6 @@ export default function Header() {
       <header className="hidden bg-[#e11b23] md:block">
         <div className="w-full bg-[#e11b23] 2xl:max-w-[83rem] 2xl:mx-auto text-white font-bold h-16">
           <div className="flex justify-between items-center h-full px-8">
-            {/* Logo with fixed dimensions to prevent CLS */}
             <Link to="/" className="w-36 h-16 flex items-center">
               <div className="h-16 w-32 flex items-center justify-center">
                 {logoUrl ? (
