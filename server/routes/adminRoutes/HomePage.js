@@ -11,7 +11,7 @@ const { createProduct, getProducts, productDelete, updateProduct, getProductbyke
 const { createChildCategory } = require('../../controler/childCategoryControler');
 const { addtoWishlist, getAllProductsWithWishlist, getUserWishlist } = require('../../controler/wishlist');
 const { addToCartControler, getCartItems, updateCartItem, removeCartItem } = require('../../controler/cart');
-const { placeOrder, updateOrderStatus, getAllOrders } = require('../../controler/order');
+const { placeOrder, updateOrderStatus, getAllOrders, createPaymentIntent } = require('../../controler/order');
 const { getBannersByType, createBanner, updateBanner, deleteBanner } = require('../../controler/BannerControler');
 const admin = require('../../middleware/adminMiddleWare');
 
@@ -49,7 +49,6 @@ router.delete('/deletebaner/:id', auth,deleteBanner);
 router.post('/getbannersbytype' ,getBannersByType)
 //router.patch('/:id/toggle-active',auth, toggleBannerActive);
 
-
     /////////////////////////Product ////////////////
     router.post('/productcreate', auth, createProduct);
     router.post('/getallproduct',getProducts)
@@ -75,7 +74,7 @@ router.post('/removeCartItem',auth , removeCartItem)
 
 /////////////////order routes //////////////////
 
-
+router.post('/createPaymentIntent' ,createPaymentIntent)
 router.post('/placeorder', auth, placeOrder);
 router.post('/updateOrderStatus',auth, updateOrderStatus)
 router.post('/getallorder',auth,getAllOrders)
