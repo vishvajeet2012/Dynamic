@@ -20,7 +20,7 @@ import {
 } from '@stripe/react-stripe-js';
 import { homeUrl } from '../../../lib/baseUrl';
 
-const stripePromise = loadStripe("pk_test_51RqzXoF7zcR2ir3B40ucXwJSZC3lv7deYwuUf6tjQCOv6EXKs6EMGqcOcws91MwjJYIe2sXrlt23XrJKlDDfG6Do00x7jJUqEH");
+const stripePromise = loadStripe("you key");
 
 const StripeCardInput = ({ onCardChange, disabled }) => {
   const stripe = useStripe();

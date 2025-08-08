@@ -154,7 +154,7 @@ const transporter = nodemailer.createTransport({
 // }
 
 
-const stripe = require('stripe')("sk_test_51RqzXoF7zcR2ir3BlaqMuZiWodaIjY53vczC2HN79utsMEOcBkWEZYP0EWDJdgQJ9SCQhxnAbfMF8hj5DDTGCeO600izpdfZxb"); 
+const stripe = require('stripe')("you key"); 
 
 
 // Create Payment Intent
