@@ -22,6 +22,7 @@ import Wishlistpage from './components/client/wishlist/wishlistPage';
 import CartPage from './components/client/cartPage';
 import OrderPlacementUI from './components/client/order';
 import AdminOrder from './components/admin/Adminorders';
+import ThankYouPage from './shared/ThankyouPage';
 function App() {
   return (
     <>
@@ -36,7 +37,7 @@ function App() {
     <Route path="/wishlist" element={<Wishlistpage/>} />
       <Route element={<ProtectedRoute />}>
       <Route path="/profile" element={<UserProfile />} />
-
+      <Route path= "/thankyou/:id" element={<ThankYouPage/>}/>
         <Route path="/category-update" element={<CategoryUpdateForm />} />
         <Route path="/p" element={<HomePageControl />} />
         <Route path='/admincategory' element={<AdminCategory />} />

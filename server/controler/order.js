@@ -1,6 +1,7 @@
 const Order = require("../models/order");
 const User = require('../models/authModel')
 const nodemailer = require("nodemailer");
+const order = require("../models/order");
 
 const transporter = nodemailer.createTransport({
   service: process.env.EMAIL_SERVICE || 'gmail',
@@ -153,6 +154,7 @@ const transporter = nodemailer.createTransport({
 // }
 
 
+const stripe = require('stripe')("sk_test_51RqzXoF7zcR2ir3BlaqMuZiWodaIjY53vczC2HN79utsMEOcBkWEZYP0EWDJdgQJ9SCQhxnAbfMF8hj5DDTGCeO600izpdfZxb"); 
 
 
 // Create Payment Intent
@@ -421,6 +423,34 @@ exports.getAllOrders = async (req, res) => {
 };
 
 
+exports.getOrderbyId = async (req,res)=>{
+  const {orderId} = req.body
+  console.log(orderId)
+
+      try{
+          ////get order form here or by id 
+        if(!orderId){
+          return res.status(404).json({message:"no order id find "})
+        }
+            const OrderC = await order.findById(orderId)
+            if(!OrderC){
+              return  res.status(404).json({message:"order not found " ,status:false})
+
+            }
+           
+             res.status(201).json({message:"Thank you for purchase" ,data:OrderC ,status:true})
+          
+
+          
+
+
+      }catch(error){
+        res.status(500).json({message:"Internal server Errror ",error:error})
+
+      }
+
+}
+
 
 /////////////////exprots update order status ///////////////////
 
@@ -430,11 +460,7 @@ exports.updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
     
-    // Log for debugging
-    console.log('Received orderId:', orderId);
-    console.log('Received status:', status);
-    
-    // Validate required fields
+
     if (!orderId || !status) {
       return res.status(400).json({ 
         message: "OrderId and status are required" 

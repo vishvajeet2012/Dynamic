@@ -11,7 +11,7 @@ const { createProduct, getProducts, productDelete, updateProduct, getProductbyke
 const { createChildCategory } = require('../../controler/childCategoryControler');
 const { addtoWishlist, getAllProductsWithWishlist, getUserWishlist } = require('../../controler/wishlist');
 const { addToCartControler, getCartItems, updateCartItem, removeCartItem } = require('../../controler/cart');
-const { placeOrder, updateOrderStatus, getAllOrders, createPaymentIntent } = require('../../controler/order');
+const { placeOrder, updateOrderStatus, getAllOrders, createPaymentIntent, getOrderbyId } = require('../../controler/order');
 const { getBannersByType, createBanner, updateBanner, deleteBanner } = require('../../controler/BannerControler');
 const admin = require('../../middleware/adminMiddleWare');
 
@@ -74,10 +74,11 @@ router.post('/removeCartItem',auth , removeCartItem)
 
 /////////////////order routes //////////////////
 
-router.post('/createPaymentIntent' ,createPaymentIntent)
+router.post('/createPaymentIntent' ,auth,createPaymentIntent)
 router.post('/placeorder', auth, placeOrder);
 router.post('/updateOrderStatus',auth, updateOrderStatus)
 router.post('/getallorder',auth,getAllOrders)
+router.post('/getOrderbyId', getOrderbyId)
 
 
 //////////////////////test start ///////////////////////////////

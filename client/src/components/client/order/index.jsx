@@ -18,8 +18,9 @@ import {
   useStripe,
   useElements
 } from '@stripe/react-stripe-js';
+import { homeUrl } from '../../../lib/baseUrl';
 
-const stripePromise = loadStripe('pk_test_your_key_here');
+const stripePromise = loadStripe("pk_test_51RqzXoF7zcR2ir3B40ucXwJSZC3lv7deYwuUf6tjQCOv6EXKs6EMGqcOcws91MwjJYIe2sXrlt23XrJKlDDfG6Do00x7jJUqEH");
 
 const StripeCardInput = ({ onCardChange, disabled }) => {
   const stripe = useStripe();
@@ -156,7 +157,7 @@ const OrderPlacementContent = () => {
 
   const createPaymentIntent = async (orderData) => {
     try {
-      const response = await fetch('/api/orders/create-payment-intent', {
+      const response = await fetch(`${homeUrl}/createPaymentIntent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

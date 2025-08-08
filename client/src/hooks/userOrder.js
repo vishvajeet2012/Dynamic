@@ -107,3 +107,45 @@ const token =localStorage.getItem('token')
   }
   return {updateOrderStatus,loading , error,data}
   }
+
+
+
+
+
+  export const useGetOrderByUserId = ()=>{
+    const [loading,setLoading] = useState(true)
+    const [error,setError]=useState(null)
+    const [data,setData] = useState()
+    const [success,setSuccess]=useState()
+
+    const getOrderByUserId = async(orderId)=>{
+
+ setLoading(true);  
+    setError(null);
+    setSuccess(false);
+
+const token =localStorage.getItem('token')
+    try {
+      const response =await axios.post(`${homeUrl}/getOrderbyId`,{orderId:orderId},
+         {
+                   headers:{
+                
+                authorization:`Bearer ${token}`
+                
+            }
+                }
+            
+      )
+      setSuccess(true)
+      setData(response.data);
+      return response.data;  
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create category');
+      throw err;
+    } finally {
+      setLoading(false);  
+    }
+  }
+return { getOrderByUserId,success,loading,error ,data}
+
+  }
