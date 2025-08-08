@@ -19,8 +19,10 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 import { homeUrl } from '../../../lib/baseUrl';
+import { useNavigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
-const stripePromise = loadStripe("you key");
+const stripePromise = loadStripe("you");
 
 const StripeCardInput = ({ onCardChange, disabled }) => {
   const stripe = useStripe();
@@ -64,10 +66,10 @@ const StripeCardInput = ({ onCardChange, disabled }) => {
 const OrderPlacementContent = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { placeOrder, loading, error, success, cartItems, getCartItems } = useCart();
+  const { placeOrder, loading, error, success, cartItems, getCartItems ,placeOrderData} = useCart();
   const { getSingleUser, loading: userLoading, user } = useGetSingleUser();
   const { userProfileUpdate, loading: addressUpdate, error: addressUpdateError, success: addressUpdateSuccess } = useUserProfileUpdate();
-
+const navi = useNavigate()
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cod');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -334,6 +336,15 @@ const OrderPlacementContent = () => {
   if (userLoading) {
     return <FullScreenLoader />;
   }
+  
+useEffect(()=>{
+ if(placeOrderData?.orderId &&  placeOrderData?.orderId){
+  
+  navi(`/thankyou/${placeOrderData?.orderId}`)
+ }
+},[placeOrderData?.orderId])
+
+ 
 
   return (
     <div className="w-full mt-4 px-4 lg:px-6 2xl:max-w-7xl 2xl:mx-auto">

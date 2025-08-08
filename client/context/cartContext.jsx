@@ -10,11 +10,10 @@ export const CartProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const [error, setError] = useState(null);
-const [placeOrderData,setPlaceOrderData]= useState()
+const [placeOrderData,setPlaceOrderData]= useState(null)
     // Get token from localStorage
     const getToken = () => localStorage.getItem('token');
 
-    // Add item to cart
     const addToCart = async (productId, quantity, size, color) => {
         setLoading(true);
         setError(null);
@@ -149,7 +148,7 @@ const [placeOrderData,setPlaceOrderData]= useState()
             
             toast(response?.data?.message)
             await getCartItems();
-            setPlaceOrderData(resposne?.data)
+            setPlaceOrderData(response?.data)
             toast(response?.message)
             return response.data;
         } catch (error) {
