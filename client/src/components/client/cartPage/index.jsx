@@ -14,7 +14,7 @@ const navigate = useNavigate();
           <p className="text-gray-600 mb-6">You must be logged in to view your cart.</p>
           <button
             onClick={() => navigate("/login")}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition"
+            className="bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition"
           >
             Go to Login
           </button>
@@ -22,6 +22,8 @@ const navigate = useNavigate();
       </div>
     );
   }
+
+  
    
 
     return (

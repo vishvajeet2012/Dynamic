@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useCart } from "../../../../context/cartContext";
 import RemoveCartProduct from "./RemoveCartProduct";
 import OrderSumary from "./oderSummery";
-import { Loader2 } from "lucide-react"; // Icon for small spinner
+import { Loader2, ShoppingCart } from "lucide-react"; // Icon for small spinner
 
 export default function CartPageProduct() {
   const {
@@ -18,7 +18,22 @@ export default function CartPageProduct() {
     getCartItems();
   }, []);
 
-  const totalItems = cartItems?.cart?.length;
+  const totalItems = cartItems?.cart?.length||0
+
+
+  if(totalItems===0) return    <div className="lg:col-span-5 md:min-w-md">
+        <div className="bg-white p-6 lg:p-8 border shadow-md sticky top-8 text-center">
+          <ShoppingCart className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">Your cart is empty</h2>
+          <p className="text-gray-500 mb-6">Add some items to your cart before placing an order.</p>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-primaryReds text-white font-bold py-2 px-6 rounded-lg hover:bg-primaryReds focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition"
+          >
+            Shop Now
+          </button>
+        </div>
+      </div>
 
   const handleUpdateQuantity = async ({ productId, quantity, size, color }) => {
     setUpdatingProductId(productId);
@@ -78,7 +93,6 @@ export default function CartPageProduct() {
                         </p>
                       )}
 
-                      {/* Quantity Controls */}
                       <div className="flex items-center gap-2 text-sm mt-2">
                         <span className="font-bold text-black">Quantity:</span>
                         <div className="flex items-center border rounded">
@@ -124,7 +138,6 @@ export default function CartPageProduct() {
                       </div>
                     </div>
 
-                    {/* Price and Remove */}
                     <div className="flex flex-col items-start md:items-end justify-between gap-4">
                       <p className="text-base">
                         <span className="text-gray-500">Price: </span>
@@ -159,7 +172,7 @@ export default function CartPageProduct() {
           </div>
         </div>
 
-        <OrderSumary totalPrice={cartItems?.totalAmount?.toFixed(2)} />
+        <OrderSumary cartlength={totalItems} totalPrice={cartItems?.totalAmount?.toFixed(2)} />
       </div>
     </>
   );

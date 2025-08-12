@@ -1,17 +1,35 @@
 import { ShoppingCart } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
-export default function OrderSumary({ totalPrice, disabled, handlePlaceOrder }) {
+export default function OrderSumary({ totalPrice, disabled, handlePlaceOrder ,cartlength }) {
   const navigate = useNavigate();
   const location = useLocation(); // Pathname check karne ke liye
-
+const [PlaceorderDisbale ,setdisabled]=useState()
   const handleClickOrder = () => {
-    if (location.pathname === "/cart") {
-      navigate("/checkout");
+    if (location.pathname==="/cart") {
+
+          if(cartlength>0){
+
+            navigate("/checkout");
+          }else{
+            
+      alert("Your cart is empty!");
+          }
+
     }else{
       navigate("/thanks")
     }
+
+
   };
+  useEffect(() => {
+    if(cartlength >0) { 
+setdisabled(false)}
+  else{
+    setdisabled(true)
+  }
+}, [cartlength]);
 
   return (
     <div className="lg:col-span-5 md:min-w-md">
@@ -39,9 +57,11 @@ export default function OrderSumary({ totalPrice, disabled, handlePlaceOrder }) 
         {location.pathname === "/cart" ? (
           <button
             type="button"
+            disabled={PlaceorderDisbale}
             onClick={handleClickOrder}
-            className="w-full bg-primaryReds text-white font-bold py-3 px-4 rounded-lg mt-8 hover:bg-primaryReds focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-transform transform hover:scale-105 flex items-center justify-center"
-          >
+         className={`w-full bg-primaryReds text-white font-bold py-3 px-4 rounded-lg mt-8 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-transform transform flex items-center justify-center ${
+      PlaceorderDisbale ? "opacity-50 cursor-not-allowed" : "hover:bg-primaryReds hover:scale-105"
+    }`}>
             Place Order
           </button>
         ) : (
