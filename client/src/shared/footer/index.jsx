@@ -94,7 +94,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Your Company Name. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} The V Store. All Rights Reserved.</p>
           <p className="mt-2">Designed with passion.</p>
         </div>
       </div>

@@ -224,7 +224,6 @@ const navi = useNavigate()
       }
 
       if (paymentIntent.status === 'succeeded') {
-        // Payment successful, place the order
         const updatedOrderData = {
           ...orderData,
           paymentResult: {
