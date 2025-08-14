@@ -42,8 +42,7 @@ export default function Signup() {
         <OtpVerification email={success?.data?.email} />
       ) : (
         <div className="min-h-screen flex">
-          {/* Left side - Branding */}
-          <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-500 to-red-600 relative overflow-hidden">
+          <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#e11b23] to-[#e11b23] relative overflow-hidden">
             <div className="absolute inset-0 bg-black/20" />
             <div className="flex flex-col justify-center items-center text-white p-12 relative z-10">
               <div className="text-center">
@@ -69,7 +68,6 @@ export default function Signup() {
             </div>
           </div>
 
-          {/* Right side - Signup Form */}
           <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
             <div className="w-full max-w-md">
               <Card className="shadow-lg border-0">
@@ -168,7 +166,7 @@ export default function Signup() {
                     <Button
                       type="submit"
                       disabled={loading}
-                      className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-medium transition-all duration-200"
+                      className="w-full h-12 bg-primaryReds hover:bg-red-700  transition-all duration-300 cursor-pointer text-white font-medium transition-all duration-200"
                     >
                       {loading ? (
                         <>
@@ -292,7 +290,7 @@ function OtpVerification({ email }) {
               <Button
                 type="submit"
                 disabled={otpLoading}
-                className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-medium transition-all duration-200"
+                className="w-full h-12 bg-primaryReds hover:bg-red-700  transition-all duration-300 cursor-pointer text-white font-medium transition-all duration-200"
               >
                 {otpLoading ? (
                   <>

@@ -112,7 +112,7 @@ export default function Login() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-medium transition-all duration-200"
+                  className="w-full h-12 bg-primaryReds hover:bg-red-700  transition-all duration-300 cursor-pointer text-white font-medium transition-all duration-200"
                 >
                   {loading ? (
                     <>

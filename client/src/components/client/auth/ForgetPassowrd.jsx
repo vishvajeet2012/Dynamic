@@ -44,7 +44,6 @@ const onSumbit = async(data)=>{
     <>  
         <div className="flex flex-col items-center justify-center h-screen">
      <form onSubmit={handleSubmit(onSumbit)} className="flex flex-col items-center justify-center border rounded-lg p-6 max-w-sm   space-y-4">
-  {/* Password Field */}
   <div className="w-full">
     <input
    {...register('password', { 
