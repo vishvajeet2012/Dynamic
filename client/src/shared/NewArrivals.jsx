@@ -25,7 +25,6 @@ if(loading){
 }
   },2000)
   },[Product])
-console.log(Product,"fdsjk")
   return (
     <section className="w-full py-6 lg:px-6">
      

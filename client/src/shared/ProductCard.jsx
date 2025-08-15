@@ -30,16 +30,20 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
 
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // --- Event Handlers ---
-
+  const token = localStorage.getItem('token');
   const handleWishlistClick = async(e) => {
    /// e.stopPropagation();
    /// setIsWishlisted((prev) => !prev);
    /// console.log("Toggled wishlist for:", name);
-        
-    toggleWishlist(_id)
-    setIsWishlisted((prev) => !prev);
-    console.log("Wishlist status:", e);
+        if(!token){
+            alert("Plese login first ")
+
+        }else{
+          
+          setIsWishlisted((prev) => !prev);
+          toggleWishlist(_id)
+
+  }
 
   };
 

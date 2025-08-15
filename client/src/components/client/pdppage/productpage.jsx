@@ -25,6 +25,23 @@ const ProductPage = () => {
   const increaseQuantity = () => setQuantity(prev => prev + 1);
   const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
 
+
+
+useEffect(() => {
+  // Page load hone par top se scroll kare
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth" // Smooth scroll (optional)
+  });
+
+  if (id) {
+    getProductBySlug(id);
+  }
+}, [id]);
+
+
+
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -34,7 +51,6 @@ const ProductPage = () => {
 
   
 
-  // Render star ratings
   const renderRating = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);

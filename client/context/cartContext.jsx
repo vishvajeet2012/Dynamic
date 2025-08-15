@@ -20,6 +20,7 @@ const [placeOrderData,setPlaceOrderData]= useState(null)
         
         try {
             const token = getToken();
+            if(!token)return;
             const response = await axios.post(`${homeUrl}/addToCart`, {
                 productId, 
                 quantity, 
@@ -109,6 +110,7 @@ const [placeOrderData,setPlaceOrderData]= useState(null)
         
         try {
             const token = getToken();
+            if(!token) return ;
             const response = await axios.post(`${homeUrl}/removeCartItem`, {
             productId, quantity, size, color
             }, {

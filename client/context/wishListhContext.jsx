@@ -15,6 +15,7 @@ export const WishlistProvider = ({ children }) => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
+            if(!token) return;
             const response = await axios.post(`${homeUrl}/addtoWishlist`, { productId }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,6 +52,7 @@ export const WishlistProvider = ({ children }) => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
+            if(!token) return;
             const response = await axios.post(`${homeUrl}/getAllProductsWithWishlist`, {}, {
                 headers: {
                     'Content-Type': 'application/json',

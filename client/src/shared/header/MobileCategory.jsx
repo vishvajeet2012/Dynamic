@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Minus, Plus } from "lucide-react";
-import { Bar, BarChart, ResponsiveContainer } from "recharts";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +15,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useGetAllCategories } from "../../hooks/useCategories";
+import { Link } from "react-router-dom";
+import { BiCategoryAlt } from "react-icons/bi";
 
 const data = [
   { goal: 400 },
@@ -33,7 +34,7 @@ const data = [
   { goal: 349 },
 ];
 
-export function DrawerDemo() {
+export function MobileCategory() {
 
 
       const { loading, error, categories, fetechCategories } = useGetAllCategories();
@@ -41,6 +42,7 @@ export function DrawerDemo() {
       useEffect(() => {
         fetechCategories();
       }, [])
+      console.log(categories,"this is vishu")
   const [goal, setGoal] = useState(350);
 
   function onClick(adjustment) {
@@ -48,9 +50,11 @@ export function DrawerDemo() {
   }
 
   return (
-    <Drawer>
-      <DrawerTrigger asChild>
-        <Button variant="outline">Open Drawer</Button>
+ <Drawer >
+       <DrawerTrigger asChild>
+        <small className="flex flex-col items-center  flex-1 justify-center">
+            <BiCategoryAlt className="text-xl" />
+            <span className=" font-medium">Category</span></small>
       </DrawerTrigger>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
@@ -90,17 +94,7 @@ export function DrawerDemo() {
               </Button>
             </div>
             <div className="mt-3 h-[120px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
-                  <Bar
-                    dataKey="goal"
-                    style={{
-                      fill: "hsl(var(--foreground))",
-                      opacity: 0.9,
-                    }}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            
             </div>
           </div>
           <DrawerFooter>

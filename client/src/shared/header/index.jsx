@@ -11,7 +11,7 @@ import { BiCategoryAlt } from "react-icons/bi";
 import { CgProfile } from "react-icons/cg";
 import { useWishlist } from "../../../context/wishListhContext";
 import { useCart } from "../../../context/cartContext";
-// Removed unused FaGrinTongueWink import
+import { MobileCategory } from "./MobileCategory";
 
 export default function Header() {
   const { getLogo, success } = getLogoheader();
@@ -19,14 +19,12 @@ export default function Header() {
   const { productsWithWishlistStatus } = useWishlist();
   const [token, setToken] = useState(() => localStorage.getItem("token"));
 
-  // Only one effect for user fetch when token changes
   useEffect(() => {
     if (token) {
       getSingleUser();
     }
-  }, [token,]);
+  }, [token]);
 
-  // Optimized token change detection - reduced frequency to prevent performance issues
   useEffect(() => {
     let timeoutId;
 
@@ -76,17 +74,6 @@ export default function Header() {
   const wishlistCount = productsWithWishlistStatus?.totalItems || 0;
   const isLoggedIn = Boolean(user?.firstName);
   const logoUrl = success?.logo?.url;
-
-  const mobileNavLinks = [
-    { href: "/", icon: <AiOutlineHome />, label: "Home" },
-    { href: "/categories", icon: <BiCategoryAlt />, label: "Category" },
-    {
-      href: isLoggedIn ? "/profile" : "/login",
-      icon: <CgProfile />,
-      label: isLoggedIn ? "Profile" : "Login",
-    },
-    { href: "/cart", icon: <CiShoppingCart />, label: "Cart" },
-  ];
 
   return (
     <>
@@ -197,29 +184,36 @@ export default function Header() {
           </div>
         </div>
 
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center h-14 text-gray-700 z-40">
-          {mobileNavLinks.map((link) => (
-            <Link
-              key={link.href}
-              to={link.href}
-              className="flex flex-col items-center text-xs flex-1 relative py-2"
-            >
-              <div className="relative">
-                <span className="text-xl">{link.icon}</span>
-                {link.label === "Cart" && (
-                  <span 
-                    className={`absolute -top-2 -right-2 text-white bg-[#e11b23] text-xs font-bold px-1.5 py-0.5 rounded-full transition-opacity duration-200 ${
-                      totalItems > 0 ? 'opacity-100' : 'opacity-0'
-                    }`}
-                    style={{ minWidth: '1.25rem', textAlign: 'center' }}
-                  >
-                    {totalItems || '0'}
-                  </span>
-                )}
-              </div>
-              <span className="mt-1 font-medium">{link.label}</span>
-            </Link>
-          ))}
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-between items-center h-14 text-gray-700 z-40">
+          <Link to="/" className="flex flex-col items-center text-xs flex-1 relative ">
+            <AiOutlineHome className="text-xl" />
+            <span className=" font-medium">Home</span>
+          </Link>
+           
+          <MobileCategory/>
+        
+          <Link 
+            to={isLoggedIn ? "/profile" : "/login"} 
+            className="flex flex-col items-center text-xs flex-1 relative"
+          >
+            <CgProfile className="text-xl" />
+            <span className=" font-medium">{isLoggedIn ? "Profile" : "Login"}</span>
+          </Link>
+          
+          <Link to="/cart" className="flex flex-col items-center text-xs flex-1 relative ">
+            <div className="relative">
+              <CiShoppingCart className="text-xl" />
+              <span 
+                className={`absolute -top-2 -right-2 text-white bg-[#e11b23] text-xs font-bold px-1.5 py-0.5 rounded-full transition-opacity duration-200 ${
+                  totalItems > 0 ? 'opacity-100' : 'opacity-0'
+                }`}
+                style={{ minWidth: '1.25rem', textAlign: 'center' }}
+              >
+                {totalItems || '0'}
+              </span>
+            </div>
+            <span className="font-medium">Cart</span>
+          </Link>
         </nav>
       </header>
     </>

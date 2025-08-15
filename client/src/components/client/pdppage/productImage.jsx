@@ -7,7 +7,6 @@ const ProductImage = ({ images, altText }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showGallery, setShowGallery] = useState(false);
 
-  // Map your images data to the format react-image-gallery expects
   const galleryImages = images.map(img => ({
     original: img.imagesUrls,
     thumbnail: img.imagesUrls,
