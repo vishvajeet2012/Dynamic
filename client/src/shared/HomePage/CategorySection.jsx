@@ -72,12 +72,11 @@ export default function CategorySection({categories, categoriesLoading}){
 
   return (
     <>
-      <section className="w-full h-full py-6 md:px-6">
+      <section className="w-full 2xl:max-w-[79rem] 2xl:mx-auto h-full py-6 md:px-6">
         {categoriesLoading ? (
           <LoadingSkeleton />
         ) : (
           <>
-            {/* Desktop View - Original Grid Layout */}
             <div className="hidden md:block text-center mb-4">
               <h1 className="text-4xl capitalize font-semibold text-black tracking-tight">
                 Categories

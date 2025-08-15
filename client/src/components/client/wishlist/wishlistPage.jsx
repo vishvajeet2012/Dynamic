@@ -38,8 +38,8 @@ const navigate = useNavigate();
           <p>Your wishlist is empty.</p>
         </div>
       ) : (
-        <div className="wishlist-items flex  ">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
+        <div className="wishlist-items w-full  ">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 ">
           {productsWithWishlistStatus?.wishlist &&
           productsWithWishlistStatus?.wishlist?.map((product, idx) => ( 
               <div

@@ -31,6 +31,7 @@ function App() {
 
       <Route path='/login' element={<Login />} />
       <Route path="/" element={<Home />} />
+       <Route path="/category/:id" element={<CategroyPage />} />
       <Route path="/signup" element={<Signup />} />
     <Route path="/:id" element={<ProductPage />} />
     <Route path='cart' element={<CartPage />} />
@@ -47,7 +48,7 @@ function App() {
         <Route path= "/AdminProduct" element={<AdminProduct/>} />
         <Route path='/fogretPassword' element={<ForgetPassowrd/>} />
         <Route path='/productupdatedelete' element={<AdminProductManagement/>} />
-        <Route path="/category/:id" element={<CategroyPage />} />
+       
         <Route path ="/checkout"  element={<OrderPlacementUI/>}/>
         <Route path="/adminorder" element={<AdminOrder/>}/>
         {/* Add other protected routes here */}

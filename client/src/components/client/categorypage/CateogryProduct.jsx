@@ -6,13 +6,16 @@ import ProductCard from "../../../shared/ProductCard";
 import RoundedCards from "../../../shared/roundedCard";
 import CategoryBanner from "../../../shared/CategoryBanner";
 import { useSubcategoryFilters } from "../../../hooks/Product/Product";
+import FullScreenLoader from "../../../shared/loading";
 
 export default function CategoryProduct({ setData, Products, Productloading, id }) {
-  const [selectedPrice, setSelectedPrice] = useState('');
-  const [selectedBrands, setSelectedBrands] = useState("");
+  const [selectedPrice, setSelectedPrice] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [selectedThemes, setSelectedThemes] = useState([]);
   const [Product, setProduct] = useState([]);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   
-  const { loading: GetAllCategories, error, categories, fetechCategories } = useGetAllCategories();
+  const { GetAllCategories, error, categories, fetechCategories } = useGetAllCategories();
   const { childCategory, getChildCategoryById, success, loading: idLoading } = useGetChildCategoryById();
   const { getFiltersForSubcategory, filters, loading: filterLoading, error: filterError, success: filterSuccess } = useSubcategoryFilters();
 
@@ -25,6 +28,14 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
     getFiltersForSubcategory(id);
   }, [id]);
 
+  const handlePriceChange = (priceRange) => {
+    setSelectedPrice((prevSelected) =>
+      prevSelected.includes(priceRange)
+        ? prevSelected.filter((price) => price !== priceRange)
+        : [...prevSelected, priceRange]
+    );
+  };
+
   const handleBrandChange = (brandId) => {
     setSelectedBrands((prevSelected) =>
       prevSelected.includes(brandId)
@@ -33,16 +44,173 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
     );
   };
 
+  const handleThemeChange = (themeName) => {
+    setSelectedThemes((prevSelected) =>
+      prevSelected.includes(themeName)
+        ? prevSelected.filter((theme) => theme !== themeName)
+        : [...prevSelected, themeName]
+    );
+  };
+
+  const applyFilters = () => {
+    setData({ 
+      childCategoryIds: selectedBrands,
+      priceRanges: selectedPrice,
+      themes: selectedThemes
+    });
+    setShowMobileFilters(false);
+  };
+
+  const clearAllFilters = () => {
+    setSelectedPrice([]);
+    setSelectedBrands([]);
+    setSelectedThemes([]);
+    setData({ 
+      childCategoryIds: [],
+      priceRanges: [],
+      themes: []
+    });
+  };
+
   useEffect(() => {
     setProduct(Products);
   }, [Products]);
 
   useEffect(() => {
-    setData({ childCategoryIds: selectedBrands })
-  }, [selectedBrands]);
+    setData({ 
+      childCategoryIds: selectedBrands,
+      priceRanges: selectedPrice,
+      themes: selectedThemes
+    });
+  }, [selectedBrands, selectedPrice, selectedThemes]);
 
   const currentPage = 1;
   const totalPages = 5;
+
+  const FilterComponent = ({ isMobile = false }) => (
+    <div className={`bg-white p-4 rounded-lg shadow-sm border border-gray-100 ${isMobile ? 'h-full overflow-y-auto' : ''}`}>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-bold text-lg">Filters</h3>
+        {isMobile && (
+          <button 
+            onClick={() => setShowMobileFilters(false)}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {/* Clear All Filters */}
+      {(selectedPrice.length > 0 || selectedBrands.length > 0 || selectedThemes.length > 0) && (
+        <button
+          onClick={clearAllFilters}
+          className="w-full mb-4 text-sm text-red-600 hover:text-red-800 underline"
+        >
+          Clear All Filters
+        </button>
+      )}
+      
+      {/* Price Range Filter */}
+      <div className="mb-6">
+        <h4 className="font-medium mb-2 flex items-center">
+          Price Range
+          {selectedPrice.length > 0 && (
+            <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+              {selectedPrice.length}
+            </span>
+          )}
+        </h4>
+        <div className="space-y-2 max-h-40 overflow-y-auto">
+          {filters?.priceFilters?.map((range) => (
+            <div key={range} className="flex items-center">
+              <input
+                type="checkbox"
+                id={`price-${range}-${isMobile ? 'mobile' : 'desktop'}`}
+                name="price-range"
+                value={range}
+                className="mr-2 h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                checked={selectedPrice.includes(range)}
+                onChange={() => handlePriceChange(range)}
+              />
+              <label htmlFor={`price-${range}-${isMobile ? 'mobile' : 'desktop'}`} className="text-sm">
+                {range}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {/* Brand Filter */}
+      <div className="mb-6">
+        <h4 className="font-medium mb-2 flex items-center">
+          Brand
+          {selectedBrands.length > 0 && (
+            <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+              {selectedBrands.length}
+            </span>
+          )}
+        </h4>
+        <div className="space-y-2 max-h-40 overflow-y-auto">
+          {filters?.childCategories?.map((brand) => (
+            <div key={brand.id} className="flex items-center">
+              <input
+                type="checkbox"
+                id={`brand-${brand._id}-${isMobile ? 'mobile' : 'desktop'}`}
+                name="brand"
+                value={brand.id}
+                className="mr-2 h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                checked={selectedBrands.includes(brand._id)}
+                onChange={() => handleBrandChange(brand._id)}
+              />
+              <label htmlFor={`brand-${brand._id}-${isMobile ? 'mobile' : 'desktop'}`} className="text-sm">
+                {brand.childCategoryName}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Theme Filter */}
+      <div className="mb-6">
+        <h4 className="font-medium mb-2 flex items-center">
+          Theme
+          {selectedThemes.length > 0 && (
+            <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+              {selectedThemes.length}
+            </span>
+          )}
+        </h4>
+        <div className="space-y-2 max-h-40 overflow-y-auto">
+          {filters?.themeSet?.map((theme) => (
+            <div key={theme} className="flex items-center">
+              <input
+                type="checkbox"
+                id={`theme-${theme}-${isMobile ? 'mobile' : 'desktop'}`}
+                name="theme"
+                value={theme}
+                className="mr-2 h-4 w-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                checked={selectedThemes.includes(theme)}
+                onChange={() => handleThemeChange(theme)}
+              />
+              <label htmlFor={`theme-${theme}-${isMobile ? 'mobile' : 'desktop'}`} className="text-sm">
+                {theme}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button 
+        onClick={applyFilters}
+        className="w-full bg-[#e11b23] text-white py-2 rounded-md hover:bg-red-700 transition-colors"
+      >
+        Apply Filters
+      </button>
+    </div>
+  );
 
   return (
     <>
@@ -55,82 +223,48 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
           <RoundedCards loading={idLoading} categories={childCategory?.data?.childCategory} />
         </div>
         
-        <section className="w-full mt-10 px-4 lg:px-6 max-w-7xl mx-auto">
+        <section className="w-full lg:mt-10 px-4 lg:px-6 max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Filters Sidebar */}
-            <div className="hidden lg:block w-full lg:w-1/4 xl:w-1/5 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-              <h3 className="font-bold text-lg mb-4">Filters</h3>
-              
-              {/* Price Filter */}
-              <div className="mb-6">
-                <h4 className="font-medium mb-2">Price Range</h4>
-                <div className="space-y-2">
-                  {filters?.priceFilters?.map((range) => (
-                    <div key={range} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`price-${range}`}
-                        name="price-range"
-                        value={range}
-                        className="mr-2"
-                        checked={selectedPrice === range}
-                        onChange={(e) => setSelectedPrice(e.target.value)}
-                      />
-                      <label htmlFor={`price-${range}`}>{range}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Brand Filter */}
-              <div className="mb-6">
-                <h4 className="font-medium mb-2">Brand</h4>
-                <div className="space-y-2">
-                  {filters?.childCategories?.map((brand) => (
-                    <div key={brand.id} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`brand-${brand._id}`}
-                        name="brand"
-                        value={brand.id}
-                        className="mr-2"
-                        checked={selectedBrands.includes(brand._id)}
-                        onChange={() => handleBrandChange(brand._id)}
-                      />
-                      <label htmlFor={`brand-${brand._id}`}>{brand.childCategoryName}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <button className="w-full bg-[#e11b23] text-white py-2 rounded-md hover:bg-white hover:text-black transition-colors">
-                Apply Filters
-              </button>
+            <div className="hidden lg:block w-full lg:w-1/4 xl:w-1/5">
+              <FilterComponent />
             </div>
 
-            {/* Products Grid */}
             <div className="w-full lg:w-3/4 xl:w-4/5">
-              {/* Mobile filter button */}
+              {/* Mobile Filter Button */}
               <div className="lg:hidden mb-4">
-                <button className="w-full bg-[#e11b23] text-white py-2 px-4 rounded-md flex items-center justify-center">
+                <button 
+                  onClick={() => setShowMobileFilters(true)}
+                  className="w-full bg-[#e11b23] text-white py-2 px-4 rounded-md flex items-center justify-center hover:bg-red-700 transition-colors"
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                   </svg>
                   Filters
+                  {(selectedPrice.length + selectedBrands.length + selectedThemes.length > 0) && (
+                    <span className="ml-2 bg-white text-red-600 text-xs px-2 py-1 rounded-full">
+                      {selectedPrice.length + selectedBrands.length + selectedThemes.length}
+                    </span>
+                  )}
                 </button>
               </div>
 
-              {/* Sort Options */}
-              <div className="flex justify-between items-center mb-6">
-                <p className="text-sm text-gray-600">
-                  Showing {Product?.data?.count || 0} products
-                </p>
-                <p>{Product?.data?.total} TotalProduct</p>
-                <div className="flex items-center">
-                  <label htmlFor="sort" className="mr-2 text-sm text-gray-600">Sort by:</label>
+              {/* Product Count and Sort */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600">
+                    Showing {Product?.data?.count || 0} of {Product?.data?.total || 0} products
+                  </p>
+                  {(selectedPrice.length > 0 || selectedBrands.length > 0 || selectedThemes.length > 0) && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      {selectedPrice.length + selectedBrands.length + selectedThemes.length} filters applied
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center w-full sm:w-auto">
+                  <label htmlFor="sort" className="mr-2 text-sm text-gray-600 whitespace-nowrap">Sort by:</label>
                   <select
                     id="sort"
-                    className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+                    className="border border-gray-300 rounded-md px-3 py-1 text-sm w-full sm:w-auto"
                   >
                     <option value="popular">Most Popular</option>
                     <option value="price-low">Price: Low to High</option>
@@ -141,7 +275,7 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
                 </div>
               </div>
 
-              {/* Products Grid with Loading State */}
+              {/* Products Grid */}
               {Productloading ? (
                 <div className="flex justify-center items-center h-64">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#e11b23]"></div>
@@ -162,13 +296,13 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
                       <nav className="flex items-center gap-1">
                         <button
                           disabled={currentPage === 1}
-                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50"
+                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 hover:bg-gray-50"
                         >
                           &laquo;
                         </button>
                         <button
                           disabled={currentPage === 1}
-                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50"
+                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 hover:bg-gray-50"
                         >
                           &lsaquo;
                         </button>
@@ -176,7 +310,11 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                           <button
                             key={page}
-                            className={`px-3 py-1 rounded-md border ${currentPage === page ? 'bg-[#e11b23] text-white border-white' : 'border-gray-300'}`}
+                            className={`px-3 py-1 rounded-md border transition-colors ${
+                              currentPage === page 
+                                ? 'bg-[#e11b23] text-white border-[#e11b23]' 
+                                : 'border-gray-300 hover:bg-gray-50'
+                            }`}
                           >
                             {page}
                           </button>
@@ -184,13 +322,13 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
 
                         <button
                           disabled={currentPage === totalPages}
-                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50"
+                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 hover:bg-gray-50"
                         >
                           &rsaquo;
                         </button>
                         <button
                           disabled={currentPage === totalPages}
-                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50"
+                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 hover:bg-gray-50"
                         >
                           &raquo;
                         </button>
@@ -202,6 +340,15 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
             </div>
           </div>
         </section>
+
+        {showMobileFilters && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowMobileFilters(false)}></div>
+            <div className="fixed inset-y-0 left-0 w-full max-w-sm bg-white shadow-xl">
+              <FilterComponent isMobile={true} />
+            </div>
+          </div>
+        )}
       </section>
     </>
   );

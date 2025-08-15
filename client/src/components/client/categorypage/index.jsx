@@ -11,7 +11,6 @@ export default function CategroyPage() {
 
   const { ProductByKeys, loading, Product } = useProductByKeys();
 
-  // Set subcategoryId or childCategoryId from URL when page loads
   useEffect(() => {
     if (id) {
       setData((prev) => ({
@@ -21,12 +20,12 @@ export default function CategroyPage() {
     }
   }, [id]);
 
-  // Fetch products when data (filters) update
   useEffect(() => {
     if (data) {
       ProductByKeys(data);
     }
   }, [data]);
+  console.log(data,"vsiuh")
 
   // Save products from API result
   useEffect(() => {

@@ -20,8 +20,8 @@ export default function AboutUs() {
   }, [getAllAboutUs]);
 
   return (
-    <div className="bg-gray-300">
-      <div className="container mx-5">
+    <div className="bg-primaryReds w-full  text-white">
+      <div className=" 2xl:max-w-[80rem] 2xl:mx-auto">
         {aboutUsData.map((value) => (
           <div key={value._id} className="">
             <div className="flex">

@@ -673,6 +673,7 @@ exports.getProductbykeys = async (req, res) => {
         childCategoryIds,
         minPrice,
         maxPrice,
+       themes ,
         page = 1,
         limit = 10
       }
@@ -696,7 +697,9 @@ exports.getProductbykeys = async (req, res) => {
 
     // Filters
     if (categoryId) query.category = categoryId;
-
+if(themes && Array.isArray(themes) && themes.length >0  ){
+  query.theme = { $in: themes }
+}  
     if (subcategoryIds && Array.isArray(subcategoryIds) && subcategoryIds.length > 0) {
       query.subcategories = { $in: subcategoryIds };
     }
@@ -761,17 +764,14 @@ exports.getFiltersForSubcategory = async (req, res) => {
       return res.status(400).json({ success: false, message: "Subcategory ID is required" });
     }
 
-    // Step 1: Get all products with this subcategory
     const products = await Product.find({
       subcategories: subcategoryId
     }).select("basePrice childCategory");
 
-    // Step 2: Convert basePrice strings to numbers
     const priceNumbers = products
-      .map(p => parseFloat(p.basePrice)) // Clean string like "Rs. 500"
+      .map(p => parseFloat(p.basePrice)) 
       .filter(price => !isNaN(price));
 
-    // Step 3: Count how many prices fall in each range
     const priceRanges = [
       { label: "₹0–₹500", min: 0, max: 500, count: 0 },
       { label: "₹501–₹1000", min: 501, max: 1000, count: 0 },
@@ -788,10 +788,14 @@ exports.getFiltersForSubcategory = async (req, res) => {
       }
     });
 
-    // Step 4: Filter only ranges that have products
     const availablePriceFilters = priceRanges.filter(r => r.count > 0).map(r => r.label);
+  
+const ThemeSet = await Product.distinct("theme", { subcategories: subcategoryId })
+   const filterThemeSet = ThemeSet.filter(Boolean)
 
-    // Step 5: Get unique child category IDs
+console.log(filterThemeSet);       // Set of unique themes
+console.log([...filterThemeSet]);  // Array of unique theme
+
     const childCategorySet = new Set();
     products.forEach(p => {
       p.childCategory?.forEach(id => {
@@ -809,6 +813,7 @@ exports.getFiltersForSubcategory = async (req, res) => {
     res.status(200).json({
       success: true,
       priceFilters: availablePriceFilters,
+      themeSet:filterThemeSet,
       childCategories
     });
 

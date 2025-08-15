@@ -1,5 +1,4 @@
 export default function FullScreenLoader({ productDetailsPage }) {
-  // Default spinner styles (same as before)
   const spinnerStyle = {
     border: '8px solid #f3f3f3',
     borderTop: '8px solid #e11b23',
@@ -26,7 +25,7 @@ export default function FullScreenLoader({ productDetailsPage }) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 animate-pulse">
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Image gallery skeleton */}
+          
           <div className="w-full md:w-1/2 space-y-4">
             <div className="bg-gray-200 rounded-lg aspect-square w-full h-96"></div>
             <div className="flex gap-2">
@@ -36,7 +35,7 @@ export default function FullScreenLoader({ productDetailsPage }) {
             </div>
           </div>
           
-          {/* Product info skeleton */}
+         
           <div className="w-full md:w-1/2 space-y-6">
             {/* Title */}
             <div className="h-8 bg-gray-200 rounded w-3/4"></div>

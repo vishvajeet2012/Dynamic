@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import FullScreenLoader from './loading';
 
 export default function CategoryBanner({ categoriesBanner, loading ,altText = 'Category Banner'}) {
    
    if(loading)  return (
-        <div className="w-full max-w-[1920px] mx-auto relative overflow-hidden">
-            <div className="w-full h-[200px] md:h-[300px] lg:h-[400px] bg-gray-200 animate-pulse rounded-md" />
-        </div>)
+            <FullScreenLoader/>        
+)
    
     if (!categoriesBanner) return null;
 

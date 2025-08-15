@@ -182,7 +182,7 @@ export const useProductByKeys= ()=>{
     const ProductByKeys = async (data) => {
          if (Object.keys(data).length === 0) {
         setLoading(true);
-        
+        console.log(data,"this is ring")
         return; // Exit the function early
     }
         

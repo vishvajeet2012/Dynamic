@@ -55,16 +55,13 @@ export default function RoundedCards({ categories = [], loading ,}) {
   return (
     <section className="w-full py-8 md:py-12">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center mb-8 md:mb-10">
+        <div className="text-center mb-4 lg:mb-8 md:mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-black tracking-tight">
             Shop by Category
           </h2>
-          <p className="text-md text-gray-500 mt-2 max-w-xl mx-auto">
-            Find what you're looking for by browsing our curated selection of product categories.
-          </p>
+         
         </div>
 
-        {/* Desktop View */}
         <div className="hidden md:grid md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-x-4 gap-y-8 justify-center">
           {displayItems?.map((category, idx) => (
             <div key={idx} className="flex justify-center">
@@ -73,7 +70,6 @@ export default function RoundedCards({ categories = [], loading ,}) {
           ))}
         </div>
 
-        {/* Mobile View */}
         <div className="md:hidden">
           {displayItems?.length > 0 && (
             <Carousel

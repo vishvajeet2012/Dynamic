@@ -26,7 +26,7 @@ if(loading){
   },2000)
   },[Product])
   return (
-    <section className="w-full py-6 lg:px-6">
+    <section className="w-full 2xl:max-w-[79rem] 2xl:mx-auto py-6 lg:px-6">
      
       {loading && <LoadingBar />}
 
