@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { useGetProduct } from '../hooks/Product/Product'
 import ProductCard from './ProductCard'
 import { Carousel } from '@/components/ui/carousel'
@@ -10,7 +10,7 @@ import SkeletonProductCard from './skeltonProductCArd'
 export default function NewArrivals({ query, titile ,setMainLoading }) {
   const { getProduct, loading, Product } = useGetProduct()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     getProduct(query)
   }, [])
 

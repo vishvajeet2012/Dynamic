@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Banner from "../../../shared/Banner";
 import Header from "../../../shared/header";
 import AboutUs from "../../../shared/HomePage/Aboutus";
@@ -10,7 +10,7 @@ export default function Home() {
   const { loading, error, categories, fetechCategories } = useGetAllCategories();
   const [mainLoading ,setMainLoading ]=useState(true)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetechCategories();
   }, []);
 

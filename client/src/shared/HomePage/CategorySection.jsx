@@ -12,7 +12,6 @@ export default function CategorySection({categories, categoriesLoading}){
     setSubCategoryData(categories?.flatMap(e => e.subcategories))
   }, [categories])
 
-  // Mobile slider settings only
   const mobileSettings = {
     dots: false,
     infinite: true,
@@ -43,10 +42,8 @@ export default function CategorySection({categories, categoriesLoading}){
     ]
   }
 
-  // Loading skeleton component
   const LoadingSkeleton = () => (
     <div className="animate-pulse">
-      {/* Desktop Loading */}
       <div className="hidden md:block text-center mb-4 px-6">
         <div className="h-10 bg-gray-300 rounded w-48 mx-auto mb-4"></div>
         <div className="mt-4">

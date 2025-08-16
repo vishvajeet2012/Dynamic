@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import { useGetBannnerData } from '../hooks/client/homePageHooks/use-banner';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
@@ -7,7 +7,7 @@ export default function Banner({ bannerType }) {
     const [currentSlide, setCurrentSlide] = useState(0);
     const { getAllBannerData, loading, error, success } = useGetBannnerData(bannerType);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const fetchBannerData = async () => {
             const data = await getAllBannerData();
             if (data && data.length > 0) {
@@ -23,7 +23,7 @@ export default function Banner({ bannerType }) {
             }
         };
         fetchBannerData();
-    }, [bannerType]);
+    }, []);
 
     // Auto-slide functionality
     useEffect(() => {
