@@ -103,7 +103,6 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
         )}
       </div>
 
-      {/* Clear All Filters */}
       {(selectedPrice.length > 0 || selectedBrands.length > 0 || selectedThemes.length > 0) && (
         <button
           onClick={clearAllFilters}
@@ -146,7 +145,7 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
       {/* Brand Filter */}
       <div className="mb-6">
         <h4 className="font-medium mb-2 flex items-center">
-          Brand
+            Categorys
           {selectedBrands.length > 0 && (
             <span className="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
               {selectedBrands.length}

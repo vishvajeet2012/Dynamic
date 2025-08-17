@@ -532,6 +532,7 @@ exports.getProducts = async (req, res) => {
 // routes/productRoutes.js
 
 const { Types } = require('mongoose'); // Import Types for ObjectId validation
+const SubCategoryModel = require('../models/SubCategoryModel');
 
 /**
 
@@ -671,56 +672,95 @@ exports.getProductbykeys = async (req, res) => {
         categoryId,
         subcategoryIds,
         childCategoryIds,
-        minPrice,
-        maxPrice,
+      priceRanges,
        themes ,
         page = 1,
         limit = 10
       }
     } = req.body;
 
-    // 🚫 Reject if no filters are provided
-    if (
-      !categoryId &&
-      (!subcategoryIds || subcategoryIds.length === 0) &&
-      (!childCategoryIds || childCategoryIds.length === 0) &&
-      minPrice === undefined &&
-      maxPrice === undefined
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "At least one filter is required to fetch products."
-      });
-    }
+    // if (
+    //   !categoryId &&
+    //   (!subcategoryIds || subcategoryIds.length === 0) &&
+    //   (!childCategoryIds || childCategoryIds.length === 0) &&
+    //   minPrice === undefined &&
+    //   maxPrice === undefined
+    // ) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "At least one filter is required to fetch products."
+    //   });
+    // }
 
     const query = {};
 
-    // Filters
     if (categoryId) query.category = categoryId;
 if(themes && Array.isArray(themes) && themes.length >0  ){
   query.theme = { $in: themes }
 }  
+if(childCategoryIds && Array.isArray(childCategoryIds) && childCategoryIds.length){
+  query.childCategory = {$in:childCategoryIds}
+
+}
     if (subcategoryIds && Array.isArray(subcategoryIds) && subcategoryIds.length > 0) {
-      query.subcategories = { $in: subcategoryIds };
+      ///   query.subcategories = { $in: subcategoryIds };
+          const foundSubCategory = await SubCategoryModel.find({_id: {$in:subcategoryIds}})
+
+          if(foundSubCategory.length === 0){
+              const foundChildcategory  = await child.find({_id: {$in:subcategoryIds}})
+                  console.log(foundChildcategory?._id,"child")
+query.childCategory = { $in: subcategoryIds };
+                  
+                  
+          }else {
+       
+          query.subcategories = { $in: subcategoryIds }}
+                
+                      
+
+        }
+
+      
+
+//       if(query?.subcategories){
+//           const subCategory = await SubCategoryModel.findById(subcategoryIds)
+//           if(!subCategory){
+//  query.subcategories= []
+//             console.log("this is no subcateogyr")
+//        query.childCategory = { $in: subcategoryIds };
+       //// why i do that subcateogy to find child category because i dont want ot create anbother custom hooks in frotented so i decide to setup subcateory universal 
+       //// from subcategory i also find child category if iam using good logic 
+       /// reduce code is also a good choice 
+               
+       //   }
+      //}
+       // if (childCategoryIds && Array.isArray(childCategoryIds) && childCategoryIds.length > 0) {
+    //   query.childCategory = { $in: childCategoryIds };
+    // }
+
+   if (priceRanges && Array.isArray(priceRanges) && priceRanges.length > 0) {
+  const priceConditions = [];
+          priceRanges.forEach(r=>{
+            const cleanRange = r.replace(/₹/g, '')
+            const [minPrice, maxPrice] =cleanRange.split(/[-–]/).map(e=> parseInt(e.trim()))
+            console.log(minPrice)
+         if (minPrice && maxPrice) {
+      priceConditions.push({
+        sellingPrice: { $gte: minPrice, $lte: maxPrice }
+      });
+
     }
+          }
+        )
+         if (priceConditions.length > 1) {
+    query.$or = query.$or ? [...query.$or, ...priceConditions] : priceConditions;
+  } else if (priceConditions.length === 1) {
+    query.sellingPrice = priceConditions[0]?.sellingPrice;
+  }
 
-    if (childCategoryIds && Array.isArray(childCategoryIds) && childCategoryIds.length > 0) {
-      query.childCategory = { $in: childCategoryIds };
-    }
 
-    if (minPrice || maxPrice) {
-      const priceQuery = {};
-      if (minPrice !== undefined) priceQuery.$gte = Number(minPrice);
-      if (maxPrice !== undefined) priceQuery.$lte = Number(maxPrice);
 
-      query.$expr = {
-        $and: [
-          { $gte: [{ $toDouble: "$basePrice" }, priceQuery.$gte || 0] },
-          { $lte: [{ $toDouble: "$basePrice" }, priceQuery.$lte || Number.MAX_SAFE_INTEGER] }
-        ]
-      };
-    }
-
+}
     const skip = (page - 1) * limit;
 
     const [products, total] = await Promise.all([

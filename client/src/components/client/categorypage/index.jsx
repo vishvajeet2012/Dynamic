@@ -3,11 +3,10 @@ import { useProductByKeys } from "../../../hooks/Product/Product";
 import { useEffect, useState } from "react";
 import CateogryProduct from "./CateogryProduct";
 
-// id from URL will be treated as subcategoryId or childCategoryId
 export default function CategroyPage() {
   const [data, setData] = useState({});
   const [products, setProducts] = useState([]);
-  const { id } = useParams(); // this is NOT categoryId as you said
+  const { id } = useParams(); 
 
   const { ProductByKeys, loading, Product } = useProductByKeys();
 

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, } from "react-router-dom";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
@@ -22,7 +22,7 @@ export default function RoundedCards({ categories = [], loading ,}) {
 
     return (
       <div  key={category?._id || idx} className={cardClass}>
-        <div className={circleClass}>
+        <Link to={`/category/${category?._id}`} className={circleClass}>
           {isSkeleton ? (
             <div className="w-full h-full bg-gray-300  aspect-square rounded-full" />
           ) : (
@@ -32,7 +32,7 @@ export default function RoundedCards({ categories = [], loading ,}) {
               className="w-full h-full lg:h-auto object-cover rounded-full"
             />
           )}
-        </div>
+        </Link>
         <p className={textClass}>
           {!isSkeleton && category?.childCategoryName}
         </p>
@@ -53,7 +53,7 @@ export default function RoundedCards({ categories = [], loading ,}) {
     : [];
 
   return (
-    <section className="w-full py-8 md:py-12">
+    <section className="w-full py-8 md:py-12 ">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-4 lg:mb-8 md:mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-black tracking-tight">
