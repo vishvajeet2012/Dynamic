@@ -82,7 +82,7 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
         )}
         {isOutOfStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-            <span className="rounded-md bg-gray-800/80 px-3 py-1 text-sm font-bold text-white">
+            <span className="rounded-md bg-gray-800/80 px-3 py-1 text-sm font-bold vf text-white">
               OUT OF STOCK
             </span>
           </div>
