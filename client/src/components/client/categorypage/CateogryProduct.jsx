@@ -142,7 +142,6 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
         </div>
       </div>
       
-      {/* Brand Filter */}
       <div className="mb-6">
         <h4 className="font-medium mb-2 flex items-center">
             Categorys

@@ -76,7 +76,7 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
         /></Link>
     
         {discount > 0 && !isOutOfStock && (
-          <span className="absolute top-2 left-2 rounded-full bg-red-600 px-2 py-0.5 text-center text-xs font-medium text-white">
+          <span className="absolute top-2 left-2 rounded-full bg-red-600 px-2 py-0.5 text-center text-[8px] md:text-xs font-medium text-white">
             {discount}% OFF
           </span>
         )}
@@ -91,31 +91,33 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
       </div>
 
   
-      <div className="flex flex-grow flex-col p-4">
+      <div className="flex flex-grow flex-col pr-4 pl-2 pb-4 pt-2 md:p-4">
        
-        <div className="flex items-start justify-between">
+        <div className=" hidden md:flex items-start justify-between">
         
           <p className="truncate text-xs text-gray-500 capitalize">
             {childCategory?.[0]?.childCategoryName||category?.categoryName || "THE V Store"}
           </p>
-          <div className="flex shrink-0 items-center gap-1.5">
-            <FaStar size={14} className="text-yellow-400" />
-            <span className="text-sm font-semibold">{rating}</span>
-            <span className="text-xs text-gray-400">({reviewCount})</span>
-          </div>
+        
         </div>
-
-        <Link to={`/${slug}`} className=" text-base  font-bold text-slate-900 truncate ">
+          <h1  className=" text-[11px]   md:text-base    h-7  md:h-0 font-bold text-slate-900  ">
+        <Link to={`/${slug}`}>
           {name}
-        </Link>
+        </Link></h1>
 
-        {/* Price */}
+  <div className="flex items-start my-1 justify-between">
+        
+          <p className="truncate text-xs text-gray-500 capitalize">
+            {childCategory?.[0]?.childCategoryName||category?.categoryName || "THE V Store"}
+          </p>
+        
+        </div>
         <div className=" flex items-baseline gap-2 "> 
-          <span className= " tex-xs md:text-lg font-bold text-slate-900">
+          <span className= " text-[12px] md:text-lg font-bold text-slate-900">
             ₹{sellingPrice}
           </span>
           {discount > 0 && (
-            <span className="text-xs md:text-sm text-slate-500 line-through">
+            <span className="text-[10px] md:text-sm text-slate-500 line-through">
               ₹{basePrice}
             </span>
           )}

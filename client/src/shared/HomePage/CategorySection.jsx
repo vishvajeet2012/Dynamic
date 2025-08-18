@@ -106,7 +106,7 @@ export default function CategorySection({categories, categoriesLoading}){
               </div>
 
               <div className="px-4">
-                <Slider {...mobileSettings} className="category-slider-mobile">
+                <Slider {...mobileSettings} className="">
                   {subCategoryData?.map((value, index) => (
                     <div key={value?._id} className="px-1">
                       <Link 
@@ -145,7 +145,7 @@ export default function CategorySection({categories, categoriesLoading}){
         }
         
         .category-slider-mobile .slick-slide {
-          height: auto;
+          height: full;
         }
         
         .category-slider-mobile .slick-slide > div {

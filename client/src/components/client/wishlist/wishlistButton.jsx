@@ -15,7 +15,9 @@ export default function WishlistButton({ isWishlisted, handleWishlistClick, prod
           className="absolute top-2 right-2 rounded-full bg-white/80 p-2 text-gray-500 shadow-sm backdrop-blur-sm transition-all hover:bg-white hover:text-red-500"
           aria-label="Remove from wishlist"
         >
-          <FaTrashAlt size={18} className="transition-all text-gray-400 hover:text-red-500" />
+          <FaTrashAlt 
+            className="transition-all text-gray-400 hover:text-red-500 w-4 h-4 sm:w-5 sm:h-5" 
+          />
         </button>
       ) : (
         <button
@@ -24,9 +26,8 @@ export default function WishlistButton({ isWishlisted, handleWishlistClick, prod
           aria-label="Add to wishlist"
         >
           <FaHeart
-            size={18}
             className={cn(
-              "transition-all",
+              "transition-all w-3 h-3 sm:w-5 sm:h-5",
               isWishlisted ? "text-red-500 scale-110" : "text-gray-400"
             )}
           />
