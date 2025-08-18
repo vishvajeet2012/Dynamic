@@ -111,11 +111,11 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
 
         {/* Price */}
         <div className=" flex items-baseline gap-2 "> 
-          <span className=" text-lg font-bold text-slate-900">
+          <span className= " tex-xs md:text-lg font-bold text-slate-900">
             ₹{sellingPrice}
           </span>
           {discount > 0 && (
-            <span className="text-sm text-slate-500 line-through">
+            <span className="text-xs md:text-sm text-slate-500 line-through">
               ₹{basePrice}
             </span>
           )}
