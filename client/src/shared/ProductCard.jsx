@@ -75,11 +75,11 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
   lazyloading          alt={name}
         /></Link>
     
-        {discount > 0 && !isOutOfStock && (
+        {/* {discount > 0 && !isOutOfStock && (
           <span className="absolute top-2 left-2 rounded-full bg-red-600 px-2 py-0.5 text-center text-[8px] md:text-xs font-medium text-white">
             {discount}% OFF
           </span>
-        )}
+        )} */}
         {isOutOfStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
             <span className="rounded-md bg-gray-800/80 px-3 py-1 text-sm font-bold vf text-white">
@@ -91,7 +91,7 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
       </div>
 
   
-      <div className="flex flex-grow flex-col pr-4 pl-2 pb-4 pt-2 md:p-4">
+      <div className="flex flex-grow flex-col pr-4 pl-2 pb-3 pt-2 md:p-4">
        
         <div className=" hidden md:flex items-start justify-between">
         
@@ -100,7 +100,7 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
           </p>
         
         </div>
-          <h1  className=" text-[11px]   md:text-base    h-7  md:h-0 font-bold text-slate-900  ">
+          <h1  className=" text-xs   md:text-base    h-7 mb-1  md:h-0 font-bold text-slate-900  ">
         <Link to={`/${slug}`}>
           {name}
         </Link></h1>

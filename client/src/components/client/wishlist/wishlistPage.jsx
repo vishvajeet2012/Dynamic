@@ -31,7 +31,7 @@ const navigate = useNavigate();
   
   return (
     <div className="wishlist-page w-full p-4">
-      <h1 className="text-3xl font-bold mb-4 border-b">Wishlist</h1>
+      <h1 className=" text-2xl md:text-3xl font-bold mb-4 border-b">Wishlist</h1>
 
       {productsWithWishlistStatus?.wishlist?.length === 0 ? (
         <div className="flex items-center justify-center h-full">

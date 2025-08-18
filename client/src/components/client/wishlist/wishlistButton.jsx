@@ -16,7 +16,7 @@ export default function WishlistButton({ isWishlisted, handleWishlistClick, prod
           aria-label="Remove from wishlist"
         >
           <FaTrashAlt 
-            className="transition-all text-gray-400 hover:text-red-500 w-4 h-4 sm:w-5 sm:h-5" 
+            className="transition-all text-gray-400 hover:text-red-500 w-3 h-3 sm:w-5 sm:h-5" 
           />
         </button>
       ) : (
