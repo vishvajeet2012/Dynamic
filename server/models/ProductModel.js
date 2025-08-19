@@ -7,11 +7,14 @@ const productSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Product name cannot exceed 100 characters']
   },
-  description: {
-    type: String,
-    required: [true, 'Product description is required'],
-    maxlength: [1000, 'Description cannot exceed 1000 characters']
-  },
+ description: {
+  type: String,
+  maxlength: [1000, 'Description cannot exceed 1000 characters'],
+  default: `98% Cotton 2% Spandex
+Machine Wash
+
+Country of Origin: India (and proud)`
+},
   basePrice: {
     type: Number,
     required: [true, 'Product Baseprice is required'],

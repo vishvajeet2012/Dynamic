@@ -154,10 +154,9 @@ const transporter = nodemailer.createTransport({
 // }
 
 
-const stripe = require('stripe')("you key"); 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); 
 
 
-// Create Payment Intent
 exports.createPaymentIntent = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -217,21 +216,18 @@ exports.placeOrder = async (req, res) => {
     
     console.log('Raw request body:', JSON.stringify(req.body, null, 2));
     
-    // Handle different payload formats
     let shippingInfo, paymentMethod, orderItems, itemsPrice, shippingPrice, totalPrice, paymentResult;
     
-    // Check if it's the old COD format
     if (req.body.shippingInfo && typeof req.body.shippingInfo === 'object' && req.body.shippingInfo.shippingInfo) {
-      // Old COD format: { shippingInfo: { shippingInfo: {...}, paymentMethod: "cod" } }
       console.log('Using COD format');
       const datas = req.body.shippingInfo;
       shippingInfo = datas.shippingInfo;
       paymentMethod = datas.paymentMethod;
-      orderItems = null; // Will use cart items
-      itemsPrice = null; // Will calculate from cart
+      orderItems = datas?.orderItems||null;
+      itemsPrice = datas?.itemsPrice||null; 
       shippingPrice = 0;
-      totalPrice = null; // Will calculate from cart
-      paymentResult = null;
+      totalPrice = datas?.totalPrice||totalPrice; 
+      paymentResult = datas?.paymentResult|| null;
     } else {
       // New Stripe format: direct properties
       console.log('Using Stripe format');
@@ -264,19 +260,20 @@ exports.placeOrder = async (req, res) => {
         message: "Invalid payment method"
       });
     }
+    console.log(paymentResult)
 
     // For Stripe payments, verify the payment
     if (paymentMethod === 'stripe') {
-      if (!paymentResult || !paymentResult.id) {
+      if (!paymentResult) {
         return res.status(400).json({
           success: false,
           message: "Payment verification failed - missing payment result"
         });
       }
 
-      // Verify payment intent with Stripe
+
       try {
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentResult.id);
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentResult?.id);
         
         if (paymentIntent.status !== 'succeeded') {
           return res.status(400).json({
@@ -311,8 +308,16 @@ exports.placeOrder = async (req, res) => {
     // Prepare order items from cart or provided data
     let finalOrderItems;
     if (orderItems && orderItems.length > 0) {
-      // Use provided order items (from frontend)
-      finalOrderItems = orderItems;
+
+      finalOrderItems = user.cart.map(item => ({
+        product: item.product._id,
+        name: item.product.name,
+        image: item.product.images?.[0]?.imagesUrls || '',
+        price: item.product.sellingPrice,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color
+      }));;
     } else {
       // Fallback to cart items (COD format)
       finalOrderItems = user.cart.map(item => ({
@@ -357,10 +362,6 @@ exports.placeOrder = async (req, res) => {
 
     const order = await Order.create(orderData);
 
-    // Send confirmation email (your existing email code here)
-    // ... email sending code
-
-    // Clear user cart
     user.cart = [];
     await user.save();
 
@@ -388,6 +389,9 @@ exports.placeOrder = async (req, res) => {
     });
   }
 };
+
+
+
 
 
 exports.getUserOrder = async(req,res)=>{

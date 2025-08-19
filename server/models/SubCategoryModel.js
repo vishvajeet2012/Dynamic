@@ -16,7 +16,7 @@ const subCategoriesSchema = new mongoose.Schema({
     },
     bannerImage:{
         type:String,
-        default:null
+        default:""
     },
       childCategory: [{
             type: mongoose.Schema.Types.ObjectId,

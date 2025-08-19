@@ -28,7 +28,7 @@ exports.createSubCategory = async (req, res) => {
         const updatedCategory = await categoryModel.findByIdAndUpdate(
             category,
             { 
-                $push: { subcategories: newSubCategory._id },
+                $addToSet: { subcategories: newSubCategory._id },
                 $set: { isActive: true } 
             },
             { new: true }
@@ -39,19 +39,13 @@ exports.createSubCategory = async (req, res) => {
             return res.status(404).json({ message: 'Category not found' });
         }
 
-        // Get fully populated category in a separate query
-        const populatedCategory = await categoryModel.findById(updatedCategory._id)
-            .populate({
-                path: 'subcategories',
-                model: 'SubCategory',
-                select: 'subCategoryName subCategoryImage subCategoryDescription isActive'
-            });
+    
 
         res.status(201).json({
             success: true,
             data: {
                 subcategory: newSubCategory,
-                category: populatedCategory
+             
             }
         });
 
@@ -67,41 +61,72 @@ exports.createSubCategory = async (req, res) => {
 
 
 
+// controllers/subCategoryController.js
+
 exports.updateSubCategory = async (req, res) => {
-    try {
-     
-        const {category,subCategoryId, subCategoryName, subCategoryImage, subCategoryDescription, isActive ,imagePublicId,bannerImage} = req.body
-                const result = await SubCategoryModel.findByIdAndUpdate(subCategoryId, {
-                    subCategoryName,
-                    subCategoryImage,
-                    subCategoryDescription,
-                    isActive,
-                    imagePublicId,
-                    bannerImage
-                }, { new: true });
+  try {
+    const {
+      category,
+      subCategoryId,
+      subCategoryName,
+      subCategoryImage,
+      subCategoryDescription,
+      isActive,
+      imagePublicId,
+      bannerImage
+    } = req.body;
 
-                  // Update category (without populate first)
-        const updatedCategory = await categoryModel.findByIdAndUpdate(
-            category,
-            { 
-                $push: { subcategories: result._id },
-                $set: { isActive: true } 
-            },
-            { new: true }
-        );
+    // 1️⃣ Update the subcategory itself
+    const result = await SubCategoryModel.findByIdAndUpdate(
+      subCategoryId,
+      {
+        subCategoryName,
+        subCategoryImage,
+        subCategoryDescription,
+        isActive,
+        imagePublicId,
+        bannerImage
+      },
+      { new: true }
+    );
 
-
-                res.status(200).json({
-                    message: 'Subcategory updated successfully',
-                    subcategory: result     
-                })
-    }catch(error)
-    {
-        res.status(500).json({ message: 'Error updating subcategory', error });
+    if (!result) {
+      return res.status(404).json({ message: 'Subcategory not found' });
     }
 
-}
+    // 2️⃣ Link subcategory to category without creating duplicates
+    await categoryModel.findByIdAndUpdate(
+      category,
+      { 
+        $addToSet: { subcategories: result._id }, // prevents duplicate adds
+        $set: { isActive: true }
+      },
+      { new: true }
+    );
 
+    // 3️⃣ (Optional) Deduplicate existing old data if needed
+    await categoryModel.updateOne(
+      { _id: category },
+      [
+        { 
+          $set: {
+            subcategories: { $setUnion: ["$subcategories", []] } // keeps only unique IDs
+          }
+        }
+      ]
+    );
+
+    // 4️⃣ Respond to client
+    res.status(200).json({
+      message: 'Subcategory updated successfully',
+      subcategory: result
+    });
+
+  } catch (error) {
+    console.error('Error updating subcategory:', error);
+    res.status(500).json({ message: 'Error updating subcategory', error });
+  }
+};
 
 
 
