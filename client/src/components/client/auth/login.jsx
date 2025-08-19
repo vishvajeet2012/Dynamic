@@ -37,7 +37,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex">
 
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-orange-500 to-red-600 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 0 relative overflow-hidden">
         <LazyLoadImage
           className="object-cover w-full h-full opacity-90"
           src="https://prod-img.thesouledstore.com/public/theSoul/storage/mobile-cms-media-prod/banner-images/Shores-app-banner.jpg?format=webp&w=768&dpr=2.0"

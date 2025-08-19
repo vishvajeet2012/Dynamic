@@ -16,7 +16,11 @@ export default function CreateAdminProduct() {
 
   const [productData, setProductData] = useState({
     name: '',
-    description: '',
+    description: `Material & Care:
+80% Cotton 18% Polyester 2% Elastane
+Machine Wash
+
+Country of Origin: India (and proud)`,
     basePrice: '',
     sellingPrice: '',
     discount: 0,
@@ -225,7 +229,7 @@ export default function CreateAdminProduct() {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded"
                 rows="4"
-                required
+                
               />
             </div>
 

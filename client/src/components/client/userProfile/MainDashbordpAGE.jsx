@@ -22,6 +22,8 @@ import { useGetSingleUser } from "../../../hooks/auth/use-Auth.js";
 import { useUserProfileUpdate } from '../../../hooks/client/homePageHooks/use-user.js';
 import { useForm } from 'react-hook-form';
 import { useUplaodImage } from '../../../hooks/client/homePageHooks/use-banner.js';
+import { useAuth } from '../../../../context/authConext.jsx';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -138,11 +140,24 @@ function ProfileSection() {
       console.error('Error updating profile:', error);
     }
   };
+  const { login: authLogin ,logout} = useAuth();///for logut
+    const navigate = useNavigate();
+    const handleLogout = (e)=>{
+      console.log(e)
+logout()
+    navigate(0);
+
+
+    }
+
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Personal Information</h2>
-      
+    <div className="bg-white rounded-lg shadow  p-2 md:p-6">
+    <div className='flex  justify-between items-center '>
+      <h2 className="  md:text-2xl font-bold text-gray-800 mb-6">Personal Information</h2>
+            <button onClick={handleLogout} className=" text-sm md:text-base font-medium bg-primaryReds py-1 rounded-md px-4 text-white mb-6">logout</button>
+
+      </div>
       <form onSubmit={handleSubmit(onSubmitProfile)}>
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex flex-col items-center w-full md:w-1/4">

@@ -1,6 +1,7 @@
 import { useState, useEffect, useLayoutEffect } from 'react';
 import { useGetBannnerData } from '../hooks/client/homePageHooks/use-banner';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Link } from 'react-router-dom';
 
 export default function Banner({ bannerType }) {    
     const [bannerData, setBannerData] = useState([]);
@@ -11,7 +12,7 @@ export default function Banner({ bannerType }) {
         const fetchBannerData = async () => {
             const data = await getAllBannerData();
             if (data && data.length > 0) {
-                // Extract and sort images from the first banner data
+              
                 const firstBanner = data[0];
                 if (firstBanner.images && firstBanner.images.length > 0) {
                     const sortedImages = [...firstBanner.images].sort((a, b) => a.order - b.order);
@@ -91,9 +92,9 @@ export default function Banner({ bannerType }) {
                         >
                             {bannerData.images.map((image, index) => (
                                 <div key={image._id || index} className="w-full flex-shrink-0 h-full">
-                                    <a 
-                                        href={bannerData.redirectUrl || '#'} 
-                                        aria-label={`Mobile banner ${index + 1}`}
+                                    <Link  
+                                        to={`https://dynamicvstore.vercel.app/${bannerData.order}`} 
+                                      
                                         className="block h-full"
                                     >
                                         <LazyLoadImage 
@@ -102,7 +103,7 @@ export default function Banner({ bannerType }) {
                                             className="w-full h-full object-cover"
                                             loading={index === 0 ? "eager" : "lazy"}
                                         />
-                                    </a>
+                                    </Link>
                                 </div>
                             ))}
                         </div>

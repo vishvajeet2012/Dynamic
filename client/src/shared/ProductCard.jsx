@@ -105,15 +105,15 @@ export default function AdaptiveProductCard({ item ,wishlistDelete}) {
           {name}
         </Link></h1>
 
-  <div className="flex items-start my-1 justify-between">
+  <div className="flex md:hidden items-start my-1 justify-between">
         
           <p className="truncate text-xs text-gray-500 capitalize">
             {childCategory?.[0]?.childCategoryName||category?.categoryName || "THE V Store"}
           </p>
         
         </div>
-        <div className=" flex items-baseline gap-2 "> 
-          <span className= " text-[12px] md:text-lg font-bold text-slate-900">
+        <div className=" lg:mt-10 flex items-baseline gap-2 "> 
+          <span className= " text-[12px] lg:text-lg font-bold text-slate-900">
             ₹{sellingPrice}
           </span>
           {discount > 0 && (

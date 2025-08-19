@@ -14,7 +14,13 @@ export const useCreateCateogry = () => {
     setSuccess(false);
 
     try {
-      const response =await axios.post(`${homeUrl}/categorycreate`,formData)
+      const response =await axios.post(`${homeUrl}/categorycreate`,formData,
+     {
+            headers:{
+              'Content-Type': 'application/json',
+              authorization:`Bearer ${localStorage.getItem('token')}`
+            }
+          })
       setSuccess(true);
       return response.data;  
     } catch (err) {
@@ -41,7 +47,12 @@ export const useCreateSubCateogry = () => {
     setSuccess(false);
 
     try {
-      const response =await axios.post(`${homeUrl}/subcategorycreate`,formData)
+      const response =await axios.post(`${homeUrl}/subcategorycreate`,formData,   {
+            headers:{
+              'Content-Type': 'application/json',
+              authorization:`Bearer ${localStorage.getItem('token')}`
+            }
+          })
       setSuccess(true);
       return response.data;  
     } catch (err) {

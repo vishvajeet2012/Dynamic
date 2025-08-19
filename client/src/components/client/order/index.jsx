@@ -22,10 +22,9 @@ import { homeUrl } from '../../../lib/baseUrl';
 import { useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
-const stripePromise = loadStripe("you");
-
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 const StripeCardInput = ({ onCardChange, disabled }) => {
-  const stripe = useStripe();
+const stripe = useStripe();
   const elements = useElements();
 
   const cardElementOptions = {

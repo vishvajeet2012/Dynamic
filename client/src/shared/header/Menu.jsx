@@ -33,18 +33,19 @@ export default function Menu() {
                   <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
                 </Link>
               </li>
-              {categories?.filter((category) => category.isActive===true)?.map((category) => (
-                <li key={category._id}>
-                  <a 
-                    href="#" 
+              {categories?.filter((category) => category.categoryName=="Men")?.map((category) => (
+                category?.subcategories?.map((sub)=>(
+                <li key={sub._id}>
+                  <Link
+                   to={`category/${sub._id}`}
                     className="flex items-center text-gray-700 hover:text-blue-600 transition-colors
                                text-sm font-medium uppercase tracking-wide relative group"
                   >
-                    {category.categoryName}
+                    {sub?.subCategoryName}
                     <span className="absolute -bottom-3 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
-                  </a>
+                  </Link>
                 </li>
-              ))}
+            ))  ))}
             </ul>
           </nav>
 
