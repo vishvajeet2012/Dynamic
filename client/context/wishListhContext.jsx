@@ -27,10 +27,17 @@ export const WishlistProvider = ({ children }) => {
            /// setWishlistItems(response?.data);
             
             // Show success notification
-           toast (response.data.message || 'Wishlist updated successflly',
-               
-           );
-            
+      toast?.success(response.data.message || "Wishlist updated successfully", {
+  style: {
+    backgroundColor: "#e11b23",
+    color: "white",
+    fontWeight: 500,
+    borderRadius: "8px",
+    padding: "12px 16px",
+  },
+  closeButton: true,
+  duration: 3000,
+});
             // Automatically refresh the wishlist and products
           ///  setProductsWithWishlistStatus([])
             await fetchProductsWithWishlistStatus();

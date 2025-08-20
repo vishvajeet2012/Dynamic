@@ -8,13 +8,13 @@ export default function CategroyPage() {
   const [products, setProducts] = useState([]);
   const { id } = useParams(); 
 
-  const { ProductByKeys, loading, Product } = useProductByKeys();
+  const { ProductByKeys, loading, Product, } = useProductByKeys();
 
   useEffect(() => {
     if (id) {
       setData((prev) => ({
         ...prev,
-        subcategoryIds: [id], // or childCategoryIds: [id] based on your logic
+        subcategoryIds: [id], 
       }));
     }
   }, [id]);
@@ -24,14 +24,11 @@ export default function CategroyPage() {
       ProductByKeys(data);
     }
   }, [data]);
-  console.log(data,"vsiuh")
 
-  // Save products from API result
   useEffect(() => {
     setProducts(Product);
   }, [Product]);
 
-  // Merge new filters into existing `data` state
   const handleFilterUpdate = (newFilters) => {
     setData((prev) => ({
       ...prev,

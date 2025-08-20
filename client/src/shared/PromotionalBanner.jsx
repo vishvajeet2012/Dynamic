@@ -84,14 +84,13 @@ export default function PromotionalBanner({ bannerType }) {
     return (
         <div className=" lg:max-w-[89rem] 2xl:max-w-[78rem] mx-auto md:px-4 mb-6">
            <div className="text-xl text-center mt-2 md:mb-4 mb-1">
- <h1 className="pl-2 md:pl-0 text-xl md:text-4xl font-semibold text-black tracking-tight">
+ <h1 className="pl-2 md:pl-0 text-xl md:text-3xl font-semibold text-[#282c3f] tracking-tight">
      Launching Soon
     </h1>
 
            </div>
             <div className="relative overflow-hidden">
                 
-                {/* Mobile Version */}
                 <div className="block md:hidden">
                     <div className="relative h-48 overflow-hidden">
                         <div 

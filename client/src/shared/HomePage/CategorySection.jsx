@@ -75,7 +75,7 @@ export default function CategorySection({categories, categoriesLoading}){
         ) : (
           <>
             <div className="hidden md:block text-center mb-4">
-              <h1 className="text-4xl capitalize font-semibold text-black tracking-tight">
+              <h1 className="text-3xl capitalize font-semibold text-[#282c3f] tracking-tight">
                 Categories
               </h1>
              

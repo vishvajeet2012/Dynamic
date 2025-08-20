@@ -485,11 +485,10 @@ exports.getProducts = async (req, res) => {
     if (req.body.size) filter.size = { $in: [req.body.size] };
     if (req.body.isNewArrival !== undefined) filter.isNewArrival = req.body.isNewArrival;
     if (req.body.isFeatured !== undefined) filter.isFeatured = req.body.isFeatured;
-    
+  if (req.body.theme !== undefined) filter.theme= req.body.theme
     // Create a unique cache key based on the filter object
     const cacheKey = `products:${JSON.stringify(filter)}`;
     
-    // Check cache first
     const cachedData = cache.get(cacheKey);
     if (cachedData) {
       // Convert cached plain objects back to proper format

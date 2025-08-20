@@ -7,6 +7,7 @@ import RoundedCards from "../../../shared/roundedCard";
 import CategoryBanner from "../../../shared/CategoryBanner";
 import { useSubcategoryFilters } from "../../../hooks/Product/Product";
 import FullScreenLoader from "../../../shared/loading";
+import AdaptiveProductCard2 from "../../../shared/productcard2";
 
 export default function CategoryProduct({ setData, Products, Productloading, id }) {
   const [selectedPrice, setSelectedPrice] = useState([]);
@@ -18,7 +19,7 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
   const { GetAllCategories, error, categories, fetechCategories } = useGetAllCategories();
   const { childCategory, getChildCategoryById, success, loading: idLoading } = useGetChildCategoryById();
   const { getFiltersForSubcategory, filters, loading: filterLoading, error: filterError, success: filterSuccess } = useSubcategoryFilters();
-
+const [pageSelect ,setPageSelect] = useState()
   useEffect(() => {
     fetechCategories();
   }, []);
@@ -56,7 +57,8 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
     setData({ 
       childCategoryIds: selectedBrands,
       priceRanges: selectedPrice,
-      themes: selectedThemes
+      themes: selectedThemes,
+     
     });
     setShowMobileFilters(false);
   };
@@ -76,16 +78,24 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
     setProduct(Products);
   }, [Products]);
 
+  const hanldePages =(e) =>{
+
+      setPageSelect(e)
+
+  }
+
   useEffect(() => {
     setData({ 
       childCategoryIds: selectedBrands,
       priceRanges: selectedPrice,
-      themes: selectedThemes
+      themes: selectedThemes,
+     
+      page:pageSelect
     });
-  }, [selectedBrands, selectedPrice, selectedThemes]);
+  }, [selectedBrands, selectedPrice, selectedThemes,pageSelect]);
 
-  const currentPage = 1;
-  const totalPages = 5;
+  const currentPage = Product?.data?.page||1
+  const totalPages = Product?.data?.pages||5;
 
   const FilterComponent = ({ isMobile = false }) => (
     <div className={`bg-white p-4 rounded-lg shadow-sm border border-gray-100 ${isMobile ? 'h-full overflow-y-auto' : ''}`}>
@@ -171,7 +181,6 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
         </div>
       </div>
 
-      {/* Theme Filter */}
       <div className="mb-6">
         <h4 className="font-medium mb-2 flex items-center">
           Theme
@@ -246,7 +255,6 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
                 </button>
               </div>
 
-              {/* Product Count and Sort */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">
@@ -258,7 +266,7 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
                     </p>
                   )}
                 </div>
-                <div className="flex items-center w-full sm:w-auto">
+                {/* <div className="flex items-center w-full sm:w-auto">
                   <label htmlFor="sort" className="mr-2 text-sm text-gray-600 whitespace-nowrap">Sort by:</label>
                   <select
                     id="sort"
@@ -270,35 +278,30 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
                     <option value="rating">Customer Rating</option>
                     <option value="newest">Newest Arrivals</option>
                   </select>
-                </div>
+                </div> */}
               </div>
 
-              {/* Products Grid */}
               {Productloading ? (
-                <div className="flex justify-center items-center h-64">
+                <div className="flex justify-center items-center h-[95rem]">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#e11b23]"></div>
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
                     {Product?.data?.data?.map((product) => (
-                      <div key={product.id} className="w-full">
-                        <ProductCard item={product} />
+                      <div key={product._id} className="w-full">
+                        <AdaptiveProductCard2 item={product} />
                       </div>
                     ))}
                   </div>
 
-                  {/* Pagination */}
+             
                   {totalPages > 1 && (
-                    <div className="flex justify-center mt-10">
+                    <div className="flex justify-center my-10">
                       <nav className="flex items-center gap-1">
+                      
                         <button
-                          disabled={currentPage === 1}
-                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 hover:bg-gray-50"
-                        >
-                          &laquo;
-                        </button>
-                        <button
+                        onClick={()=>hanldePages(currentPage-1)}
                           disabled={currentPage === 1}
                           className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 hover:bg-gray-50"
                         >
@@ -306,7 +309,8 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
                         </button>
 
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                          <button
+                          <button 
+                          
                             key={page}
                             className={`px-3 py-1 rounded-md border transition-colors ${
                               currentPage === page 
@@ -319,17 +323,13 @@ export default function CategoryProduct({ setData, Products, Productloading, id 
                         ))}
 
                         <button
+                           onClick={()=>hanldePages(currentPage + 1)}
                           disabled={currentPage === totalPages}
                           className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 hover:bg-gray-50"
                         >
                           &rsaquo;
                         </button>
-                        <button
-                          disabled={currentPage === totalPages}
-                          className="px-3 py-1 rounded-md border border-gray-300 disabled:opacity-50 hover:bg-gray-50"
-                        >
-                          &raquo;
-                        </button>
+                    
                       </nav>
                     </div>
                   )}

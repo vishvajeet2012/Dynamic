@@ -22,7 +22,8 @@ export default function Home() {
       <NewArrivals setMainLoading={setMainLoading} titile={"New Arrival"} query={{ isNewArrival: true }} />
       <CategorySection  categoriesLoading={mainLoading} categories={categories} />
         <PromotionalBanner bannerType="promotional" />
-         <NewArrivals setMainLoading={setMainLoading} titile={"Featured"} query={{ isFeatured: true }} />
+          <NewArrivals setMainLoading={setMainLoading} titile={"Featured"} query={{ isFeatured: true }} />
+         <NewArrivals setMainLoading={setMainLoading} titile={"FANDOM HIDDEN GEMS"} query={{ theme: "Marvel" }} />
       <AboutUs />
     </>
   );

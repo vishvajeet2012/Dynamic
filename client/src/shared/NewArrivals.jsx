@@ -35,7 +35,7 @@ if(loading){
   {loading ? (
     <div className="w-48 h-8 mx-auto bg-gray-300 rounded-md animate-pulse"></div>
   ) : (
-    <h1 className="pl-2 md:pl-0 text-xl md:text-4xl font-semibold text-black tracking-tight">
+    <h1 className="pl-2 md:pl-0 text-xl md:text-3xl font-semibold text-[#282c3f] tracking-tight">
       {titile}
     </h1>
   )}

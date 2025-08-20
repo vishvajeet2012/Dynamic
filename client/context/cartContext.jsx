@@ -35,9 +35,29 @@ const [placeOrderData,setPlaceOrderData]= useState(null)
                 
                 if(response?.data?.message=== "Product already in cart, quantity updated"){
 
-                toast.error(response?.data?.message)    }
+                toast.info(response.data?.message , {
+  style: {
+    backgroundColor: "#e11b23",
+    color: "white",
+    fontWeight: 500,
+    borderRadius: "8px",
+    padding: "12px 16px",
+  },
+  closeButton: true,
+  duration: 1500,
+});    }
                 else{
-                    toast(response?.data?.message)
+                toast.success(response.data?.message , {
+  style: {
+    backgroundColor: "#e11b23",
+    color: "white",
+    fontWeight: 500,
+    borderRadius: "8px",
+    padding: "12px 16px",
+  },
+  closeButton: true,
+  duration: 1500,
+}); 
                 }
         
             await getCartItems();
@@ -62,7 +82,7 @@ const [placeOrderData,setPlaceOrderData]= useState(null)
                     authorization: `Bearer ${token}`
                 }
             });
-            
+           
             setCartItems(response?.data || []);
             return response.data;
         } catch (error) {
@@ -121,7 +141,17 @@ const [placeOrderData,setPlaceOrderData]= useState(null)
             });
             
             await getCartItems();
-            toast(response?.data?.message)
+    toast(response.data.message, {
+  style: {
+    backgroundColor: "#e11b23",
+    color: "white",
+    fontWeight: 500,
+    borderRadius: "8px",
+    padding: "12px 16px",
+  },
+  closeButton: true,
+  duration: 3000,
+});
             return response.data;
         } catch (error) {
             setError(error.response?.data?.message || 'Failed to remove cart item');

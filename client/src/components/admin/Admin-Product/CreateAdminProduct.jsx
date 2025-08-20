@@ -16,11 +16,7 @@ export default function CreateAdminProduct() {
 
   const [productData, setProductData] = useState({
     name: '',
-    description: `Material & Care:
-80% Cotton 18% Polyester 2% Elastane
-Machine Wash
-
-Country of Origin: India (and proud)`,
+    description: ``,
     basePrice: '',
     sellingPrice: '',
     discount: 0,
@@ -188,20 +184,38 @@ Country of Origin: India (and proud)`,
       theme: productData.theme
     };
 
-    console.log('Product payload:', productToCreate); // For debugging
     await createProduct(productToCreate);
+  setProductData ({   name: '',
+    description: ``,
+    basePrice: '',
+    sellingPrice: '',
+    discount: 0,
+    color: '',
+    size: [],
+    gender: 'unisex',
+    category: '',
+    subcategories: [],
+    childCategories: [],
+    stock: 0,
+    isNewArrival: false,
+    images: [],
+    slug: '',
+    theme: "",
+    isFeatured: false,
+  });
+  setPreviewImages()
   };
 
   const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'OS'];
-  const genderOptions = ['men', 'women', 'unisex'];
+  const genderOptions = ['men', 'women', 'Kid'];
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Create New Product</h1>
 
-      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error?.message|| "eror while createedign product"}</div>}
       {success && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">Product created successfully!</div>}
-      {categoriesError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">Failed to load categories: {categoriesError}</div>}
+      {categoriesError && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">Failed to load categories: {categoriesError?.message ||"error during fetch category"}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
