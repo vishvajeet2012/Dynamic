@@ -20,16 +20,15 @@ export default function AboutUs() {
   }, [getAllAboutUs]);
 
   return (
-    <div className="bg-primaryReds w-full  text-white">
+    <div className="bg-primaryReds w-full  p-4 text-white">
       <div className=" 2xl:max-w-[80rem] 2xl:mx-auto">
         {aboutUsData.map((value) => (
           <div key={value._id} className="">
-            <div className="flex">
-              <h1 className="text-2xl font-medium">{value?.heading}</h1>
+            <div className="flex flex-col justify-center text-center">
+              <h1 className="tracking-wide text-lg md:text-3xl font-medium">{value?.heading}</h1>
+              {/* <p>{value?.description}</p> */}
             </div>
-            <div className="ShortDeCription">
-              <p>{value?.description}</p>
-            </div>
+           
           </div>
         ))}
       </div>
