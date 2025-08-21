@@ -5,6 +5,7 @@ import ProductImage from './productImage';
 import { useProductDetail } from '../../../hooks/Product/Product';
 import AddToCart from '../cartPage/AddToCart';
 import LoadingBar from '../../../shared/loading'
+import NotFound from '../../404Error';
 
 const ProductPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -77,9 +78,9 @@ SetSelectedSize(e)
 
   if (loading) return <LoadingBar productDetailsPage={"productDetailsPage"}/>
   if (error) return <div>Error loading product</div>;
-
+   if(!productDetail)return <NotFound/>     
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8"> 
       <div className="flex flex-col md:flex-row gap-8">
    
         {productDetail?.images && (

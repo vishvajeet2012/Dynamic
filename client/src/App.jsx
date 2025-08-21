@@ -23,6 +23,7 @@ import CartPage from './components/client/cartPage';
 import OrderPlacementUI from './components/client/order';
 import AdminOrder from './components/admin/Adminorders';
 import ThankYouPage from './shared/ThankyouPage';
+import NotFound from './components/404Error';
 function App() {
   return (
     <>
@@ -51,8 +52,9 @@ function App() {
        
         <Route path ="/checkout"  element={<OrderPlacementUI/>}/>
         <Route path="/adminorder" element={<AdminOrder/>}/>
-        {/* Add other protected routes here */}
-      </Route>
+      
+      <Route path="*" element={<NotFound />} />     
+             </Route>
     </Routes>
     <Footer/>
     </>
